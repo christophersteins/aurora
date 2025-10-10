@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: aurora_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aurora_user
+      POSTGRES_PASSWORD: aurora_password
+      POSTGRES_DB: aurora_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aurora_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: aurora_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aurora_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  aurora_network:
+    driver: bridge
