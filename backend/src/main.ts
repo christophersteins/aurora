@@ -10,7 +10,8 @@ async function bootstrap() {
     credentials: true,
   });
   
-  await app.listen(4000);
-  console.log('Backend läuft auf: http://localhost:4000');
+  const port = process.env.PORT || 4000;
+  await app.listen(port);
+  console.log(`Backend läuft auf: http://localhost:${port}`);
 }
 bootstrap();
