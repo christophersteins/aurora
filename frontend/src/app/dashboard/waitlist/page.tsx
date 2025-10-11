@@ -19,6 +19,7 @@ export default function WaitlistDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [downloading, setDownloading] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +61,25 @@ export default function WaitlistDashboardPage() {
       setError('CSV-Export fehlgeschlagen');
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleToggleNotified = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
+    setError('');
+    
+    try {
+      await apiClient.patch(`/waitlist/${id}/notified`, {
+        notified: !currentStatus,
+      });
+
+      setEntries(entries.map(entry => 
+        entry.id === id ? { ...entry, notified: !currentStatus } : entry
+      ));
+    } catch (error) {
+      setError('Status konnte nicht aktualisiert werden');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -173,6 +193,9 @@ export default function WaitlistDashboardPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aktionen
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -204,6 +227,21 @@ export default function WaitlistDashboardPage() {
                           Ausstehend
                         </span>
                       )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => handleToggleNotified(entry.id, entry.notified)}
+                        disabled={updatingId === entry.id}
+                        className="text-indigo-600 hover:text-indigo-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {updatingId === entry.id ? (
+                          'Lädt...'
+                        ) : entry.notified ? (
+                          '↩️ Rückgängig'
+                        ) : (
+                          '✅ Als benachrichtigt markieren'
+                        )}
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Waitlist } from './entities/waitlist.entity';
@@ -12,7 +12,6 @@ export class WaitlistService {
   ) {}
 
   async join(joinWaitlistDto: JoinWaitlistDto): Promise<Waitlist> {
-    // Prüfe ob Email bereits existiert
     const existing = await this.waitlistRepository.findOne({
       where: { email: joinWaitlistDto.email },
     });
@@ -21,7 +20,6 @@ export class WaitlistService {
       throw new ConflictException('Diese E-Mail ist bereits auf der Warteliste');
     }
 
-    // Erstelle neuen Waitlist-Eintrag
     const waitlistEntry = this.waitlistRepository.create(joinWaitlistDto);
     return this.waitlistRepository.save(waitlistEntry);
   }
@@ -34,5 +32,17 @@ export class WaitlistService {
 
   async getCount(): Promise<number> {
     return this.waitlistRepository.count();
+  }
+
+  // NEU: Update notified status
+  async updateNotified(id: string, notified: boolean): Promise<Waitlist> {
+    const entry = await this.waitlistRepository.findOne({ where: { id } });
+    
+    if (!entry) {
+      throw new NotFoundException('Eintrag nicht gefunden');
+    }
+
+    entry.notified = notified;
+    return this.waitlistRepository.save(entry);
   }
 }
