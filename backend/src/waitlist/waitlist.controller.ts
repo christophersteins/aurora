@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { WaitlistService } from './waitlist.service';
 import { JoinWaitlistDto } from './dto/join-waitlist.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('waitlist')
 export class WaitlistController {
@@ -19,5 +20,11 @@ export class WaitlistController {
   async getCount() {
     const count = await this.waitlistService.getCount();
     return { count };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getAll() {
+    return this.waitlistService.getAll();
   }
 }
