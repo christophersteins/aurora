@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { getTypeOrmConfig } from './config/typeorm.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { WaitlistModule } from './waitlist/waitlist.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    WaitlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
