@@ -21,7 +21,7 @@ import { WaitlistModule } from './waitlist/waitlist.module';
     }),
     UsersModule,
     AuthModule,
-    WaitlistModule,
+    WaitlistModule,  // ← Neu hinzugefügt
   ],
   controllers: [AppController],
   providers: [AppService],
