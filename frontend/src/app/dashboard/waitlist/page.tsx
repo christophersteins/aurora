@@ -18,14 +18,12 @@ export default function WaitlistDashboardPage() {
   const [entries, setEntries] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Prüfe Authentication
         await authService.getProfile();
-
-        // Lade Waitlist-Einträge
         const response = await apiClient.get('/waitlist');
         setEntries(response.data);
       } catch (error) {
@@ -43,6 +41,28 @@ export default function WaitlistDashboardPage() {
     router.push('/login');
   };
 
+  const handleDownloadCsv = async () => {
+    setDownloading(true);
+    try {
+      const response = await apiClient.get('/waitlist/export/csv', {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `waitlist_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setError('CSV-Export fehlgeschlagen');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -53,7 +73,6 @@ export default function WaitlistDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navigation */}
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -84,16 +103,34 @@ export default function WaitlistDashboardPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Warteliste Verwaltung
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {entries.length} {entries.length === 1 ? 'Eintrag' : 'Einträge'} insgesamt
-            </p>
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                Warteliste Verwaltung
+              </h2>
+              <p className="text-gray-600 mt-1">
+                {entries.length} {entries.length === 1 ? 'Eintrag' : 'Einträge'} insgesamt
+              </p>
+            </div>
+            <button
+              onClick={handleDownloadCsv}
+              disabled={downloading || entries.length === 0}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {downloading ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  Exportiere...
+                </>
+              ) : (
+                <>
+                  <span>📥</span>
+                  CSV exportieren
+                </>
+              )}
+            </button>
           </div>
 
           {error && (
@@ -102,7 +139,6 @@ export default function WaitlistDashboardPage() {
             </div>
           )}
 
-          {/* Statistiken */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border-b border-gray-200">
             <div className="bg-indigo-50 rounded-lg p-4">
               <div className="text-indigo-600 text-sm font-medium">Gesamt</div>
@@ -124,7 +160,6 @@ export default function WaitlistDashboardPage() {
             </div>
           </div>
 
-          {/* Tabelle */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
