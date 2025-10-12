@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Waitlist } from './entities/waitlist.entity';
 import { JoinWaitlistDto } from './dto/join-waitlist.dto';
 
@@ -34,7 +34,6 @@ export class WaitlistService {
     return this.waitlistRepository.count();
   }
 
-  // NEU: Update notified status
   async updateNotified(id: string, notified: boolean): Promise<Waitlist> {
     const entry = await this.waitlistRepository.findOne({ where: { id } });
     
@@ -44,5 +43,15 @@ export class WaitlistService {
 
     entry.notified = notified;
     return this.waitlistRepository.save(entry);
+  }
+
+  // NEU: Bulk-Update
+  async bulkUpdateNotified(ids: string[], notified: boolean): Promise<number> {
+    const result = await this.waitlistRepository.update(
+      { id: In(ids) },
+      { notified }
+    );
+    
+    return result.affected || 0;
   }
 }

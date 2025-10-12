@@ -20,6 +20,8 @@ export default function WaitlistDashboardPage() {
   const [error, setError] = useState('');
   const [downloading, setDownloading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,6 +85,45 @@ export default function WaitlistDashboardPage() {
     }
   };
 
+  const handleSelectAll = () => {
+    if (selectedIds.length === entries.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(entries.map(e => e.id));
+    }
+  };
+
+  const handleSelectOne = (id: string) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  const handleBulkMarkNotified = async () => {
+    if (selectedIds.length === 0) return;
+    
+    setBulkUpdating(true);
+    setError('');
+    
+    try {
+      await apiClient.patch('/waitlist/bulk/notified', {
+        ids: selectedIds,
+        notified: true,
+      });
+
+      setEntries(entries.map(entry => 
+        selectedIds.includes(entry.id) ? { ...entry, notified: true } : entry
+      ));
+      setSelectedIds([]);
+    } catch (error) {
+      setError('Bulk-Update fehlgeschlagen');
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -132,25 +173,51 @@ export default function WaitlistDashboardPage() {
               </h2>
               <p className="text-gray-600 mt-1">
                 {entries.length} {entries.length === 1 ? 'Eintrag' : 'Einträge'} insgesamt
+                {selectedIds.length > 0 && (
+                  <span className="ml-2 text-indigo-600 font-medium">
+                    ({selectedIds.length} ausgewählt)
+                  </span>
+                )}
               </p>
             </div>
-            <button
-              onClick={handleDownloadCsv}
-              disabled={downloading || entries.length === 0}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {downloading ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  Exportiere...
-                </>
-              ) : (
-                <>
-                  <span>📥</span>
-                  CSV exportieren
-                </>
+            <div className="flex gap-3">
+              {selectedIds.length > 0 && (
+                <button
+                  onClick={handleBulkMarkNotified}
+                  disabled={bulkUpdating}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {bulkUpdating ? (
+                    <>
+                      <span className="animate-spin">⏳</span>
+                      Aktualisiere...
+                    </>
+                  ) : (
+                    <>
+                      <span>✅</span>
+                      Ausgewählte als benachrichtigt markieren
+                    </>
+                  )}
+                </button>
               )}
-            </button>
+              <button
+                onClick={handleDownloadCsv}
+                disabled={downloading || entries.length === 0}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {downloading ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    Exportiere...
+                  </>
+                ) : (
+                  <>
+                    <span>📥</span>
+                    CSV exportieren
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -184,6 +251,14 @@ export default function WaitlistDashboardPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-6 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.length === entries.length && entries.length > 0}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     E-Mail
                   </th>
@@ -201,6 +276,14 @@ export default function WaitlistDashboardPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {entries.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(entry.id)}
+                        onChange={() => handleSelectOne(entry.id)}
+                        className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         {entry.email}
