@@ -45,13 +45,27 @@ export class WaitlistService {
     return this.waitlistRepository.save(entry);
   }
 
-  // NEU: Bulk-Update
   async bulkUpdateNotified(ids: string[], notified: boolean): Promise<number> {
     const result = await this.waitlistRepository.update(
       { id: In(ids) },
       { notified }
     );
     
+    return result.affected || 0;
+  }
+
+  // NEU: Einzelnen Eintrag löschen
+  async delete(id: string): Promise<void> {
+    const result = await this.waitlistRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException('Eintrag nicht gefunden');
+    }
+  }
+
+  // NEU: Mehrere Einträge löschen
+  async bulkDelete(ids: string[]): Promise<number> {
+    const result = await this.waitlistRepository.delete({ id: In(ids) });
     return result.affected || 0;
   }
 }
