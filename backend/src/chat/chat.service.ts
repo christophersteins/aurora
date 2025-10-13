@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
+import { Conversation } from './entities/conversation.entity';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
@@ -9,68 +10,94 @@ export class ChatService {
   constructor(
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
+    @InjectRepository(Conversation)
+    private conversationRepository: Repository<Conversation>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
-  async createMessage(senderId: string, recipientId: string, content: string): Promise<Message> {
+  async sendMessage(
+    conversationId: string,
+    senderId: string,
+    content: string,
+  ): Promise<Message> {
+    const conversation = await this.conversationRepository.findOne({
+      where: { id: conversationId },
+      relations: ['participants'],
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    // Check if sender is participant
+    const isParticipant = conversation.participants.some(
+      (participant) => participant.id === senderId,
+    );
+
+    if (!isParticipant) {
+      throw new NotFoundException('User is not a participant in this conversation');
+    }
+
     const message = this.messageRepository.create({
       content,
-      sender: { id: senderId } as User,
-      recipient: { id: recipientId } as User,
+      senderId,
+      conversationId,
     });
+
     return await this.messageRepository.save(message);
   }
 
-  async sendMessage(senderId: string, recipientId: string, content: string): Promise<Message> {
-    return this.createMessage(senderId, recipientId, content);
-  }
-
-  async getMessages(userId: string, otherUserId: string): Promise<Message[]> {
+  async getConversationMessages(conversationId: string): Promise<Message[]> {
     return await this.messageRepository.find({
-      where: [
-        { sender: { id: userId }, recipient: { id: otherUserId } },
-        { sender: { id: otherUserId }, recipient: { id: userId } },
-      ],
+      where: { conversationId },
+      relations: ['sender'],
       order: { createdAt: 'ASC' },
-      relations: ['sender', 'recipient'],
     });
   }
 
-  async getConversation(userId: string, otherUserId: string): Promise<Message[]> {
-    return this.getMessages(userId, otherUserId);
-  }
-
-  async markMessagesAsRead(userId: string, otherUserId: string): Promise<void> {
-    await this.messageRepository.update(
-      {
-        sender: { id: otherUserId },
-        recipient: { id: userId },
-        isRead: false,
-      },
-      { isRead: true }
-    );
-  }
-
-  async getConversations(userId: string): Promise<any[]> {
-    const messages = await this.messageRepository
-      .createQueryBuilder('message')
+  async getUserConversations(userId: string): Promise<Conversation[]> {
+    return await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .leftJoinAndSelect('conversation.participants', 'participant')
+      .leftJoinAndSelect('conversation.messages', 'message')
       .leftJoinAndSelect('message.sender', 'sender')
-      .leftJoinAndSelect('message.recipient', 'recipient')
-      .where('message.senderId = :userId OR message.recipientId = :userId', { userId })
-      .orderBy('message.createdAt', 'DESC')
+      .where('participant.id = :userId', { userId })
+      .orderBy('conversation.updatedAt', 'DESC')
       .getMany();
+  }
 
-    const conversationsMap = new Map();
-    messages.forEach(message => {
-      const otherUserId = message.sender.id === userId ? message.recipient.id : message.sender.id;
-      if (!conversationsMap.has(otherUserId)) {
-        conversationsMap.set(otherUserId, {
-          user: message.sender.id === userId ? message.recipient : message.sender,
-          lastMessage: message,
-          unreadCount: 0,
-        });
-      }
+  async createConversation(
+    userId: string,
+    otherUserId: string,
+  ): Promise<Conversation> {
+    // Check if conversation already exists
+    const existingConversation = await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .leftJoin('conversation.participants', 'participant')
+      .where('participant.id IN (:...userIds)', { userIds: [userId, otherUserId] })
+      .groupBy('conversation.id')
+      .having('COUNT(DISTINCT participant.id) = 2')
+      .getOne();
+
+    if (existingConversation) {
+      return existingConversation;
+    }
+
+    // Create new conversation
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const otherUser = await this.userRepository.findOne({
+      where: { id: otherUserId },
     });
 
-    return Array.from(conversationsMap.values());
+    if (!user || !otherUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    const conversation = this.conversationRepository.create({
+      participants: [user, otherUser],
+    });
+
+    return await this.conversationRepository.save(conversation);
   }
 }

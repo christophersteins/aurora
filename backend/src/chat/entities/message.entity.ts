@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Conversation } from './conversation.entity';
 
 @Entity('messages')
 export class Message {
@@ -9,15 +17,20 @@ export class Message {
   @Column('text')
   content: string;
 
-  @ManyToOne(() => User, { eager: false })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'sender_id' })
   sender: User;
 
-  @ManyToOne(() => User, { eager: false })
-  recipient: User;
+  @Column({ name: 'sender_id' })
+  senderId: string;
 
-  @Column({ default: false })
-  isRead: boolean;
+  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
+  @JoinColumn({ name: 'conversation_id' })
+  conversation: Conversation;
 
-  @CreateDateColumn()
+  @Column({ name: 'conversation_id' })
+  conversationId: string;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
