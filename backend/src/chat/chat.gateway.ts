@@ -97,7 +97,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const messages = await this.chatService.getMessages(data.conversationId);
+      const messages = await this.chatService.getMessages(client.data.userId, data.conversationId);
       return { event: 'messages', data: messages };
     } catch (error) {
       console.error('Error getting messages:', error);
