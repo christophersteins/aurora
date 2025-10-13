@@ -12,7 +12,15 @@
     "build": "npm run build --workspace=frontend && npm run build --workspace=backend",
     "lint": "npm run lint --workspaces"
   },
-  "keywords": ["social", "video", "chat", "geolocation"],
+  "keywords": [
+    "social",
+    "video",
+    "chat",
+    "geolocation"
+  ],
   "author": "christophersteins",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "zustand": "^5.0.8"
+  }
 }
