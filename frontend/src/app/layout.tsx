@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-import QueryProvider from '@/providers/query-provider';
-
-const inter = Inter({ subsets: ['latin'] });
+import { SocketProvider } from '@/contexts/SocketContext';
 
 export const metadata: Metadata = {
   title: 'Aurora',
@@ -17,8 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de">
-      <body className={inter.className}>
-        <QueryProvider>{children}</QueryProvider>
+      <body>
+        <SocketProvider>
+          {children}
+        </SocketProvider>
       </body>
     </html>
   );
