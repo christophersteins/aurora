@@ -15,10 +15,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Sicherstellen, dass messages immer ein Array ist
+  const messageList = Array.isArray(messages) ? messages : [];
+
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messageList]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,12 +50,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
       {/* Nachrichten-Liste */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length === 0 ? (
+        {messageList.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-400">
             Noch keine Nachrichten. Schreibe die erste!
           </div>
         ) : (
-          messages.map((message) => (
+          messageList.map((message) => (
             <ChatMessage
               key={message.id}
               message={message}
