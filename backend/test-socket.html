@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora Socket.io Test</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .connected { background: #d4edda; color: #155724; }
+    .disconnected { background: #f8d7da; color: #721c24; }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    #logs {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Aurora Socket.io Test</h1>
+    
+    <div id="status" class="status disconnected">
+      ❌ Nicht verbunden
+    </div>
+
+    <div>
+      <button onclick="connectSocket()">Verbinden</button>
+      <button onclick="disconnectSocket()">Trennen</button>
+      <button onclick="registerUser()">User Registrieren (Test-ID: test-user-123)</button>
+      <button onclick="joinConversation()">Conversation Beitreten (Test-ID: conv-456)</button>
+      <button onclick="sendTestMessage()">Test-Nachricht Senden</button>
+    </div>
+
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    let socket = null;
+    const testUserId = 'test-user-123';
+    const testConversationId = 'conv-456';
+
+    function log(message, type = 'info') {
+      const logsDiv = document.getElementById('logs');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+      logsDiv.appendChild(entry);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    function updateStatus(connected) {
+      const statusDiv = document.getElementById('status');
+      if (connected) {
+        statusDiv.className = 'status connected';
+        statusDiv.textContent = '✅ Verbunden';
+      } else {
+        statusDiv.className = 'status disconnected';
+        statusDiv.textContent = '❌ Nicht verbunden';
+      }
+    }
+
+    function connectSocket() {
+      if (socket && socket.connected) {
+        log('⚠️ Bereits verbunden!');
+        return;
+      }
+
+      socket = io('http://localhost:4000', {
+        transports: ['websocket'],
+        reconnection: true
+      });
+
+      socket.on('connect', () => {
+        log('✅ Verbindung hergestellt! Socket ID: ' + socket.id);
+        updateStatus(true);
+      });
+
+      socket.on('disconnect', () => {
+        log('❌ Verbindung getrennt');
+        updateStatus(false);
+      });
+
+      socket.on('connect_error', (error) => {
+        log('❌ Verbindungsfehler: ' + error.message);
+        updateStatus(false);
+      });
+
+      socket.on('message:received', (data) => {
+        log('📨 Nachricht empfangen: ' + JSON.stringify(data, null, 2));
+      });
+
+      socket.on('error', (data) => {
+        log('❌ Server-Fehler: ' + JSON.stringify(data));
+      });
+    }
+
+    function disconnectSocket() {
+      if (socket) {
+        socket.disconnect();
+        log('🔌 Trennung initiiert');
+      } else {
+        log('⚠️ Keine aktive Verbindung');
+      }
+    }
+
+    function registerUser() {
+      if (!socket || !socket.connected) {
+        log('⚠️ Nicht verbunden! Erst verbinden.');
+        return;
+      }
+      socket.emit('user:register', { userId: testUserId });
+      log('👤 User registriert: ' + testUserId);
+    }
+
+    function joinConversation() {
+      if (!socket || !socket.connected) {
+        log('⚠️ Nicht verbunden! Erst verbinden.');
+        return;
+      }
+      socket.emit('conversation:join', { conversationId: testConversationId });
+      log('💬 Conversation beigetreten: ' + testConversationId);
+    }
+
+    function sendTestMessage() {
+      if (!socket || !socket.connected) {
+        log('⚠️ Nicht verbunden! Erst verbinden.');
+        return;
+      }
+      const message = {
+        conversationId: testConversationId,
+        content: 'Hallo, das ist eine Test-Nachricht! 🚀',
+        senderId: testUserId
+      };
+      socket.emit('message:send', message);
+      log('📤 Nachricht gesendet: ' + message.content);
+    }
+
+    // Auto-connect beim Laden
+    window.onload = () => {
+      log('🎯 Test-Client geladen. Klicke auf "Verbinden" um zu starten.');
+    };
+  </script>
+</body>
+</html>
