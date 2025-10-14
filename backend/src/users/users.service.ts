@@ -79,4 +79,55 @@ export class UsersService {
 
     return user;
   }
+
+  /**
+   * Findet Benutzer im Umkreis eines Standorts
+   * @param latitude - Breitengrad des Zentrums
+   * @param longitude - Längengrad des Zentrums
+   * @param radiusInKm - Suchradius in Kilometern
+   * @param excludeUserId - Optional: User-ID, die ausgeschlossen werden soll (z.B. der anfragende User)
+   */
+  async findUsersWithinRadius(
+    latitude: number,
+    longitude: number,
+    radiusInKm: number,
+    excludeUserId?: string,
+  ): Promise<User[]> {
+    // Validierung
+    if (latitude < -90 || latitude > 90) {
+      throw new Error('Latitude must be between -90 and 90');
+    }
+    if (longitude < -180 || longitude > 180) {
+      throw new Error('Longitude must be between -180 and 180');
+    }
+    if (radiusInKm <= 0) {
+      throw new Error('Radius must be greater than 0');
+    }
+
+    const point = `SRID=4326;POINT(${longitude} ${latitude})`;
+
+    // QueryBuilder mit PostGIS ST_DWithin
+    // ST_DWithin prüft, ob Distanz <= radius (in Metern)
+    const query = this.usersRepository
+      .createQueryBuilder('user')
+      .where(
+        `ST_DWithin(
+          user.location::geography,
+          ST_GeomFromText(:point)::geography,
+          :radius
+        )`,
+        {
+          point,
+          radius: radiusInKm * 1000, // Konvertierung: km -> Meter
+        },
+      )
+      .andWhere('user.location IS NOT NULL'); // Nur User mit Standort
+
+    // Optional: Eigene User-ID ausschließen
+    if (excludeUserId) {
+      query.andWhere('user.id != :excludeUserId', { excludeUserId });
+    }
+
+    return query.getMany();
+  }
 }
