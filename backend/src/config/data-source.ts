@@ -12,7 +12,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'aurora_user',
   password: process.env.DB_PASSWORD || 'aurora_password',
   database: process.env.DB_DATABASE || 'aurora_db',
-  entities: [User, Message], // Nur User und Message
+  entities: [User, Message],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
+  logging: true, // Hilfreich für Debugging
 });
