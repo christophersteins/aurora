@@ -15,18 +15,14 @@ const SocketContext = createContext<SocketContextType>({
 
 export const useSocket = () => useContext(SocketContext);
 
-export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const socketInstance = io('http://localhost:4000', {
+      transports: ['websocket', 'polling'],
       autoConnect: true,
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
     });
 
     socketInstance.on('connect', () => {
@@ -37,10 +33,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     socketInstance.on('disconnect', () => {
       console.log('❌ Socket disconnected');
       setIsConnected(false);
-    });
-
-    socketInstance.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
     });
 
     setSocket(socketInstance);
