@@ -1,94 +1,99 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ChatMessage } from './ChatMessage';
-import { useChat } from '@/hooks/useChat';
+'use client';
+
+import React, { useState } from 'react';
+
+interface Message {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: Date;
+}
 
 interface ChatWindowProps {
-  recipientId: string;
+  conversationId: string | null;
   currentUserId: string;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({
-  recipientId,
-  currentUserId,
-}) => {
-  const { messages, sendMessage, isConnected } = useChat(recipientId);
+export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Sicherstellen, dass messages immer ein Array ist
-  const messageList = Array.isArray(messages) ? messages : [];
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || !conversationId) return;
 
-  // Auto-scroll zu neuen Nachrichten
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messageList]);
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      senderId: currentUserId,
+      content: inputValue,
+      timestamp: new Date(),
+    };
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputValue.trim() && isConnected) {
-      sendMessage(inputValue.trim());
-      setInputValue('');
-    }
+    setMessages([...messages, newMessage]);
+    setInputValue('');
+    console.log('📤 Nachricht gesendet:', newMessage);
   };
 
+  if (!conversationId) {
+    return (
+      <div className="flex items-center justify-center h-full bg-gray-50">
+        <p className="text-gray-500">Wähle eine Konversation aus</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-white">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
-        <h2 className="text-lg font-semibold">Chat</h2>
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          />
-          <span className="text-xs text-gray-600">
-            {isConnected ? 'Verbunden' : 'Getrennt'}
-          </span>
-        </div>
+      <div className="p-4 border-b bg-gray-100">
+        <h2 className="font-semibold">Chat #{conversationId}</h2>
       </div>
 
-      {/* Nachrichten-Liste */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messageList.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            Noch keine Nachrichten. Schreibe die erste!
-          </div>
+      {/* Nachrichten */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.length === 0 ? (
+          <p className="text-gray-400 text-center">Noch keine Nachrichten</p>
         ) : (
-          messageList.map((message) => (
-            <ChatMessage
-              key={message.id}
-              message={message}
-              isOwnMessage={message.senderId === currentUserId}
-            />
+          messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs px-4 py-2 rounded-lg ${
+                  msg.senderId === currentUserId
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                <p>{msg.content}</p>
+                <span className="text-xs opacity-75">
+                  {msg.timestamp.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </div>
           ))
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Eingabefeld */}
-      <form
-        onSubmit={handleSendMessage}
-        className="border-t px-4 py-3 bg-gray-50"
-      >
+      <div className="p-4 border-t bg-gray-50">
         <div className="flex gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Nachricht schreiben..."
-            disabled={!isConnected}
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            placeholder="Nachricht eingeben..."
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
-            type="submit"
-            disabled={!inputValue.trim() || !isConnected}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            onClick={handleSendMessage}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
           >
             Senden
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

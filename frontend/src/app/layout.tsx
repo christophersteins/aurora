@@ -1,3 +1,4 @@
+import './globals.css'
 import { SocketProvider } from '@/contexts/SocketContext';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
