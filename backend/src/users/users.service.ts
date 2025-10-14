@@ -107,12 +107,12 @@ export class UsersService {
     const point = `SRID=4326;POINT(${longitude} ${latitude})`;
 
     // QueryBuilder mit PostGIS ST_DWithin
-    // ST_DWithin prüft, ob Distanz <= radius (in Metern)
+    // WICHTIG: Tabellen- und Spaltennamen müssen escaped sein!
     const query = this.usersRepository
       .createQueryBuilder('user')
       .where(
         `ST_DWithin(
-          user.location::geography,
+          "user"."location"::geography,
           ST_GeomFromText(:point)::geography,
           :radius
         )`,
@@ -121,11 +121,11 @@ export class UsersService {
           radius: radiusInKm * 1000, // Konvertierung: km -> Meter
         },
       )
-      .andWhere('user.location IS NOT NULL'); // Nur User mit Standort
+      .andWhere('"user"."location" IS NOT NULL'); // Nur User mit Standort
 
     // Optional: Eigene User-ID ausschließen
     if (excludeUserId) {
-      query.andWhere('user.id != :excludeUserId', { excludeUserId });
+      query.andWhere('"user"."id" != :excludeUserId', { excludeUserId });
     }
 
     return query.getMany();
