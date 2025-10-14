@@ -14,11 +14,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ unique: true })
-  username: string;
-
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  username: string;
 
   @Column({ nullable: true })
   firstName: string;
@@ -27,16 +27,16 @@ export class User {
   lastName: string;
 
   @Column({ nullable: true })
-  avatarUrl: string;
+  profilePicture: string;
 
-  @Column({ default: false })
-  isPremium: boolean;
-
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
-  latitude: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
-  longitude: number;
+  // Geolocation-Feld für PostGIS
+  @Column({
+    type: 'geometry',
+    spatialFeatureType: 'Point',
+    srid: 4326, // WGS84 (Standard für GPS-Koordinaten)
+    nullable: true,
+  })
+  location: string; // GeoJSON oder WKT Format
 
   @CreateDateColumn()
   createdAt: Date;
