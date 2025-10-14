@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSocket } from '@/contexts/SocketContext';
 
 interface Message {
   id: string;
@@ -15,22 +16,49 @@ interface ChatWindowProps {
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
+  const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim() || !conversationId) return;
+  // Socket-Listener für eingehende Nachrichten
+  useEffect(() => {
+    if (!socket || !conversationId) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      senderId: currentUserId,
-      content: inputValue,
-      timestamp: new Date(),
+    const eventName = `message:${conversationId}`;
+
+    const handleMessage = (message: any) => {
+      console.log('📥 Nachricht empfangen:', message);
+      setMessages((prev) => [...prev, {
+        ...message,
+        timestamp: new Date(message.timestamp),
+      }]);
     };
 
-    setMessages([...messages, newMessage]);
+    socket.on(eventName, handleMessage);
+
+    return () => {
+      socket.off(eventName, handleMessage);
+    };
+  }, [socket, conversationId]);
+
+  // Nachrichten zurücksetzen bei Konversationswechsel
+  useEffect(() => {
+    setMessages([]);
+  }, [conversationId]);
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || !conversationId || !socket) return;
+
+    const messageData = {
+      conversationId,
+      senderId: currentUserId,
+      content: inputValue,
+    };
+
+    console.log('📤 Sende Nachricht:', messageData);
+    socket.emit('sendMessage', messageData);
+    
     setInputValue('');
-    console.log('📤 Nachricht gesendet:', newMessage);
   };
 
   if (!conversationId) {
@@ -44,8 +72,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="p-4 border-b bg-gray-100">
+      <div className="p-4 border-b bg-gray-100 flex justify-between items-center">
         <h2 className="font-semibold">Chat #{conversationId}</h2>
+        <span className={`text-sm ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
+          {isConnected ? '🟢 Verbunden' : '🔴 Getrennt'}
+        </span>
       </div>
 
       {/* Nachrichten */}
@@ -84,11 +115,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Nachricht eingeben..."
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={!isConnected}
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           />
           <button
             onClick={handleSendMessage}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            disabled={!isConnected}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-gray-300"
           >
             Senden
           </button>
