@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 
@@ -63,5 +63,46 @@ export class ChatService {
 
   async markAsRead(messageId: string): Promise<void> {
     await this.messageRepository.update(messageId, { isRead: true });
+  }
+
+  async getUserConversationsWithLastMessage(userId: string): Promise<any[]> {
+    const conversations = await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where(':userId = ANY(conversation.participants)', { userId })
+      .orderBy('conversation.updatedAt', 'DESC')
+      .getMany();
+
+    // Für jede Konversation die letzte Nachricht laden
+    const conversationsWithMessages = await Promise.all(
+      conversations.map(async (conv) => {
+        const lastMessage = await this.messageRepository.findOne({
+          where: { conversationId: conv.id },
+          order: { createdAt: 'DESC' },
+        });
+
+        const unreadCount = await this.messageRepository.count({
+          where: {
+            conversationId: conv.id,
+            isRead: false,
+            senderId: Not(userId),
+          },
+        });
+
+        // Andere Teilnehmer ermitteln
+        const otherUserId = conv.participants.find(p => p !== userId);
+
+        return {
+          id: conv.id,
+          otherUserId,
+          otherUserName: `User ${otherUserId}`, // TODO: Später mit echten User-Daten ersetzen
+          lastMessage: lastMessage?.content || null,
+          lastMessageTime: lastMessage?.createdAt || conv.updatedAt,
+          unreadCount,
+          updatedAt: conv.updatedAt,
+        };
+      })
+    );
+
+    return conversationsWithMessages;
   }
 }
