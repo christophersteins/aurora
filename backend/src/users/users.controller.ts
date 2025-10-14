@@ -1,23 +1,34 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Param, 
+  Delete,
+  Put,
+  UseGuards 
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { User } from './entities/user.entity';
+import { UpdateLocationDto } from './dto/update-location.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+  // ... bestehende Endpoints (findAll, findOne, create, remove)
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Put(':id/location')
+  @UseGuards(JwtAuthGuard)
+  async updateLocation(
+    @Param('id') id: string,
+    @Body() updateLocationDto: UpdateLocationDto,
+  ): Promise<User> {
+    return this.usersService.updateLocation(
+      id,
+      updateLocationDto.latitude,
+      updateLocationDto.longitude,
+    );
   }
 }
