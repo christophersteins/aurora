@@ -19,19 +19,47 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Socket-Listener für eingehende Nachrichten
+  // Nachrichten aus DB laden, wenn Konversation gewählt wird
+  useEffect(() => {
+    if (!socket || !conversationId) return;
+
+    setIsLoading(true);
+    console.log('📂 Lade Nachrichten für Konversation:', conversationId);
+
+    socket.emit('loadMessages', { conversationId }, (response: any) => {
+      if (response?.success && response.messages) {
+        const loadedMessages = response.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.createdAt),
+        }));
+        setMessages(loadedMessages);
+        console.log('✅ Nachrichten geladen:', loadedMessages.length);
+      }
+      setIsLoading(false);
+    });
+  }, [socket, conversationId]);
+
+  // Socket-Listener für neue eingehende Nachrichten
   useEffect(() => {
     if (!socket || !conversationId) return;
 
     const eventName = `message:${conversationId}`;
 
     const handleMessage = (message: any) => {
-      console.log('📥 Nachricht empfangen:', message);
-      setMessages((prev) => [...prev, {
-        ...message,
-        timestamp: new Date(message.timestamp),
-      }]);
+      console.log('📥 Neue Nachricht empfangen:', message);
+      
+      // Prüfe ob Nachricht bereits existiert (verhindert Duplikate)
+      setMessages((prev) => {
+        const exists = prev.some(m => m.id === message.id);
+        if (exists) return prev;
+        
+        return [...prev, {
+          ...message,
+          timestamp: new Date(message.timestamp),
+        }];
+      });
     };
 
     socket.on(eventName, handleMessage);
@@ -40,11 +68,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
       socket.off(eventName, handleMessage);
     };
   }, [socket, conversationId]);
-
-  // Nachrichten zurücksetzen bei Konversationswechsel
-  useEffect(() => {
-    setMessages([]);
-  }, [conversationId]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim() || !conversationId || !socket) return;
@@ -81,7 +104,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
       {/* Nachrichten */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 ? (
+        {isLoading ? (
+          <p className="text-gray-400 text-center">Lade Nachrichten...</p>
+        ) : messages.length === 0 ? (
           <p className="text-gray-400 text-center">Noch keine Nachrichten</p>
         ) : (
           messages.map((msg) => (
@@ -115,12 +140,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Nachricht eingeben..."
-            disabled={!isConnected}
+            disabled={!isConnected || isLoading}
             className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           />
           <button
             onClick={handleSendMessage}
-            disabled={!isConnected}
+            disabled={!isConnected || isLoading}
             className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-gray-300"
           >
             Senden
