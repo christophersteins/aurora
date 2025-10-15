@@ -23,8 +23,15 @@ export default function EscortProfileForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Funktion zum Formatieren des Datums für das Input-Feld
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
   const [formData, setFormData] = useState<UpdateEscortProfileDto>({
-    birthDate: user?.birthDate || '',
+    birthDate: formatDateForInput(user?.birthDate),
     nationalities: user?.nationalities || [],
     languages: user?.languages || [],
     height: user?.height || undefined,
@@ -36,6 +43,7 @@ export default function EscortProfileForm() {
     eyeColor: user?.eyeColor || '',
     hasTattoos: user?.hasTattoos || false,
     hasPiercings: user?.hasPiercings || false,
+    isSmoker: user?.isSmoker || false,
     description: user?.description || '',
   });
 
@@ -82,28 +90,6 @@ export default function EscortProfileForm() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleNationality = (nationality: string) => {
-    setFormData((prev) => {
-      const current = prev.nationalities || [];
-      if (current.includes(nationality)) {
-        return { ...prev, nationalities: current.filter((n) => n !== nationality) };
-      } else {
-        return { ...prev, nationalities: [...current, nationality] };
-      }
-    });
-  };
-
-  const toggleLanguage = (language: string) => {
-    setFormData((prev) => {
-      const current = prev.languages || [];
-      if (current.includes(language)) {
-        return { ...prev, languages: current.filter((l) => l !== language) };
-      } else {
-        return { ...prev, languages: [...current, language] };
-      }
-    });
   };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,44 +216,52 @@ export default function EscortProfileForm() {
           />
         </div>
 
-        {/* Nationalitäten (Mehrfachauswahl) */}
+        {/* Nationalität (Mehrfachauswahl mit Select) */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Nationalitäten (Mehrfachauswahl)
-          </label>
-          <div className="border rounded p-3 max-h-48 overflow-y-auto">
+          <label className="block text-sm font-medium mb-2">Nationalität</label>
+          <select
+            multiple
+            value={formData.nationalities || []}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions, option => option.value);
+              setFormData({ ...formData, nationalities: selected });
+            }}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            size={5}
+          >
             {NATIONALITIES.map((nationality) => (
-              <label key={nationality} className="flex items-center mb-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.nationalities?.includes(nationality)}
-                  onChange={() => toggleNationality(nationality)}
-                  className="mr-2"
-                />
-                <span>{nationality}</span>
-              </label>
+              <option key={nationality} value={nationality}>
+                {nationality}
+              </option>
             ))}
-          </div>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Halte Strg (Windows) oder Cmd (Mac) gedrückt, um mehrere auszuwählen
+          </p>
         </div>
 
-        {/* Sprachen (Mehrfachauswahl) */}
+        {/* Sprachen (Mehrfachauswahl mit Select) */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Sprachen (Mehrfachauswahl)
-          </label>
-          <div className="border rounded p-3 max-h-48 overflow-y-auto">
+          <label className="block text-sm font-medium mb-2">Sprachen</label>
+          <select
+            multiple
+            value={formData.languages || []}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions, option => option.value);
+              setFormData({ ...formData, languages: selected });
+            }}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            size={5}
+          >
             {LANGUAGES.map((language) => (
-              <label key={language} className="flex items-center mb-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.languages?.includes(language)}
-                  onChange={() => toggleLanguage(language)}
-                  className="mr-2"
-                />
-                <span>{language}</span>
-              </label>
+              <option key={language} value={language}>
+                {language}
+              </option>
             ))}
-          </div>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Halte Strg (Windows) oder Cmd (Mac) gedrückt, um mehrere auszuwählen
+          </p>
         </div>
 
         {/* Größe */}
@@ -389,59 +383,90 @@ export default function EscortProfileForm() {
           </select>
         </div>
 
-        {/* Tattoos */}
-        <div className="flex items-center">
-          <label className="flex items-center cursor-pointer">
-            <span className="mr-3 text-sm font-medium">Tattoos</span>
-            <div className="relative">
+        {/* Raucher/in */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Raucher/in</label>
+          <div className="flex gap-4">
+            <label className="flex items-center cursor-pointer">
               <input
-                type="checkbox"
-                checked={formData.hasTattoos}
-                onChange={(e) => setFormData({ ...formData, hasTattoos: e.target.checked })}
-                className="sr-only"
+                type="radio"
+                name="isSmoker"
+                checked={formData.isSmoker === false}
+                onChange={() => setFormData({ ...formData, isSmoker: false })}
+                className="mr-2"
               />
-              <div
-                className={`block w-14 h-8 rounded-full ${
-                  formData.hasTattoos ? 'bg-blue-500' : 'bg-gray-300'
-                }`}
-              ></div>
-              <div
-                className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${
-                  formData.hasTattoos ? 'transform translate-x-6' : ''
-                }`}
-              ></div>
-            </div>
-          </label>
+              <span>Nein</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="isSmoker"
+                checked={formData.isSmoker === true}
+                onChange={() => setFormData({ ...formData, isSmoker: true })}
+                className="mr-2"
+              />
+              <span>Ja</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Tattoos */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Tattoos</label>
+          <div className="flex gap-4">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="hasTattoos"
+                checked={formData.hasTattoos === false}
+                onChange={() => setFormData({ ...formData, hasTattoos: false })}
+                className="mr-2"
+              />
+              <span>Nein</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="hasTattoos"
+                checked={formData.hasTattoos === true}
+                onChange={() => setFormData({ ...formData, hasTattoos: true })}
+                className="mr-2"
+              />
+              <span>Ja</span>
+            </label>
+          </div>
         </div>
 
         {/* Piercings */}
-        <div className="flex items-center">
-          <label className="flex items-center cursor-pointer">
-            <span className="mr-3 text-sm font-medium">Piercings</span>
-            <div className="relative">
+        <div>
+          <label className="block text-sm font-medium mb-2">Piercings</label>
+          <div className="flex gap-4">
+            <label className="flex items-center cursor-pointer">
               <input
-                type="checkbox"
-                checked={formData.hasPiercings}
-                onChange={(e) => setFormData({ ...formData, hasPiercings: e.target.checked })}
-                className="sr-only"
+                type="radio"
+                name="hasPiercings"
+                checked={formData.hasPiercings === false}
+                onChange={() => setFormData({ ...formData, hasPiercings: false })}
+                className="mr-2"
               />
-              <div
-                className={`block w-14 h-8 rounded-full ${
-                  formData.hasPiercings ? 'bg-blue-500' : 'bg-gray-300'
-                }`}
-              ></div>
-              <div
-                className={`absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${
-                  formData.hasPiercings ? 'transform translate-x-6' : ''
-                }`}
-              ></div>
-            </div>
-          </label>
+              <span>Nein</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="hasPiercings"
+                checked={formData.hasPiercings === true}
+                onChange={() => setFormData({ ...formData, hasPiercings: true })}
+                className="mr-2"
+              />
+              <span>Ja</span>
+            </label>
+          </div>
         </div>
 
-        {/* Beschreibung */}
+        {/* Über mich */}
         <div>
-          <label className="block text-sm font-medium mb-2">Beschreibung</label>
+          <label className="block text-sm font-medium mb-2">Über mich</label>
           <textarea
             value={formData.description || ''}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
