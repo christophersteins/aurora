@@ -1,10 +1,12 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
+  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
+import { UserRole } from '../enums/user-role.enum';
 
 @Entity('users')
 export class User {
@@ -12,35 +14,46 @@ export class User {
   id: string;
 
   @Column({ unique: true })
+  @Index()
   email: string;
-
-  @Column()
-  password: string;
 
   @Column({ nullable: true })
   username: string;
 
-  @Column({ nullable: true })
+  @Column()
+  password: string;
+
+  @Column({ name: 'first_name', nullable: true })
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'last_name', nullable: true })
   lastName: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'profile_picture', nullable: true })
   profilePicture: string;
 
-  // Geolocation-Feld für PostGIS
   @Column({
-    type: 'geometry',
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CUSTOMER,
+  })
+  @Index()
+  role: UserRole;
+
+  @Column({
+    type: 'geography',
     spatialFeatureType: 'Point',
-    srid: 4326, // WGS84 (Standard für GPS-Koordinaten)
+    srid: 4326,
     nullable: true,
   })
-  location: string; // GeoJSON oder WKT Format
+  location: {
+    type: string;
+    coordinates: [number, number];
+  };
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
