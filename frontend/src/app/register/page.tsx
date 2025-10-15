@@ -2,69 +2,66 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/services/auth.service';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-  });
-  const [error, setError] = useState('');
+  const { setAuth } = useAuthStore();
+  
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validierung
+    if (password !== confirmPassword) {
+      setError('Passwörter stimmen nicht überein');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Passwort muss mindestens 8 Zeichen lang sein');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await authService.register(formData);
-      localStorage.setItem('auth_token', response.access_token);
-      router.push('/dashboard');
+      const response = await authService.register({ email, username, password });
+      setAuth(response.user, response.access_token);
+      router.push('/'); // Redirect zur Homepage
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message;
-      if (Array.isArray(errorMessage)) {
-        setError(errorMessage.join(', '));
-      } else {
-        setError(errorMessage || 'Registrierung fehlgeschlagen');
-      }
+      setError(err.response?.data?.message || 'Registrierung fehlgeschlagen');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Aurora</h1>
-        <h2 className="text-xl font-semibold text-center mb-6 text-gray-600">Registrierung</h2>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600 p-4">
+      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Aurora</h1>
+          <p className="text-gray-600">Erstelle dein Konto</p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
             </label>
             <input
-              id="email"
-              name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="deine@email.com"
@@ -72,85 +69,70 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-              Username *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Benutzername
             </label>
             <input
-              id="username"
-              name="username"
               type="text"
-              value={formData.username}
-              onChange={handleChange}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
-              minLength={3}
-              maxLength={20}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="username"
+              placeholder="benutzername"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Passwort *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Passwort
             </label>
             <input
-              id="password"
-              name="password"
               type="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={8}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="••••••••"
+              placeholder="Mindestens 8 Zeichen"
             />
           </div>
 
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-              Vorname
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Passwort bestätigen
             </label>
             <input
-              id="firstName"
-              name="firstName"
-              type="text"
-              value={formData.firstName}
-              onChange={handleChange}
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Max"
+              placeholder="Passwort wiederholen"
             />
           </div>
 
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-              Nachname
-            </label>
-            <input
-              id="lastName"
-              name="lastName"
-              type="text"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Mustermann"
-            />
-          </div>
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? 'Lädt...' : 'Registrieren'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Schon einen Account?{' '}
-          <Link href="/login" className="text-purple-600 hover:text-purple-700 font-medium">
-            Jetzt einloggen
-          </Link>
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Bereits ein Konto?{' '}
+            <Link href="/login" className="text-purple-500 hover:underline font-medium">
+              Jetzt anmelden
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

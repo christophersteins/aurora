@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { geolocationService } from '@/services/geolocationService';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useAuthStore } from '@/store/authStore';
 
 interface User {
   id: string;
@@ -16,13 +17,9 @@ interface User {
   };
 }
 
-interface NearbyUsersProps {
-  userId: string;
-  token: string;
-}
-
-export default function NearbyUsers({ userId, token }: NearbyUsersProps) {
-  const [radius, setRadius] = useState(10); // Standard: 10 km
+export default function NearbyUsers() {
+  const { user, token, isAuthenticated } = useAuthStore();
+  const [radius, setRadius] = useState(10);
   const [nearbyUsers, setNearbyUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +27,11 @@ export default function NearbyUsers({ userId, token }: NearbyUsersProps) {
   const { latitude, longitude, requestLocation } = useGeolocation();
 
   const searchNearbyUsers = async () => {
+    if (!isAuthenticated || !token || !user) {
+      setError('Bitte logge dich ein.');
+      return;
+    }
+
     if (!latitude || !longitude) {
       setError('Keine Standortdaten verfügbar. Bitte Standort abrufen.');
       return;
@@ -44,7 +46,7 @@ export default function NearbyUsers({ userId, token }: NearbyUsersProps) {
         longitude,
         radius,
         token,
-        userId // Eigene User-ID ausschließen
+        user.id
       );
       setNearbyUsers(users);
     } catch (err: any) {
@@ -55,10 +57,19 @@ export default function NearbyUsers({ userId, token }: NearbyUsersProps) {
   };
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (latitude && longitude && isAuthenticated) {
       searchNearbyUsers();
     }
-  }, [latitude, longitude, radius]);
+  }, [latitude, longitude, radius, isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="p-6 border rounded-lg bg-white shadow-sm">
+        <h2 className="text-2xl font-bold mb-4">Benutzer in der Nähe</h2>
+        <p className="text-gray-600">Bitte logge dich ein, um Benutzer in deiner Nähe zu finden.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 border rounded-lg bg-white shadow-sm">
@@ -84,7 +95,7 @@ export default function NearbyUsers({ userId, token }: NearbyUsersProps) {
         <label className="block text-sm font-medium mb-2">
           Umkreis: {radius} km
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {[5, 10, 20, 50, 100, 500].map((r) => (
             <button
               key={r}
