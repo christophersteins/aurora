@@ -23,6 +23,7 @@ export interface User {
   eyeColor?: string;
   hasTattoos?: boolean;
   hasPiercings?: boolean;
+  isSmoker?: boolean;
   description?: string;
   createdAt: string;
   updatedAt: string;
@@ -65,5 +66,6 @@ export interface UpdateEscortProfileDto {
   eyeColor?: string;
   hasTattoos?: boolean;
   hasPiercings?: boolean;
+  isSmoker?: boolean;
   description?: string;
 }

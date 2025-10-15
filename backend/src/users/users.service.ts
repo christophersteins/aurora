@@ -110,6 +110,7 @@ export class UsersService {
       eyeColor?: string;
       hasTattoos?: boolean;
       hasPiercings?: boolean;
+      isSmoker?: boolean;
       description?: string;
     },
   ): Promise<User> {
@@ -141,6 +142,7 @@ export class UsersService {
     if (updateData.eyeColor !== undefined) user.eyeColor = updateData.eyeColor;
     if (updateData.hasTattoos !== undefined) user.hasTattoos = updateData.hasTattoos;
     if (updateData.hasPiercings !== undefined) user.hasPiercings = updateData.hasPiercings;
+    if (updateData.isSmoker !== undefined) user.isSmoker = updateData.isSmoker;
     if (updateData.description !== undefined) user.description = updateData.description;
 
     return this.usersRepository.save(user);

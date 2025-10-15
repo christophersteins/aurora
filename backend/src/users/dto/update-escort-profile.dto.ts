@@ -56,6 +56,10 @@ export class UpdateEscortProfileDto {
   hasPiercings?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  isSmoker?: boolean;
+
+  @IsOptional()
   @IsString()
   description?: string;
 }

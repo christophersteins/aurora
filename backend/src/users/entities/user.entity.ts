@@ -85,6 +85,9 @@ export class User {
   @Column({ type: 'boolean', default: false })
   hasPiercings: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isSmoker: boolean;
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
