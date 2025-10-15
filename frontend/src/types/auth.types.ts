@@ -1,5 +1,3 @@
-import { UserRole } from './user-role.enum';
-
 export interface User {
   id: string;
   email: string;
@@ -7,11 +5,25 @@ export interface User {
   firstName?: string;
   lastName?: string;
   profilePicture?: string;
-  role: UserRole;
+  role?: 'customer' | 'escort' | 'business';
   location?: {
     type: string;
     coordinates: [number, number];
   };
+  // Escort-spezifische Felder
+  birthDate?: string;
+  nationalities?: string[];
+  languages?: string[];
+  height?: number;
+  weight?: number;
+  bodyType?: string;
+  cupSize?: string;
+  hairColor?: string;
+  hairLength?: string;
+  eyeColor?: string;
+  hasTattoos?: boolean;
+  hasPiercings?: boolean;
+  description?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,12 +44,26 @@ export interface RegisterDto {
   email: string;
   username: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
-  role?: UserRole;
+  role?: 'customer' | 'escort' | 'business';
 }
 
 export interface AuthResponse {
   access_token: string;
   user: User;
+}
+
+export interface UpdateEscortProfileDto {
+  birthDate?: string;
+  nationalities?: string[];
+  languages?: string[];
+  height?: number;
+  weight?: number;
+  bodyType?: string;
+  cupSize?: string;
+  hairColor?: string;
+  hairLength?: string;
+  eyeColor?: string;
+  hasTattoos?: boolean;
+  hasPiercings?: boolean;
+  description?: string;
 }
