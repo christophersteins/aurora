@@ -6,13 +6,16 @@ import {
   Param, 
   Delete,
   Put,
+  Patch,
   Query,
-  UseGuards 
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { NearbyQueryDto } from './dto/nearby-query.dto';
+import { UpdateEscortProfileDto } from './dto/update-escort-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('users')
@@ -43,5 +46,15 @@ export class UsersController {
       updateLocationDto.latitude,
       updateLocationDto.longitude,
     );
+  }
+
+  @Patch('escort-profile')
+  @UseGuards(JwtAuthGuard)
+  async updateEscortProfile(
+    @Request() req,
+    @Body() updateEscortProfileDto: UpdateEscortProfileDto,
+  ): Promise<User> {
+    const userId = req.user.id;
+    return this.usersService.updateEscortProfile(userId, updateEscortProfileDto);
   }
 }

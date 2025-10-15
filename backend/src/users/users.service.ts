@@ -89,6 +89,57 @@ export class UsersService {
     return user;
   }
 
+  async updateEscortProfile(
+    userId: string,
+    updateData: {
+      birthDate?: string;
+      nationalities?: string[];
+      languages?: string[];
+      height?: number;
+      weight?: number;
+      bodyType?: string;
+      cupSize?: string;
+      hairColor?: string;
+      hairLength?: string;
+      eyeColor?: string;
+      hasTattoos?: boolean;
+      hasPiercings?: boolean;
+      description?: string;
+    },
+  ): Promise<User> {
+    const user = await this.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Prüfe, ob User die Rolle ESCORT hat
+    if (user.role !== UserRole.ESCORT) {
+      throw new Error('Only users with ESCORT role can update escort profile');
+    }
+
+    // Konvertiere birthDate von string zu Date, falls vorhanden
+    if (updateData.birthDate) {
+      user.birthDate = new Date(updateData.birthDate);
+    }
+
+    // Aktualisiere die anderen Felder
+    if (updateData.nationalities !== undefined) user.nationalities = updateData.nationalities;
+    if (updateData.languages !== undefined) user.languages = updateData.languages;
+    if (updateData.height !== undefined) user.height = updateData.height;
+    if (updateData.weight !== undefined) user.weight = updateData.weight;
+    if (updateData.bodyType !== undefined) user.bodyType = updateData.bodyType;
+    if (updateData.cupSize !== undefined) user.cupSize = updateData.cupSize;
+    if (updateData.hairColor !== undefined) user.hairColor = updateData.hairColor;
+    if (updateData.hairLength !== undefined) user.hairLength = updateData.hairLength;
+    if (updateData.eyeColor !== undefined) user.eyeColor = updateData.eyeColor;
+    if (updateData.hasTattoos !== undefined) user.hasTattoos = updateData.hasTattoos;
+    if (updateData.hasPiercings !== undefined) user.hasPiercings = updateData.hasPiercings;
+    if (updateData.description !== undefined) user.description = updateData.description;
+
+    return this.usersRepository.save(user);
+  }
+
   async findUsersWithinRadius(
     latitude: number,
     longitude: number,
