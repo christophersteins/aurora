@@ -1,10 +1,9 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
+  Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
 } from 'typeorm';
 import { UserRole } from '../enums/user-role.enum';
 
@@ -14,46 +13,84 @@ export class User {
   id: string;
 
   @Column({ unique: true })
-  @Index()
   email: string;
-
-  @Column({ nullable: true })
-  username: string;
 
   @Column()
   password: string;
 
-  @Column({ name: 'first_name', nullable: true })
+  @Column({ nullable: true })
+  username: string;
+
+  @Column({ nullable: true })
   firstName: string;
 
-  @Column({ name: 'last_name', nullable: true })
+  @Column({ nullable: true })
   lastName: string;
 
-  @Column({ name: 'profile_picture', nullable: true })
+  @Column({ nullable: true })
   profilePicture: string;
 
+  // Benutzerrolle
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.CUSTOMER,
   })
-  @Index()
   role: UserRole;
 
+  // Geolocation-Feld für PostGIS
   @Column({
-    type: 'geography',
+    type: 'geometry',
     spatialFeatureType: 'Point',
     srid: 4326,
     nullable: true,
   })
-  location: {
-    type: string;
-    coordinates: [number, number];
-  };
+  location: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  // === ESCORT-SPEZIFISCHE FELDER ===
+  
+  @Column({ type: 'date', nullable: true })
+  birthDate: Date;
+
+  @Column('text', { array: true, nullable: true })
+  nationalities: string[];
+
+  @Column('text', { array: true, nullable: true })
+  languages: string[];
+
+  @Column({ type: 'int', nullable: true })
+  height: number; // in cm
+
+  @Column({ type: 'int', nullable: true })
+  weight: number; // in kg
+
+  @Column({ nullable: true })
+  bodyType: string; // z.B. 'schlank', 'athletisch', 'kurvig'
+
+  @Column({ nullable: true })
+  cupSize: string; // z.B. 'A', 'B', 'C'
+
+  @Column({ nullable: true })
+  hairColor: string;
+
+  @Column({ nullable: true })
+  hairLength: string;
+
+  @Column({ nullable: true })
+  eyeColor: string;
+
+  @Column({ type: 'boolean', default: false })
+  hasTattoos: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  hasPiercings: boolean;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 }

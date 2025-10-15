@@ -56,17 +56,37 @@ export class UsersService {
     latitude: number,
     longitude: number,
   ): Promise<User> {
-    const user = await this.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
+    // Validierung
+    if (latitude < -90 || latitude > 90) {
+      throw new Error('Latitude must be between -90 and 90');
+    }
+    if (longitude < -180 || longitude > 180) {
+      throw new Error('Longitude must be between -180 and 180');
     }
 
-    user.location = {
-      type: 'Point',
-      coordinates: [longitude, latitude],
-    };
+    // PostGIS Point im WKT-Format (Well-Known Text)
+    const point = `SRID=4326;POINT(${longitude} ${latitude})`;
 
-    return this.usersRepository.save(user);
+    // User aktualisieren
+    const result = await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ location: () => `ST_GeomFromText('${point}')` })
+      .where('id = :userId', { userId })
+      .execute();
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Aktualisierten User zurückgeben
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return user;
   }
 
   async findUsersWithinRadius(
