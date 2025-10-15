@@ -1,4 +1,5 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsEnum } from 'class-validator';
+import { UserRole } from '../../users/enums/user-role.enum';
 
 export class RegisterDto {
   @IsEmail()
@@ -6,21 +7,23 @@ export class RegisterDto {
 
   @IsString()
   @MinLength(3)
-  @MaxLength(20)
   username: string;
 
   @IsString()
-  @MinLength(8)
-  @MaxLength(50)
+  @MinLength(6)
   password: string;
 
-  @IsString()
   @IsOptional()
-  @MaxLength(50)
+  @IsString()
   firstName?: string;
 
-  @IsString()
   @IsOptional()
-  @MaxLength(50)
+  @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsEnum(UserRole, {
+    message: 'role must be one of: customer, escort, business',
+  })
+  role?: UserRole;
 }
