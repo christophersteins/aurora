@@ -22,7 +22,7 @@ export class AuthService {
     const user = await this.usersService.create(registerDto);
 
     // Generiere JWT-Token
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = this.jwtService.sign(payload);
 
     return {
@@ -33,6 +33,7 @@ export class AuthService {
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     };
   }
@@ -54,7 +55,7 @@ export class AuthService {
     }
 
     // Generiere JWT-Token
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = this.jwtService.sign(payload);
 
     return {
@@ -65,6 +66,7 @@ export class AuthService {
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     };
   }
