@@ -176,4 +176,15 @@ export class UsersService {
 
     return query.getMany();
   }
+
+  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
+    const user = await this.findById(userId);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    Object.assign(user, updateData);
+    return this.usersRepository.save(user);
+  }
 }

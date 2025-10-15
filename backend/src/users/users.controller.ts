@@ -9,8 +9,13 @@ import {
   Patch,
   Query,
   UseGuards,
-  Request
+  Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from '../config/multer.config';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateLocationDto } from './dto/update-location.dto';
@@ -61,5 +66,34 @@ export class UsersController {
   @Get()
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
+  }
+
+  @Post('upload-profile-picture')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('profilePicture', multerConfig))
+  async uploadProfilePicture(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const userId = req.user.id;
+    const profilePictureUrl = `/uploads/profile-pictures/${file.filename}`;
+
+    // Aktualisiere User mit neuer Profilbild-URL
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    user.profilePicture = profilePictureUrl;
+    await this.usersService.updateUser(userId, { profilePicture: profilePictureUrl });
+
+    return {
+      message: 'Profile picture uploaded successfully',
+      profilePicture: profilePictureUrl,
+    };
   }
 }
