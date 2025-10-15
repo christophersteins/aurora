@@ -28,6 +28,7 @@ export class AuthController {
         username: req.user.username,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
+        role: req.user.role,
       },
     };
   }
