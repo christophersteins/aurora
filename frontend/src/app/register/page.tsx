@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { authService } from '@/services/authService';
+import RoleSelector from '@/components/auth/RoleSelector';
+import { UserRole } from '@/types/user-role.enum';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<UserRole>(UserRole.CUSTOMER);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,15 +30,20 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Passwort muss mindestens 8 Zeichen lang sein');
+    if (password.length < 6) {
+      setError('Passwort muss mindestens 6 Zeichen lang sein');
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await authService.register({ email, username, password });
+      const response = await authService.register({ 
+        email, 
+        username, 
+        password,
+        role,
+      });
       setAuth(response.user, response.access_token);
       router.push('/'); // Redirect zur Homepage
     } catch (err: any) {
@@ -54,6 +62,8 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <RoleSelector selectedRole={role} onChange={setRole} />
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -92,7 +102,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Mindestens 8 Zeichen"
+              placeholder="Mindestens 6 Zeichen"
             />
           </div>
 
