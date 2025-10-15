@@ -1,3 +1,5 @@
+import { UserRole } from './user-role.enum';
+
 export interface User {
   id: string;
   email: string;
@@ -5,6 +7,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   profilePicture?: string;
+  role: UserRole;
   location?: {
     type: string;
     coordinates: [number, number];
@@ -29,6 +32,9 @@ export interface RegisterDto {
   email: string;
   username: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole;
 }
 
 export interface AuthResponse {
