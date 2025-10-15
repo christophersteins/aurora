@@ -10,9 +10,18 @@ const apiClient = axios.create({
 // Request-Interceptor für JWT-Token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Hole Token aus Zustand persist storage
+    const storedAuth = localStorage.getItem('aurora-auth-storage');
+    if (storedAuth) {
+      try {
+        const parsedAuth = JSON.parse(storedAuth);
+        const token = parsedAuth.state?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Error parsing auth storage:', error);
+      }
     }
     return config;
   },
@@ -26,7 +35,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
+      // Lösche gesamten Auth-State bei 401
+      localStorage.removeItem('aurora-auth-storage');
       window.location.href = '/login';
     }
     return Promise.reject(error);

@@ -41,6 +41,6 @@ export const authService = {
   },
 
   logout() {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('aurora-auth-storage');
   },
 };

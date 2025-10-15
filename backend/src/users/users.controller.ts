@@ -57,4 +57,9 @@ export class UsersController {
     const userId = req.user.id;
     return this.usersService.updateEscortProfile(userId, updateEscortProfileDto);
   }
+
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
 }
