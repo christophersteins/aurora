@@ -12,10 +12,9 @@ export default function RegisterPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
   
-  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<UserRole>(UserRole.CUSTOMER);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,11 +24,6 @@ export default function RegisterPage() {
     setError('');
 
     // Validierung
-    if (password !== confirmPassword) {
-      setError('Passwörter stimmen nicht überein');
-      return;
-    }
-
     if (password.length < 6) {
       setError('Passwort muss mindestens 6 Zeichen lang sein');
       return;
@@ -66,20 +60,6 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="deine@email.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
               Benutzername
             </label>
             <input
@@ -94,6 +74,20 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="deine@email.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Passwort
             </label>
             <input
@@ -103,20 +97,6 @@ export default function RegisterPage() {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="Mindestens 6 Zeichen"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Passwort bestätigen
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Passwort wiederholen"
             />
           </div>
 

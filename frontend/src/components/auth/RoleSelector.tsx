@@ -18,7 +18,7 @@ export default function RoleSelector({ selectedRole, onChange }: RoleSelectorPro
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">
-        Ich bin ein/eine
+        Anmelden als
       </label>
       <div className="grid grid-cols-3 gap-3">
         {roles.map((role) => (
@@ -30,7 +30,7 @@ export default function RoleSelector({ selectedRole, onChange }: RoleSelectorPro
               px-4 py-3 rounded-lg border-2 font-medium transition-all
               ${
                 selectedRole === role.value
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-purple-500 bg-purple-50 text-purple-700'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
               }
             `}
