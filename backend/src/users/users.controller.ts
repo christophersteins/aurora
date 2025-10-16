@@ -68,6 +68,11 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('escorts')
+  async findAllEscorts(): Promise<User[]> {
+    return this.usersService.findAllEscorts();
+  }
+
   @Post('upload-profile-picture')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('profilePicture', multerConfig))

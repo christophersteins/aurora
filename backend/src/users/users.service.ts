@@ -42,6 +42,25 @@ export class UsersService {
     });
   }
 
+  async findAllEscorts(): Promise<User[]> {
+    return this.usersRepository.find({
+      where: { role: UserRole.ESCORT },
+      select: [
+        'id',
+        'email',
+        'username',
+        'firstName',
+        'lastName',
+        'profilePicture',
+        'role',
+        'birthDate',
+        'location',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
   }
