@@ -41,7 +41,8 @@ export default function MembersPage() {
         const storedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
         if (storedFilters) {
           const parsed = JSON.parse(storedFilters);
-          setFilters(parsed);
+          // Merge mit initialFilters um neue Felder zu garantieren
+          setFilters({ ...initialFilters, ...parsed });
         }
       } catch (error) {
         console.error('Fehler beim Laden der Filter aus LocalStorage:', error);
@@ -122,6 +123,11 @@ export default function MembersPage() {
       if (!hasMatchingLanguage) return false;
     }
 
+    // Typ
+    if (filters.types.length > 0) {
+      if (!escort.type || !filters.types.includes(escort.type)) return false;
+    }
+
     // Größe
     if (filters.heightMin !== null && (escort.height === null || escort.height === undefined || escort.height < filters.heightMin)) return false;
     if (filters.heightMax !== null && (escort.height === null || escort.height === undefined || escort.height > filters.heightMax)) return false;
@@ -135,7 +141,7 @@ export default function MembersPage() {
       if (!escort.bodyType || !filters.bodyTypes.includes(escort.bodyType)) return false;
     }
 
-    // Körbchengröße
+    // Oberweite
     if (filters.cupSizes.length > 0) {
       if (!escort.cupSize || !filters.cupSizes.includes(escort.cupSize)) return false;
     }
@@ -153,6 +159,11 @@ export default function MembersPage() {
     // Augenfarbe
     if (filters.eyeColors.length > 0) {
       if (!escort.eyeColor || !filters.eyeColors.includes(escort.eyeColor)) return false;
+    }
+
+    // Intimbereich
+    if (filters.intimateHair.length > 0) {
+      if (!escort.intimateHair || !filters.intimateHair.includes(escort.intimateHair)) return false;
     }
 
     // Tattoos
@@ -205,6 +216,7 @@ export default function MembersPage() {
       filters.ageMax !== null ||
       filters.nationalities.length > 0 ||
       filters.languages.length > 0 ||
+      filters.types.length > 0 ||
       filters.heightMin !== null ||
       filters.heightMax !== null ||
       filters.weightMin !== null ||
@@ -214,6 +226,7 @@ export default function MembersPage() {
       filters.hairColors.length > 0 ||
       filters.hairLengths.length > 0 ||
       filters.eyeColors.length > 0 ||
+      filters.intimateHair.length > 0 ||
       filters.hasTattoos !== 'all' ||
       filters.hasPiercings !== 'all' ||
       filters.isSmoker !== 'all'

@@ -6,11 +6,13 @@ import { MemberFilters } from '@/types/filter.types';
 import {
   NATIONALITIES,
   LANGUAGES,
+  TYPES,
   BODY_TYPES,
   CUP_SIZES,
   HAIR_COLORS,
   HAIR_LENGTHS,
   EYE_COLORS,
+  INTIMATE_HAIR,
 } from '@/constants/escortProfileOptions';
 
 interface MemberFilterSidebarProps {
@@ -128,7 +130,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Min"
+                  placeholder="Von"
                   value={filters.ageMin || ''}
                   onChange={(e) =>
                     updateFilter('ageMin', e.target.value ? parseInt(e.target.value) : null)
@@ -141,7 +143,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Max"
+                  placeholder="Bis"
                   value={filters.ageMax || ''}
                   onChange={(e) =>
                     updateFilter('ageMax', e.target.value ? parseInt(e.target.value) : null)
@@ -194,6 +196,26 @@ export default function MemberFilterSidebar({
             </div>
           </div>
 
+          {/* Typ */}
+          <div className="pt-4 border-t">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Typ
+            </label>
+            <div className="space-y-2">
+              {TYPES.map((type) => (
+                <label key={type} className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.types.includes(type)}
+                    onChange={() => toggleArrayItem('types', type)}
+                    className="mr-2 w-4 h-4 text-indigo-600 focus:ring-indigo-500 rounded"
+                  />
+                  <span className="text-sm">{type}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           {/* Größe */}
           <div className="pt-4 border-t">
             <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -203,7 +225,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Min"
+                  placeholder="Von"
                   value={filters.heightMin || ''}
                   onChange={(e) =>
                     updateFilter('heightMin', e.target.value ? parseInt(e.target.value) : null)
@@ -216,7 +238,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Max"
+                  placeholder="Bis"
                   value={filters.heightMax || ''}
                   onChange={(e) =>
                     updateFilter('heightMax', e.target.value ? parseInt(e.target.value) : null)
@@ -238,7 +260,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Min"
+                  placeholder="Von"
                   value={filters.weightMin || ''}
                   onChange={(e) =>
                     updateFilter('weightMin', e.target.value ? parseInt(e.target.value) : null)
@@ -251,7 +273,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="Max"
+                  placeholder="Bis"
                   value={filters.weightMax || ''}
                   onChange={(e) =>
                     updateFilter('weightMax', e.target.value ? parseInt(e.target.value) : null)
@@ -284,10 +306,10 @@ export default function MemberFilterSidebar({
             </div>
           </div>
 
-          {/* Körbchengröße */}
+          {/* Oberweite */}
           <div className="pt-4 border-t">
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Körbchengröße
+              Oberweite
             </label>
             <div className="grid grid-cols-5 gap-2">
               {CUP_SIZES.map((size) => (
@@ -361,6 +383,26 @@ export default function MemberFilterSidebar({
                     className="mr-2 w-4 h-4 text-indigo-600 focus:ring-indigo-500 rounded"
                   />
                   <span className="text-sm">{color}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Intimbereich */}
+          <div className="pt-4 border-t">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Intimbereich
+            </label>
+            <div className="space-y-2">
+              {INTIMATE_HAIR.map((option) => (
+                <label key={option} className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.intimateHair.includes(option)}
+                    onChange={() => toggleArrayItem('intimateHair', option)}
+                    className="mr-2 w-4 h-4 text-indigo-600 focus:ring-indigo-500 rounded"
+                  />
+                  <span className="text-sm">{option}</span>
                 </label>
               ))}
             </div>
