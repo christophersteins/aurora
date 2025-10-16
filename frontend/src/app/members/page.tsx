@@ -1,24 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
-import { useRouter } from 'next/navigation';
+import { Filter } from 'lucide-react';
+import MemberFilterSidebar from '@/components/MemberFilterSidebar';
+import { MemberFilters, initialFilters } from '@/types/filter.types';
+
+const FILTER_STORAGE_KEY = 'aurora_member_filters';
 
 export default function MembersPage() {
+  const router = useRouter();
   const [escorts, setEscorts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [filterSidebarOpen, setFilterSidebarOpen] = useState(false);
+  const [filters, setFilters] = useState<MemberFilters>(initialFilters);
+  const [filtersLoaded, setFiltersLoaded] = useState(false);
 
   useEffect(() => {
     const fetchEscorts = async () => {
       try {
         const data = await escortService.getAllEscorts();
         setEscorts(data);
-      } catch (err) {
-        setError('Fehler beim Laden der Escorts');
-        console.error(err);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Fehler beim Laden der Escorts');
       } finally {
         setLoading(false);
       }
@@ -27,89 +34,326 @@ export default function MembersPage() {
     fetchEscorts();
   }, []);
 
-  const calculateAge = (birthDate: string | undefined): number | null => {
+  // Filter aus LocalStorage laden beim Mount
+  useEffect(() => {
+    const loadFiltersFromStorage = () => {
+      try {
+        const storedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
+        if (storedFilters) {
+          const parsed = JSON.parse(storedFilters);
+          setFilters(parsed);
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden der Filter aus LocalStorage:', error);
+      } finally {
+        setFiltersLoaded(true);
+      }
+    };
+
+    loadFiltersFromStorage();
+  }, []);
+
+  // Filter in LocalStorage speichern bei Änderungen
+  useEffect(() => {
+    // Nur speichern, wenn Filter bereits geladen wurden (nicht beim initialen Mount)
+    if (filtersLoaded) {
+      try {
+        localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+      } catch (error) {
+        console.error('Fehler beim Speichern der Filter in LocalStorage:', error);
+      }
+    }
+  }, [filters, filtersLoaded]);
+
+  // Funktion zur Altersberechnung
+  const calculateAge = (birthDate?: string): number | null => {
     if (!birthDate) return null;
     const birth = new Date(birthDate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
+
     return age;
+  };
+
+  // Gefilterte Escorts
+  const filteredEscorts = escorts.filter((escort) => {
+    // Suchbegriff
+    if (filters.searchQuery.trim()) {
+      const query = filters.searchQuery.toLowerCase();
+      const firstName = escort.firstName?.toLowerCase() || '';
+      const lastName = escort.lastName?.toLowerCase() || '';
+      const username = escort.username?.toLowerCase() || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      const matchesSearch =
+        firstName.includes(query) ||
+        lastName.includes(query) ||
+        username.includes(query) ||
+        fullName.includes(query);
+
+      if (!matchesSearch) return false;
+    }
+
+    // Alter
+    const age = calculateAge(escort.birthDate);
+    if (filters.ageMin !== null && (age === null || age < filters.ageMin)) return false;
+    if (filters.ageMax !== null && (age === null || age > filters.ageMax)) return false;
+
+    // Nationalität
+    if (filters.nationalities.length > 0) {
+      if (!escort.nationalities || escort.nationalities.length === 0) return false;
+      const hasMatchingNationality = escort.nationalities.some((nat) =>
+        filters.nationalities.includes(nat)
+      );
+      if (!hasMatchingNationality) return false;
+    }
+
+    // Sprachen
+    if (filters.languages.length > 0) {
+      if (!escort.languages || escort.languages.length === 0) return false;
+      const hasMatchingLanguage = escort.languages.some((lang) =>
+        filters.languages.includes(lang)
+      );
+      if (!hasMatchingLanguage) return false;
+    }
+
+    // Größe
+    if (filters.heightMin !== null && (escort.height === null || escort.height === undefined || escort.height < filters.heightMin)) return false;
+    if (filters.heightMax !== null && (escort.height === null || escort.height === undefined || escort.height > filters.heightMax)) return false;
+
+    // Gewicht
+    if (filters.weightMin !== null && (escort.weight === null || escort.weight === undefined || escort.weight < filters.weightMin)) return false;
+    if (filters.weightMax !== null && (escort.weight === null || escort.weight === undefined || escort.weight > filters.weightMax)) return false;
+
+    // Figur
+    if (filters.bodyTypes.length > 0) {
+      if (!escort.bodyType || !filters.bodyTypes.includes(escort.bodyType)) return false;
+    }
+
+    // Körbchengröße
+    if (filters.cupSizes.length > 0) {
+      if (!escort.cupSize || !filters.cupSizes.includes(escort.cupSize)) return false;
+    }
+
+    // Haarfarbe
+    if (filters.hairColors.length > 0) {
+      if (!escort.hairColor || !filters.hairColors.includes(escort.hairColor)) return false;
+    }
+
+    // Haarlänge
+    if (filters.hairLengths.length > 0) {
+      if (!escort.hairLength || !filters.hairLengths.includes(escort.hairLength)) return false;
+    }
+
+    // Augenfarbe
+    if (filters.eyeColors.length > 0) {
+      if (!escort.eyeColor || !filters.eyeColors.includes(escort.eyeColor)) return false;
+    }
+
+    // Tattoos
+    if (filters.hasTattoos !== 'all') {
+      const hasTattoos = escort.hasTattoos === true;
+      if (filters.hasTattoos === 'yes' && !hasTattoos) return false;
+      if (filters.hasTattoos === 'no' && hasTattoos) return false;
+    }
+
+    // Piercings
+    if (filters.hasPiercings !== 'all') {
+      const hasPiercings = escort.hasPiercings === true;
+      if (filters.hasPiercings === 'yes' && !hasPiercings) return false;
+      if (filters.hasPiercings === 'no' && hasPiercings) return false;
+    }
+
+    // Raucher/in
+    if (filters.isSmoker !== 'all') {
+      const isSmoker = escort.isSmoker === true;
+      if (filters.isSmoker === 'yes' && !isSmoker) return false;
+      if (filters.isSmoker === 'no' && isSmoker) return false;
+    }
+
+    return true;
+  });
+
+  // Funktion zum Navigieren zum Profil
+  const handleProfileClick = (username?: string) => {
+    if (username) {
+      router.push(`/profile/${username}`);
+    }
+  };
+
+  // Filter zurücksetzen
+  const handleResetFilters = () => {
+    setFilters(initialFilters);
+    // Filter auch aus LocalStorage entfernen
+    try {
+      localStorage.removeItem(FILTER_STORAGE_KEY);
+    } catch (error) {
+      console.error('Fehler beim Entfernen der Filter aus LocalStorage:', error);
+    }
+  };
+
+  // Prüfe ob Filter aktiv sind
+  const hasActiveFilters = () => {
+    return (
+      filters.searchQuery.trim() !== '' ||
+      filters.ageMin !== null ||
+      filters.ageMax !== null ||
+      filters.nationalities.length > 0 ||
+      filters.languages.length > 0 ||
+      filters.heightMin !== null ||
+      filters.heightMax !== null ||
+      filters.weightMin !== null ||
+      filters.weightMax !== null ||
+      filters.bodyTypes.length > 0 ||
+      filters.cupSizes.length > 0 ||
+      filters.hairColors.length > 0 ||
+      filters.hairLengths.length > 0 ||
+      filters.eyeColors.length > 0 ||
+      filters.hasTattoos !== 'all' ||
+      filters.hasPiercings !== 'all' ||
+      filters.isSmoker !== 'all'
+    );
   };
 
   if (loading) {
     return (
-      <main className="min-h-screen p-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">Member Directory</h1>
-          <p className="text-gray-600">Lädt...</p>
-        </div>
-      </main>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-xl text-gray-600">Lädt...</p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen p-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">Member Directory</h1>
-          <div className="p-4 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-700">{error}</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Erneut versuchen
+          </button>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Member Directory</h1>
-        
-        {escorts.length === 0 ? (
-          <p className="text-gray-600">Keine Escorts gefunden.</p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800">Member Directory</h1>
+          <p className="text-gray-600 mt-2">
+            {filteredEscorts.length} von {escorts.length}{' '}
+            {escorts.length === 1 ? 'Escort' : 'Escorts'}
+            {hasActiveFilters() && ' (gefiltert)'}
+          </p>
+        </div>
+
+        {/* Filter Button */}
+        <div className="mb-6 flex items-center gap-4">
+          <button
+            onClick={() => setFilterSidebarOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          >
+            <Filter className="w-5 h-5" />
+            Filter
+            {hasActiveFilters() && (
+              <span className="ml-1 px-2 py-0.5 bg-white text-indigo-600 rounded-full text-xs font-semibold">
+                Aktiv
+              </span>
+            )}
+          </button>
+          
+          {hasActiveFilters() && (
+            <button
+              onClick={handleResetFilters}
+              className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+            >
+              Alle Filter zurücksetzen
+            </button>
+          )}
+        </div>
+
+        {/* Escorts Grid */}
+        {filteredEscorts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg mb-4">
+              {hasActiveFilters()
+                ? 'Keine Escorts mit den ausgewählten Filtern gefunden'
+                : 'Keine Escorts gefunden'}
+            </p>
+            {hasActiveFilters() && (
+              <button
+                onClick={handleResetFilters}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Filter zurücksetzen
+              </button>
+            )}
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {escorts.map((escort) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredEscorts.map((escort) => {
               const age = calculateAge(escort.birthDate);
-              
+
               return (
                 <div
                   key={escort.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
-                  onClick={() => router.push(`/profile/${escort.username?.toLowerCase() || escort.id}`)}
+                  onClick={() => handleProfileClick(escort.username)}
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
                 >
                   {/* Profilbild */}
-                  <div className="h-64 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <div className="aspect-square bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
                     {escort.profilePicture ? (
                       <img
-                        src={escort.profilePicture}
+                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${
+                          escort.profilePicture
+                        }`}
                         alt={escort.username || 'Profilbild'}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="text-white text-6xl font-bold">
-                        {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
+                        {(
+                          escort.firstName?.[0] ||
+                          escort.username?.[0] ||
+                          escort.email[0]
+                        ).toUpperCase()}
                       </div>
                     )}
                   </div>
 
-                  {/* Info */}
+                  {/* Informationen */}
                   <div className="p-4">
-                    <h2 className="text-xl font-semibold mb-2">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-1">
                       {escort.firstName && escort.lastName
                         ? `${escort.firstName} ${escort.lastName}`
                         : escort.username || 'Unbekannt'}
-                    </h2>
-                    
+                    </h3>
+
+                    <p className="text-sm text-gray-500 mb-3">
+                      @{escort.username || escort.email}
+                    </p>
+
                     <div className="space-y-1 text-sm text-gray-600">
                       {age && (
-                        <p>🎂 {age} Jahre</p>
+                        <p>
+                          <span className="font-medium">Alter:</span> {age} Jahre
+                        </p>
                       )}
-                      <p>📍 Stadt unbekannt</p>
-                      <p className="text-xs text-gray-400">@{escort.username}</p>
+
+                      <p>
+                        <span className="font-medium">Stadt:</span>{' '}
+                        {escort.location ? 'Verfügbar' : 'Nicht angegeben'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -118,6 +362,15 @@ export default function MembersPage() {
           </div>
         )}
       </div>
-    </main>
+
+      {/* Filter Sidebar */}
+      <MemberFilterSidebar
+        isOpen={filterSidebarOpen}
+        onClose={() => setFilterSidebarOpen(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        onResetFilters={handleResetFilters}
+      />
+    </div>
   );
 }
