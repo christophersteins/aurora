@@ -15,8 +15,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const id = params.id as string;
-        const data = await escortService.getEscortById(id);
+        const username = params.id as string; // params.id enthält jetzt den Username
+        const data = await escortService.getEscortByUsername(username);
         setEscort(data);
       } catch (err) {
         setError('Fehler beim Laden des Profils');

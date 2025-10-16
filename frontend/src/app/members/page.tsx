@@ -79,7 +79,7 @@ export default function MembersPage() {
                 <div
                   key={escort.id}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
-                  onClick={() => router.push(`/profile/${escort.id}`)}
+                  onClick={() => router.push(`/profile/${escort.username?.toLowerCase() || escort.id}`)}
                 >
                   {/* Profilbild */}
                   <div className="h-64 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
