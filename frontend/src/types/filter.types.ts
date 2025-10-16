@@ -18,6 +18,11 @@ export interface MemberFilters {
   hasTattoos: 'all' | 'yes' | 'no';
   hasPiercings: 'all' | 'yes' | 'no';
   isSmoker: 'all' | 'yes' | 'no';
+  // Radius-Filter
+  useRadius: boolean;
+  radiusKm: number;
+  userLatitude: number | null;
+  userLongitude: number | null;
 }
 
 export const initialFilters: MemberFilters = {
@@ -40,4 +45,9 @@ export const initialFilters: MemberFilters = {
   hasTattoos: 'all',
   hasPiercings: 'all',
   isSmoker: 'all',
+  // Radius-Filter Defaults
+  useRadius: false,
+  radiusKm: 50,
+  userLatitude: null,
+  userLongitude: null,
 };

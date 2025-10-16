@@ -81,6 +81,26 @@ export default function MembersPage() {
     return age;
   };
 
+  // Berechne Distanz zwischen zwei Koordinaten (Haversine-Formel)
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number => {
+    const R = 6371; // Erdradius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
   // Gefilterte Escorts
   const filteredEscorts = escorts.filter((escort) => {
     // Suchbegriff
@@ -98,6 +118,25 @@ export default function MembersPage() {
         fullName.includes(query);
 
       if (!matchesSearch) return false;
+    }
+
+    // Radius-Filter
+    if (filters.useRadius && filters.userLatitude && filters.userLongitude) {
+      if (!escort.location) return false;
+      
+      // Extrahiere Koordinaten aus PostGIS Point
+      const coords = escort.location.coordinates;
+      if (!coords || coords.length !== 2) return false;
+      
+      const [escortLon, escortLat] = coords;
+      const distance = calculateDistance(
+        filters.userLatitude,
+        filters.userLongitude,
+        escortLat,
+        escortLon
+      );
+      
+      if (distance > filters.radiusKm) return false;
     }
 
     // Alter
@@ -229,7 +268,8 @@ export default function MembersPage() {
       filters.intimateHair.length > 0 ||
       filters.hasTattoos !== 'all' ||
       filters.hasPiercings !== 'all' ||
-      filters.isSmoker !== 'all'
+      filters.isSmoker !== 'all' ||
+      filters.useRadius
     );
   };
 
