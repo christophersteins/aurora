@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { escortProfileService } from '@/services/escortProfileService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { UpdateEscortProfileDto } from '@/types/auth.types';
+import MultiSelectDropdown from './MultiSelectDropdown';
 import {
   NATIONALITIES,
   LANGUAGES,
@@ -216,53 +217,23 @@ export default function EscortProfileForm() {
           />
         </div>
 
-        {/* Nationalität (Mehrfachauswahl mit Select) */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Nationalität</label>
-          <select
-            multiple
-            value={formData.nationalities || []}
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions, option => option.value);
-              setFormData({ ...formData, nationalities: selected });
-            }}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            size={5}
-          >
-            {NATIONALITIES.map((nationality) => (
-              <option key={nationality} value={nationality}>
-                {nationality}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">
-            Halte Strg (Windows) oder Cmd (Mac) gedrückt, um mehrere auszuwählen
-          </p>
-        </div>
+        {/* Nationalität (Mehrfachauswahl) */}
+        <MultiSelectDropdown
+          label="Nationalität"
+          options={NATIONALITIES}
+          selectedValues={formData.nationalities || []}
+          onChange={(values) => setFormData({ ...formData, nationalities: values })}
+          placeholder="Nationalitäten auswählen..."
+        />
 
-        {/* Sprachen (Mehrfachauswahl mit Select) */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Sprachen</label>
-          <select
-            multiple
-            value={formData.languages || []}
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions, option => option.value);
-              setFormData({ ...formData, languages: selected });
-            }}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            size={5}
-          >
-            {LANGUAGES.map((language) => (
-              <option key={language} value={language}>
-                {language}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">
-            Halte Strg (Windows) oder Cmd (Mac) gedrückt, um mehrere auszuwählen
-          </p>
-        </div>
+        {/* Sprachen (Mehrfachauswahl) */}
+        <MultiSelectDropdown
+          label="Sprachen"
+          options={LANGUAGES}
+          selectedValues={formData.languages || []}
+          onChange={(values) => setFormData({ ...formData, languages: values })}
+          placeholder="Sprachen auswählen..."
+        />
 
         {/* Größe */}
         <div>
@@ -391,21 +362,21 @@ export default function EscortProfileForm() {
               <input
                 type="radio"
                 name="isSmoker"
-                checked={formData.isSmoker === false}
-                onChange={() => setFormData({ ...formData, isSmoker: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="isSmoker"
                 checked={formData.isSmoker === true}
                 onChange={() => setFormData({ ...formData, isSmoker: true })}
                 className="mr-2"
               />
               <span>Ja</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="isSmoker"
+                checked={formData.isSmoker === false}
+                onChange={() => setFormData({ ...formData, isSmoker: false })}
+                className="mr-2"
+              />
+              <span>Nein</span>
             </label>
           </div>
         </div>
@@ -418,21 +389,21 @@ export default function EscortProfileForm() {
               <input
                 type="radio"
                 name="hasTattoos"
-                checked={formData.hasTattoos === false}
-                onChange={() => setFormData({ ...formData, hasTattoos: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasTattoos"
                 checked={formData.hasTattoos === true}
                 onChange={() => setFormData({ ...formData, hasTattoos: true })}
                 className="mr-2"
               />
               <span>Ja</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="hasTattoos"
+                checked={formData.hasTattoos === false}
+                onChange={() => setFormData({ ...formData, hasTattoos: false })}
+                className="mr-2"
+              />
+              <span>Nein</span>
             </label>
           </div>
         </div>
@@ -445,21 +416,21 @@ export default function EscortProfileForm() {
               <input
                 type="radio"
                 name="hasPiercings"
-                checked={formData.hasPiercings === false}
-                onChange={() => setFormData({ ...formData, hasPiercings: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasPiercings"
                 checked={formData.hasPiercings === true}
                 onChange={() => setFormData({ ...formData, hasPiercings: true })}
                 className="mr-2"
               />
               <span>Ja</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="hasPiercings"
+                checked={formData.hasPiercings === false}
+                onChange={() => setFormData({ ...formData, hasPiercings: false })}
+                className="mr-2"
+              />
+              <span>Nein</span>
             </label>
           </div>
         </div>
