@@ -34,6 +34,20 @@ export class UsersController {
     return this.usersService.findAllEscorts();
   }
 
+  @Get('username/:username')
+  async findByUsername(@Param('username') username: string): Promise<Partial<User>> {
+    const user = await this.usersService.findByUsername(username.toLowerCase());
+    
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    
+    // Entferne das Passwort aus der Response
+    const { password, ...userWithoutPassword } = user;
+    
+    return userWithoutPassword;
+  }
+
   @Get('nearby')
   @UseGuards(JwtAuthGuard)
   async findNearby(@Query() query: NearbyQueryDto): Promise<User[]> {

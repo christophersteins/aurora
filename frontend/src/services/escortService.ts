@@ -11,4 +11,11 @@ export const escortService = {
     const response = await apiClient.get(`/users/${id}`);
     return response.data;
   },
+
+  async getEscortByUsername(username: string): Promise<User> {
+    // Konvertiere zu Kleinbuchstaben für URL
+    const lowercaseUsername = username.toLowerCase();
+    const response = await apiClient.get(`/users/username/${lowercaseUsername}`);
+    return response.data;
+  },
 };
