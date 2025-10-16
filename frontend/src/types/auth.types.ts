@@ -14,6 +14,7 @@ export interface User {
   birthDate?: string;
   nationalities?: string[];
   languages?: string[];
+  type?: string;
   height?: number;
   weight?: number;
   bodyType?: string;
@@ -21,12 +22,13 @@ export interface User {
   hairColor?: string;
   hairLength?: string;
   eyeColor?: string;
+  intimateHair?: string;
   hasTattoos?: boolean;
   hasPiercings?: boolean;
   isSmoker?: boolean;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthState {
@@ -57,6 +59,7 @@ export interface UpdateEscortProfileDto {
   birthDate?: string;
   nationalities?: string[];
   languages?: string[];
+  type?: string;
   height?: number;
   weight?: number;
   bodyType?: string;
@@ -64,6 +67,7 @@ export interface UpdateEscortProfileDto {
   hairColor?: string;
   hairLength?: string;
   eyeColor?: string;
+  intimateHair?: string;
   hasTattoos?: boolean;
   hasPiercings?: boolean;
   isSmoker?: boolean;

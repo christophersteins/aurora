@@ -16,6 +16,10 @@ export class UpdateEscortProfileDto {
   languages?: string[];
 
   @IsOptional()
+  @IsString()
+  type?: string; // Typ
+
+  @IsOptional()
   @IsInt()
   @Min(140)
   @Max(220)
@@ -29,11 +33,11 @@ export class UpdateEscortProfileDto {
 
   @IsOptional()
   @IsString()
-  bodyType?: string;
+  bodyType?: string; // Figur
 
   @IsOptional()
   @IsString()
-  cupSize?: string;
+  cupSize?: string; // Oberweite
 
   @IsOptional()
   @IsString()
@@ -46,6 +50,10 @@ export class UpdateEscortProfileDto {
   @IsOptional()
   @IsString()
   eyeColor?: string;
+
+  @IsOptional()
+  @IsString()
+  intimateHair?: string; // Intimbereich
 
   @IsOptional()
   @IsBoolean()

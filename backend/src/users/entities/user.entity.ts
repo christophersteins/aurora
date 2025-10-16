@@ -58,6 +58,9 @@ export class User {
   @Column('text', { array: true, nullable: true })
   languages: string[];
 
+  @Column({ nullable: true })
+  type: string; // Typ (Afrikanisch, Asiatisch, etc.)
+
   @Column({ type: 'int', nullable: true })
   height: number; // in cm
 
@@ -65,10 +68,10 @@ export class User {
   weight: number; // in kg
 
   @Column({ nullable: true })
-  bodyType: string; // z.B. 'schlank', 'athletisch', 'kurvig'
+  bodyType: string; // Figur
 
   @Column({ nullable: true })
-  cupSize: string; // z.B. 'A', 'B', 'C'
+  cupSize: string; // Oberweite
 
   @Column({ nullable: true })
   hairColor: string;
@@ -78,6 +81,9 @@ export class User {
 
   @Column({ nullable: true })
   eyeColor: string;
+
+  @Column({ nullable: true })
+  intimateHair: string; // Intimbereich
 
   @Column({ type: 'boolean', default: false })
   hasTattoos: boolean;

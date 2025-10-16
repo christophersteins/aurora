@@ -4,6 +4,7 @@ export interface MemberFilters {
   ageMax: number | null;
   nationalities: string[];
   languages: string[];
+  types: string[];
   heightMin: number | null;
   heightMax: number | null;
   weightMin: number | null;
@@ -13,6 +14,7 @@ export interface MemberFilters {
   hairColors: string[];
   hairLengths: string[];
   eyeColors: string[];
+  intimateHair: string[];
   hasTattoos: 'all' | 'yes' | 'no';
   hasPiercings: 'all' | 'yes' | 'no';
   isSmoker: 'all' | 'yes' | 'no';
@@ -24,6 +26,7 @@ export const initialFilters: MemberFilters = {
   ageMax: null,
   nationalities: [],
   languages: [],
+  types: [],
   heightMin: null,
   heightMax: null,
   weightMin: null,
@@ -33,6 +36,7 @@ export const initialFilters: MemberFilters = {
   hairColors: [],
   hairLengths: [],
   eyeColors: [],
+  intimateHair: [],
   hasTattoos: 'all',
   hasPiercings: 'all',
   isSmoker: 'all',

@@ -126,6 +126,7 @@ export class UsersService {
       birthDate?: string;
       nationalities?: string[];
       languages?: string[];
+      type?: string;
       height?: number;
       weight?: number;
       bodyType?: string;
@@ -133,6 +134,7 @@ export class UsersService {
       hairColor?: string;
       hairLength?: string;
       eyeColor?: string;
+      intimateHair?: string;
       hasTattoos?: boolean;
       hasPiercings?: boolean;
       isSmoker?: boolean;
@@ -158,6 +160,7 @@ export class UsersService {
     // Aktualisiere die anderen Felder
     if (updateData.nationalities !== undefined) user.nationalities = updateData.nationalities;
     if (updateData.languages !== undefined) user.languages = updateData.languages;
+    if (updateData.type !== undefined) user.type = updateData.type;
     if (updateData.height !== undefined) user.height = updateData.height;
     if (updateData.weight !== undefined) user.weight = updateData.weight;
     if (updateData.bodyType !== undefined) user.bodyType = updateData.bodyType;
@@ -165,6 +168,7 @@ export class UsersService {
     if (updateData.hairColor !== undefined) user.hairColor = updateData.hairColor;
     if (updateData.hairLength !== undefined) user.hairLength = updateData.hairLength;
     if (updateData.eyeColor !== undefined) user.eyeColor = updateData.eyeColor;
+    if (updateData.intimateHair !== undefined) user.intimateHair = updateData.intimateHair;
     if (updateData.hasTattoos !== undefined) user.hasTattoos = updateData.hasTattoos;
     if (updateData.hasPiercings !== undefined) user.hasPiercings = updateData.hasPiercings;
     if (updateData.isSmoker !== undefined) user.isSmoker = updateData.isSmoker;

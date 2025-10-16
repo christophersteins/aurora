@@ -48,13 +48,23 @@ export const HEIGHTS = Array.from({ length: 81 }, (_, i) => 140 + i);
 // Gewicht in kg (40-200)
 export const WEIGHTS = Array.from({ length: 161 }, (_, i) => 40 + i);
 
+export const TYPES = [
+  'Afrikanisch',
+  'Asiatisch',
+  'Exotisch',
+  'Latina',
+  'Orientalisch',
+  'Osteuropäisch',
+  'Skandinavisch',
+  'Westeuropäisch',
+];
+
 export const BODY_TYPES = [
+  'Sehr schlank',
   'Schlank',
-  'Athletisch',
-  'Normal',
-  'Kurvig',
+  'Mittel',
   'Mollig',
-  'Plus Size',
+  'Sehr mollig',
 ];
 
 export const CUP_SIZES = [
@@ -92,6 +102,12 @@ export const EYE_COLORS = [
   'Grün',
   'Braun',
   'Grau',
-  'Haselnuss',
-  'Bernstein',
+  'Andere',
+];
+
+export const INTIMATE_HAIR = [
+  'Total rasiert',
+  'Teilrasiert',
+  'Behaart',
+  'Stark behaart',
 ];
