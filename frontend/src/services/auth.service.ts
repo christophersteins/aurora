@@ -6,6 +6,7 @@ export interface RegisterData {
   password: string;
   firstName?: string;
   lastName?: string;
+  role?: 'customer' | 'escort' | 'business';
 }
 
 export interface LoginData {
@@ -21,6 +22,7 @@ export interface AuthResponse {
     username: string;
     firstName?: string;
     lastName?: string;
+    role?: 'customer' | 'escort' | 'business';
   };
 }
 

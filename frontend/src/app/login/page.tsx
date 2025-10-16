@@ -24,8 +24,11 @@ export default function LoginPage() {
       const response = await authService.login({ email, password });
       setAuth(response.user, response.access_token);
       router.push('/'); // Redirect zur Homepage
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login fehlgeschlagen');
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Login fehlgeschlagen';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

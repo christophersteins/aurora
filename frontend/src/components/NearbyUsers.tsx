@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { geolocationService } from '@/services/geolocationService';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { useAuthStore } from '@/store/authStore';
+import apiClient from '@/lib/api-client';
 
 interface User {
   id: string;
@@ -18,22 +16,32 @@ interface User {
 }
 
 export default function NearbyUsers() {
-  const { user, token, isAuthenticated } = useAuthStore();
-  const [radius, setRadius] = useState(10);
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [radius, setRadius] = useState<number>(5);
   const [nearbyUsers, setNearbyUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const { latitude, longitude, requestLocation } = useGeolocation();
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+        },
+        (err) => {
+          setError(`Fehler beim Abrufen der Position: ${err.message}`);
+        }
+      );
+    } else {
+      setError('Geolocation wird von diesem Browser nicht unterstützt');
+    }
+  }, []);
 
   const searchNearbyUsers = async () => {
-    if (!isAuthenticated || !token || !user) {
-      setError('Bitte logge dich ein.');
-      return;
-    }
-
     if (!latitude || !longitude) {
-      setError('Keine Standortdaten verfügbar. Bitte Standort abrufen.');
+      setError('Position nicht verfügbar');
       return;
     }
 
@@ -41,62 +49,40 @@ export default function NearbyUsers() {
     setError(null);
 
     try {
-      const users = await geolocationService.getNearbyUsers(
-        latitude,
-        longitude,
-        radius,
-        token,
-        user.id
-      );
-      setNearbyUsers(users);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Fehler beim Laden der Benutzer');
+      const response = await apiClient.get('/users/nearby', {
+        params: {
+          latitude,
+          longitude,
+          radius,
+        },
+      });
+      setNearbyUsers(response.data);
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Fehler beim Suchen der Benutzer';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (latitude && longitude && isAuthenticated) {
-      searchNearbyUsers();
-    }
-  }, [latitude, longitude, radius, isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return (
-      <div className="p-6 border rounded-lg bg-white shadow-sm">
-        <h2 className="text-2xl font-bold mb-4">Benutzer in der Nähe</h2>
-        <p className="text-gray-600">Bitte logge dich ein, um Benutzer in deiner Nähe zu finden.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6 border rounded-lg bg-white shadow-sm">
-      <h2 className="text-2xl font-bold mb-4">Benutzer in der Nähe</h2>
+      <h2 className="text-2xl font-bold mb-4">Benutzer in deiner Nähe</h2>
 
-      {/* Standort abrufen */}
       <div className="mb-4">
-        <button
-          onClick={requestLocation}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Standort abrufen
-        </button>
-        {latitude && longitude && (
-          <p className="text-sm text-gray-600 mt-2">
-            📍 Dein Standort: {latitude.toFixed(4)}, {longitude.toFixed(4)}
-          </p>
-        )}
-      </div>
+        <p className="text-sm text-gray-600 mb-2">
+          Deine Position: {latitude && longitude 
+            ? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` 
+            : 'Wird ermittelt...'}
+        </p>
 
-      {/* Radius-Auswahl */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">
-          Umkreis: {radius} km
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Radius: {radius} km
         </label>
-        <div className="flex gap-2 flex-wrap">
-          {[5, 10, 20, 50, 100, 500].map((r) => (
+        <div className="flex gap-2">
+          {[1, 5, 10, 25, 50].map((r) => (
             <button
               key={r}
               onClick={() => setRadius(r)}
@@ -112,7 +98,6 @@ export default function NearbyUsers() {
         </div>
       </div>
 
-      {/* Suchen Button */}
       <button
         onClick={searchNearbyUsers}
         disabled={loading || !latitude || !longitude}
@@ -121,14 +106,12 @@ export default function NearbyUsers() {
         {loading ? 'Suche...' : 'Benutzer suchen'}
       </button>
 
-      {/* Fehler */}
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded mb-4">
           <p className="text-red-700">{error}</p>
         </div>
       )}
 
-      {/* Benutzer-Liste */}
       <div>
         <h3 className="text-lg font-semibold mb-3">
           {nearbyUsers.length} Benutzer gefunden
@@ -145,7 +128,6 @@ export default function NearbyUsers() {
               className="p-4 border rounded-lg hover:bg-gray-50 transition"
             >
               <div className="flex items-center gap-3">
-                {/* Profilbild Placeholder */}
                 <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
                   {user.username?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                 </div>

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 interface MultiSelectDropdownProps {
-  label: string;
+  label?: string;
   options: string[];
   selectedValues: string[];
   onChange: (values: string[]) => void;
@@ -22,7 +22,6 @@ export default function MultiSelectDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Schließe Dropdown wenn außerhalb geklickt wird
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -35,7 +34,6 @@ export default function MultiSelectDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fokussiere Suchfeld wenn Dropdown öffnet
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -54,17 +52,15 @@ export default function MultiSelectDropdown({
     onChange(selectedValues.filter((v) => v !== option));
   };
 
-  // Filtere Optionen basierend auf Suchbegriff
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">{label}</label>
+      {label && <label className="block text-sm font-medium mb-2">{label}</label>}
       
       <div className="relative" ref={dropdownRef}>
-        {/* Selected Tags Display */}
         <div
           onClick={() => setIsOpen(!isOpen)}
           className="min-h-[42px] px-4 py-2 border rounded focus-within:ring-2 focus-within:ring-blue-500 cursor-pointer bg-white"
@@ -95,10 +91,8 @@ export default function MultiSelectDropdown({
           )}
         </div>
 
-        {/* Dropdown Menu */}
         {isOpen && (
           <div className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
-            {/* Suchfeld */}
             <div className="p-2 border-b">
               <input
                 ref={searchInputRef}
@@ -111,7 +105,6 @@ export default function MultiSelectDropdown({
               />
             </div>
 
-            {/* Optionen Liste */}
             <div className="max-h-60 overflow-y-auto">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (

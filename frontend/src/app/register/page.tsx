@@ -40,8 +40,11 @@ export default function RegisterPage() {
       });
       setAuth(response.user, response.access_token);
       router.push('/'); // Redirect zur Homepage
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registrierung fehlgeschlagen');
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registrierung fehlgeschlagen';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -39,8 +39,11 @@ export const useLocationUpdate = ({
     try {
       await geolocationService.updateLocation(userId, latitude, longitude, token);
       setUpdateSuccess(true);
-    } catch (err: any) {
-      setUpdateError(err.response?.data?.message || 'Fehler beim Aktualisieren des Standorts');
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Fehler beim Aktualisieren des Standorts';
+      setUpdateError(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -57,7 +60,6 @@ export const useLocationUpdate = ({
     setUpdateSuccess(false);
 
     try {
-      // Standort abrufen und direkt verarbeiten
       await new Promise<void>((resolve, reject) => {
         if (!navigator.geolocation) {
           reject(new Error('Geolocation wird nicht unterstützt'));
@@ -70,13 +72,13 @@ export const useLocationUpdate = ({
             const lng = position.coords.longitude;
 
             try {
-              // Direkt ans Backend senden
               await geolocationService.updateLocation(userId, lat, lng, token);
               setUpdateSuccess(true);
-            } catch (err: any) {
-              setUpdateError(
-                err.response?.data?.message || 'Fehler beim Aktualisieren des Standorts'
-              );
+            } catch (err) {
+              const errorMessage = err instanceof Error 
+                ? err.message 
+                : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Fehler beim Aktualisieren des Standorts';
+              setUpdateError(errorMessage);
             }
             resolve();
           },
@@ -94,8 +96,11 @@ export const useLocationUpdate = ({
           }
         );
       });
-    } catch (err: any) {
-      setUpdateError(err.message || 'Fehler beim Abrufen des Standorts');
+    } catch (err) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : 'Fehler beim Abrufen des Standorts';
+      setUpdateError(errorMessage);
     } finally {
       setIsUpdating(false);
     }

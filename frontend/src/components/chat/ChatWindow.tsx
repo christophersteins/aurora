@@ -15,22 +15,38 @@ interface ChatWindowProps {
   currentUserId: string;
 }
 
+interface LoadMessagesResponse {
+  success: boolean;
+  messages: Array<{
+    id: string;
+    senderId: string;
+    content: string;
+    createdAt: string;
+  }>;
+}
+
+interface IncomingMessage {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: string;
+}
+
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
   const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Nachrichten aus DB laden, wenn Konversation gewählt wird
   useEffect(() => {
     if (!socket || !conversationId) return;
 
     setIsLoading(true);
     console.log('📂 Lade Nachrichten für Konversation:', conversationId);
 
-    socket.emit('loadMessages', { conversationId }, (response: any) => {
+    socket.emit('loadMessages', { conversationId }, (response: LoadMessagesResponse) => {
       if (response?.success && response.messages) {
-        const loadedMessages = response.messages.map((msg: any) => ({
+        const loadedMessages = response.messages.map((msg) => ({
           ...msg,
           timestamp: new Date(msg.createdAt),
         }));
@@ -41,16 +57,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     });
   }, [socket, conversationId]);
 
-  // Socket-Listener für neue eingehende Nachrichten
   useEffect(() => {
     if (!socket || !conversationId) return;
 
     const eventName = `message:${conversationId}`;
 
-    const handleMessage = (message: any) => {
+    const handleMessage = (message: IncomingMessage) => {
       console.log('📥 Neue Nachricht empfangen:', message);
       
-      // Prüfe ob Nachricht bereits existiert (verhindert Duplikate)
       setMessages((prev) => {
         const exists = prev.some(m => m.id === message.id);
         if (exists) return prev;
@@ -94,7 +108,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
       <div className="p-4 border-b bg-gray-100 flex justify-between items-center">
         <h2 className="font-semibold">Chat #{conversationId}</h2>
         <span className={`text-sm ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
@@ -102,7 +115,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         </span>
       </div>
 
-      {/* Nachrichten */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {isLoading ? (
           <p className="text-gray-400 text-center">Lade Nachrichten...</p>
@@ -131,7 +143,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         )}
       </div>
 
-      {/* Eingabefeld */}
       <div className="p-4 border-t bg-gray-50">
         <div className="flex gap-2">
           <input

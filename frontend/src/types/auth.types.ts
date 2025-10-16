@@ -25,8 +25,8 @@ export interface User {
   hasPiercings?: boolean;
   isSmoker?: boolean;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthState {
