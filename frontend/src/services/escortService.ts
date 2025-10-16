@@ -6,4 +6,9 @@ export const escortService = {
     const response = await apiClient.get('/users/escorts');
     return response.data;
   },
+
+  async getEscortById(id: string): Promise<User> {
+    const response = await apiClient.get(`/users/${id}`);
+    return response.data;
+  },
 };
