@@ -27,7 +27,12 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // ... bestehende Endpoints
+  // Spezifische Routes zuerst (vor dynamischen Routes wie :id)
+  
+  @Get('escorts')
+  async findAllEscorts(): Promise<User[]> {
+    return this.usersService.findAllEscorts();
+  }
 
   @Get('nearby')
   @UseGuards(JwtAuthGuard)
@@ -38,6 +43,26 @@ export class UsersController {
       query.radius,
       query.excludeUserId,
     );
+  }
+
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
+
+  // Dynamische Route :id kommt NACH allen spezifischen GET-Routes
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Partial<User>> {
+    const user = await this.usersService.findById(id);
+    
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    
+    // Entferne das Passwort aus der Response
+    const { password, ...userWithoutPassword } = user;
+    
+    return userWithoutPassword;
   }
 
   @Put(':id/location')
@@ -61,16 +86,6 @@ export class UsersController {
   ): Promise<User> {
     const userId = req.user.id;
     return this.usersService.updateEscortProfile(userId, updateEscortProfileDto);
-  }
-
-  @Get()
-  async findAll(): Promise<User[]> {
-    return this.usersService.findAll();
-  }
-
-  @Get('escorts')
-  async findAllEscorts(): Promise<User[]> {
-    return this.usersService.findAllEscorts();
   }
 
   @Post('upload-profile-picture')
