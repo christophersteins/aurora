@@ -203,255 +203,281 @@ export default function EscortProfileForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Geburtsdatum */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Geburtsdatum {age !== null && <span className="text-gray-600">({age} Jahre)</span>}
-          </label>
-          <input
-            type="date"
-            value={formData.birthDate}
-            onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Nationalität (Mehrfachauswahl) */}
-        <MultiSelectDropdown
-          label="Nationalität"
-          options={NATIONALITIES}
-          selectedValues={formData.nationalities || []}
-          onChange={(values) => setFormData({ ...formData, nationalities: values })}
-          placeholder="Nationalitäten auswählen..."
-        />
-
-        {/* Sprachen (Mehrfachauswahl) */}
-        <MultiSelectDropdown
-          label="Sprachen"
-          options={LANGUAGES}
-          selectedValues={formData.languages || []}
-          onChange={(values) => setFormData({ ...formData, languages: values })}
-          placeholder="Sprachen auswählen..."
-        />
-
-        {/* Größe */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Größe (cm)</label>
-          <select
-            value={formData.height || ''}
-            onChange={(e) => setFormData({ ...formData, height: Number(e.target.value) })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {HEIGHTS.map((height) => (
-              <option key={height} value={height}>
-                {height} cm
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Gewicht */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Gewicht (kg)</label>
-          <select
-            value={formData.weight || ''}
-            onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {WEIGHTS.map((weight) => (
-              <option key={weight} value={weight}>
-                {weight} kg
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Figur */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Figur</label>
-          <select
-            value={formData.bodyType || ''}
-            onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {BODY_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Körbchengröße */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Körbchengröße</label>
-          <select
-            value={formData.cupSize || ''}
-            onChange={(e) => setFormData({ ...formData, cupSize: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {CUP_SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Haarfarbe */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Haarfarbe</label>
-          <select
-            value={formData.hairColor || ''}
-            onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {HAIR_COLORS.map((color) => (
-              <option key={color} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Haarlänge */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Haarlänge</label>
-          <select
-            value={formData.hairLength || ''}
-            onChange={(e) => setFormData({ ...formData, hairLength: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {HAIR_LENGTHS.map((length) => (
-              <option key={length} value={length}>
-                {length}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Augenfarbe */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Augenfarbe</label>
-          <select
-            value={formData.eyeColor || ''}
-            onChange={(e) => setFormData({ ...formData, eyeColor: e.target.value })}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Bitte wählen</option>
-            {EYE_COLORS.map((color) => (
-              <option key={color} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Raucher/in */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Raucher/in</label>
-          <div className="flex gap-4">
-            <label className="flex items-center cursor-pointer">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* === PERSÖNLICHE INFORMATIONEN === */}
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Persönliche Informationen</h3>
+          <div className="space-y-6">
+            {/* Geburtsdatum */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Geburtsdatum {age !== null && <span className="text-gray-600">({age} Jahre)</span>}
+              </label>
               <input
-                type="radio"
-                name="isSmoker"
-                checked={formData.isSmoker === true}
-                onChange={() => setFormData({ ...formData, isSmoker: true })}
-                className="mr-2"
+                type="date"
+                value={formData.birthDate}
+                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <span>Ja</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="isSmoker"
-                checked={formData.isSmoker === false}
-                onChange={() => setFormData({ ...formData, isSmoker: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
+            </div>
+
+            {/* Nationalität (Mehrfachauswahl) */}
+            <MultiSelectDropdown
+              label="Nationalität"
+              options={NATIONALITIES}
+              selectedValues={formData.nationalities || []}
+              onChange={(values) => setFormData({ ...formData, nationalities: values })}
+              placeholder="Nationalitäten auswählen..."
+            />
+
+            {/* Sprachen (Mehrfachauswahl) */}
+            <MultiSelectDropdown
+              label="Sprachen"
+              options={LANGUAGES}
+              selectedValues={formData.languages || []}
+              onChange={(values) => setFormData({ ...formData, languages: values })}
+              placeholder="Sprachen auswählen..."
+            />
           </div>
         </div>
 
-        {/* Tattoos */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Tattoos</label>
-          <div className="flex gap-4">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasTattoos"
-                checked={formData.hasTattoos === true}
-                onChange={() => setFormData({ ...formData, hasTattoos: true })}
-                className="mr-2"
-              />
-              <span>Ja</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasTattoos"
-                checked={formData.hasTattoos === false}
-                onChange={() => setFormData({ ...formData, hasTattoos: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
+        {/* === KÖRPERLICHE MERKMALE === */}
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Körperliche Merkmale</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Größe */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Größe (cm)</label>
+              <select
+                value={formData.height || ''}
+                onChange={(e) => setFormData({ ...formData, height: Number(e.target.value) })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {HEIGHTS.map((height) => (
+                  <option key={height} value={height}>
+                    {height} cm
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Gewicht */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Gewicht (kg)</label>
+              <select
+                value={formData.weight || ''}
+                onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {WEIGHTS.map((weight) => (
+                  <option key={weight} value={weight}>
+                    {weight} kg
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Figur */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Figur</label>
+              <select
+                value={formData.bodyType || ''}
+                onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {BODY_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Körbchengröße */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Körbchengröße</label>
+              <select
+                value={formData.cupSize || ''}
+                onChange={(e) => setFormData({ ...formData, cupSize: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {CUP_SIZES.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Piercings */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Piercings</label>
-          <div className="flex gap-4">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasPiercings"
-                checked={formData.hasPiercings === true}
-                onChange={() => setFormData({ ...formData, hasPiercings: true })}
-                className="mr-2"
-              />
-              <span>Ja</span>
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="hasPiercings"
-                checked={formData.hasPiercings === false}
-                onChange={() => setFormData({ ...formData, hasPiercings: false })}
-                className="mr-2"
-              />
-              <span>Nein</span>
-            </label>
+        {/* === AUSSEHEN === */}
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Aussehen</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Haarfarbe */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Haarfarbe</label>
+              <select
+                value={formData.hairColor || ''}
+                onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {HAIR_COLORS.map((color) => (
+                  <option key={color} value={color}>
+                    {color}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Haarlänge */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Haarlänge</label>
+              <select
+                value={formData.hairLength || ''}
+                onChange={(e) => setFormData({ ...formData, hairLength: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {HAIR_LENGTHS.map((length) => (
+                  <option key={length} value={length}>
+                    {length}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Augenfarbe */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Augenfarbe</label>
+              <select
+                value={formData.eyeColor || ''}
+                onChange={(e) => setFormData({ ...formData, eyeColor: e.target.value })}
+                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Bitte wählen</option>
+                {EYE_COLORS.map((color) => (
+                  <option key={color} value={color}>
+                    {color}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Über mich */}
-        <div>
-          <label className="block text-sm font-medium mb-2">Über mich</label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={6}
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Erzähle etwas über dich..."
-          />
+        {/* === WEITERE MERKMALE === */}
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Weitere Merkmale</h3>
+          <div className="space-y-4">
+            {/* Raucher/in */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Raucher/in</label>
+              <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="isSmoker"
+                    checked={formData.isSmoker === true}
+                    onChange={() => setFormData({ ...formData, isSmoker: true })}
+                    className="mr-2"
+                  />
+                  <span>Ja</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="isSmoker"
+                    checked={formData.isSmoker === false}
+                    onChange={() => setFormData({ ...formData, isSmoker: false })}
+                    className="mr-2"
+                  />
+                  <span>Nein</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Tattoos */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Tattoos</label>
+              <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasTattoos"
+                    checked={formData.hasTattoos === true}
+                    onChange={() => setFormData({ ...formData, hasTattoos: true })}
+                    className="mr-2"
+                  />
+                  <span>Ja</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasTattoos"
+                    checked={formData.hasTattoos === false}
+                    onChange={() => setFormData({ ...formData, hasTattoos: false })}
+                    className="mr-2"
+                  />
+                  <span>Nein</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Piercings */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Piercings</label>
+              <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasPiercings"
+                    checked={formData.hasPiercings === true}
+                    onChange={() => setFormData({ ...formData, hasPiercings: true })}
+                    className="mr-2"
+                  />
+                  <span>Ja</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasPiercings"
+                    checked={formData.hasPiercings === false}
+                    onChange={() => setFormData({ ...formData, hasPiercings: false })}
+                    className="mr-2"
+                  />
+                  <span>Nein</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* === ÜBER MICH === */}
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Über mich</h3>
+          <div>
+            <textarea
+              value={formData.description || ''}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={6}
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Erzähle etwas über dich..."
+            />
+          </div>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-lg"
         >
           {loading ? 'Wird gespeichert...' : 'Profil speichern'}
         </button>
