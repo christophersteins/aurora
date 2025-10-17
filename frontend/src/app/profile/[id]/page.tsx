@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { escortService } from '@/services/escortService';
+import { profilePictureService } from '@/services/profilePictureService';
 import { User } from '@/types/auth.types';
 
 export default function ProfilePage() {
@@ -14,9 +15,9 @@ export default function ProfilePage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Placeholder images - später durch echte Fotos ersetzen
+  // Generate photos array with full URLs
   const photos = escort?.profilePicture 
-    ? [escort.profilePicture, escort.profilePicture, escort.profilePicture] 
+    ? [profilePictureService.getProfilePictureUrl(escort.profilePicture)] 
     : [];
 
   useEffect(() => {
@@ -124,16 +125,25 @@ export default function ProfilePage() {
           {/* Photo Gallery - 2/3 width */}
           <div className="lg:col-span-2">
             <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-secondary)' }}>
-              {/* Main Image */}
-              <div className="relative aspect-[4/3] bg-gradient-to-br" style={{
-                background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
-              }}>
+              {/* Main Image - flexible height, no cropping */}
+              <div 
+                className="relative w-full flex items-center justify-center" 
+                style={{
+                  minHeight: '500px',
+                  maxHeight: '700px',
+                  background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
+                }}
+              >
                 {photos.length > 0 ? (
                   <>
                     <img
                       src={photos[selectedImageIndex]}
                       alt={`Foto ${selectedImageIndex + 1}`}
-                      className="w-full h-full object-cover cursor-pointer"
+                      className="w-full h-full cursor-pointer"
+                      style={{ 
+                        objectFit: 'contain',
+                        maxHeight: '700px'
+                      }}
                       onClick={() => setIsFullscreen(true)}
                     />
                     
@@ -142,7 +152,7 @@ export default function ProfilePage() {
                       <>
                         <button
                           onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
                           style={{ 
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
@@ -153,7 +163,7 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
                           style={{ 
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
@@ -335,7 +345,7 @@ export default function ProfilePage() {
             {/* Close Button */}
             <button
               onClick={() => setIsFullscreen(false)}
-              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all"
+              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110"
               style={{ 
                 background: 'rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-button)',
@@ -359,7 +369,7 @@ export default function ProfilePage() {
                 <>
                   <button
                     onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110"
                     style={{ 
                       background: 'rgba(0, 0, 0, 0.7)',
                       color: 'var(--text-button)',
@@ -370,7 +380,7 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110"
                     style={{ 
                       background: 'rgba(0, 0, 0, 0.7)',
                       color: 'var(--text-button)',
