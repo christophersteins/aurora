@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { Filter, MapPin } from 'lucide-react';
+import { Filter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown } from 'lucide-react';
 
 // Filter-Interface
 interface Filters {
@@ -62,6 +62,8 @@ const initialFilters: Filters = {
 
 const FILTER_STORAGE_KEY = 'aurora_member_filters';
 
+type GridView = 'compact' | 'comfortable';
+
 export default function MembersPage() {
   const router = useRouter();
   const [escorts, setEscorts] = useState<User[]>([]);
@@ -69,7 +71,8 @@ export default function MembersPage() {
   const [error, setError] = useState<string | null>(null);
   const [filterSidebarOpen, setFilterSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(initialFilters);
-  const [sortBy, setSortBy] = useState<'distance' | 'none'>('none');
+  const [sortBy, setSortBy] = useState<'distance'>('distance');
+  const [gridView, setGridView] = useState<GridView>('compact');
 
   // Lade Filter aus LocalStorage beim Mount
   useEffect(() => {
@@ -169,7 +172,6 @@ export default function MembersPage() {
     if (filters.useRadius && filters.userLatitude && filters.userLongitude) {
       if (!escort.location) return false;
       
-      // Extrahiere Koordinaten aus PostGIS Point
       const coords = escort.location.coordinates;
       if (!coords || coords.length !== 2) return false;
       
@@ -276,12 +278,10 @@ export default function MembersPage() {
 
   // Sortierung nach Entfernung (aufsteigend - nächste zuerst)
   const sortedEscorts = [...filteredEscorts].sort((a, b) => {
-    // Sortierung nach Entfernung
     if (sortBy === 'distance' && filters.useRadius && filters.userLatitude && filters.userLongitude) {
       const aCoords = a.location?.coordinates;
       const bCoords = b.location?.coordinates;
 
-      // Escorts ohne Location ans Ende
       if (!aCoords || aCoords.length !== 2) return 1;
       if (!bCoords || bCoords.length !== 2) return -1;
 
@@ -302,10 +302,9 @@ export default function MembersPage() {
         bLon
       );
 
-      return distanceA - distanceB; // Aufsteigend sortieren
+      return distanceA - distanceB;
     }
 
-    // Keine Sortierung
     return 0;
   });
 
@@ -319,7 +318,6 @@ export default function MembersPage() {
   // Filter zurücksetzen
   const handleResetFilters = () => {
     setFilters(initialFilters);
-    // Filter auch aus LocalStorage entfernen
     try {
       localStorage.removeItem(FILTER_STORAGE_KEY);
     } catch (error) {
@@ -353,22 +351,31 @@ export default function MembersPage() {
     );
   };
 
+  // Grid-Klassen basierend auf View-Auswahl
+  const getGridClasses = () => {
+    if (gridView === 'compact') {
+      return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+    } else {
+      return 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-xl text-gray-600">Lädt...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-text-secondary">Lädt...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-600 mb-4">{error}</p>
+          <p className="text-xl text-red-500 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="btn-base btn-primary"
           >
             Erneut versuchen
           </button>
@@ -378,65 +385,94 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Member Directory</h1>
-          <p className="text-gray-600 mt-2">
-            {sortedEscorts.length} von {escorts.length}{' '}
-            {escorts.length === 1 ? 'Escort' : 'Escorts'}
-            {hasActiveFilters() && ' (gefiltert)'}
-          </p>
+          <h1 className="text-4xl font-bold gradient-text">Escorts</h1>
         </div>
 
-        {/* Filter Button */}
-        <div className="mb-6 flex items-center gap-4">
-          <button
-            onClick={() => setFilterSidebarOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-          >
-            <Filter className="w-5 h-5" />
-            Filter
-            {hasActiveFilters() && (
-              <span className="ml-1 px-2 py-0.5 bg-white text-indigo-600 rounded-full text-xs font-semibold">
-                Aktiv
-              </span>
-            )}
-          </button>
-          
-          {hasActiveFilters() && (
+        {/* Toolbar: Filter, Sortierung, View Switcher */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Linke Seite: Filter Button und Sortierung */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            {/* Filter Button */}
+            <button
+              onClick={() => setFilterSidebarOpen(true)}
+              className="btn-base btn-primary flex items-center justify-center gap-2"
+            >
+              <Filter className="w-5 h-5" />
+              Filter
+              {hasActiveFilters() && (
+                <span 
+                  className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ backgroundColor: '#000000', color: '#00d4ff' }}
+                >
+                  Aktiv
+                </span>
+              )}
+            </button>
+
+            {/* Sortierung Select */}
+            <div className="relative">
+              <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
+              <select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'distance')}
+                className="pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular appearance-none cursor-pointer"
+              >
+                <option value="distance">Entfernung aufsteigend</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Rechte Seite: View Switcher */}
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => setGridView('compact')}
+              className={`p-2 rounded-lg border transition ${
+                gridView === 'compact'
+                  ? 'text-white border-secondary'
+                  : 'bg-bg-primary text-text-secondary border-border hover:border-secondary hover:text-secondary'
+              }`}
+              style={gridView === 'compact' ? { backgroundColor: '#4d7cfe' } : {}}
+              title="Kompakte Ansicht (weniger pro Reihe)"
+            >
+              <LayoutGrid className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setGridView('comfortable')}
+              className={`p-2 rounded-lg border transition ${
+                gridView === 'comfortable'
+                  ? 'text-white border-secondary'
+                  : 'bg-bg-primary text-text-secondary border-border hover:border-secondary hover:text-secondary'
+              }`}
+              style={gridView === 'comfortable' ? { backgroundColor: '#4d7cfe' } : {}}
+              title="Komfortable Ansicht (mehr pro Reihe)"
+            >
+              <Grid3x3 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Filter zurücksetzen (wenn aktiv) */}
+        {hasActiveFilters() && (
+          <div className="mb-6">
             <button
               onClick={handleResetFilters}
-              className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+              className="text-sm font-medium hover:opacity-80 transition"
+              style={{ color: '#b845ed' }}
             >
               Alle Filter zurücksetzen
             </button>
-          )}
-        </div>
-
-        {/* Sortierung Select */}
-        <div className="mb-6">
-          <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-2">
-            Sortieren nach
-          </label>
-          <select
-            id="sort-select"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'distance' | 'none')}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-          >
-            <option value="none">Standard</option>
-            {filters.useRadius && (
-              <option value="distance">Entfernung (aufsteigend)</option>
-            )}
-          </select>
-        </div>
+          </div>
+        )}
 
         {/* Escorts Grid */}
         {sortedEscorts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg mb-4">
+            <p className="text-text-secondary text-lg mb-4">
               {hasActiveFilters()
                 ? 'Keine Escorts mit den ausgewählten Filtern gefunden'
                 : 'Keine Escorts gefunden'}
@@ -444,14 +480,14 @@ export default function MembersPage() {
             {hasActiveFilters() && (
               <button
                 onClick={handleResetFilters}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                className="btn-base btn-primary"
               >
                 Filter zurücksetzen
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className={getGridClasses()}>
             {sortedEscorts.map((escort) => {
               const age = calculateAge(escort.birthDate);
 
@@ -459,10 +495,10 @@ export default function MembersPage() {
                 <div
                   key={escort.id}
                   onClick={() => handleProfileClick(escort.username)}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                  className="bg-bg-primary border-depth rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-105"
                 >
                   {/* Profilbild */}
-                  <div className="aspect-square bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                  <div className="aspect-square bg-bg-secondary flex items-center justify-center">
                     {escort.profilePicture ? (
                       <img
                         src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${
@@ -472,7 +508,7 @@ export default function MembersPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="text-white text-6xl font-bold">
+                      <div className="text-text-secondary text-6xl">
                         {(
                           escort.firstName?.[0] ||
                           escort.username?.[0] ||
@@ -484,11 +520,11 @@ export default function MembersPage() {
 
                   {/* Informationen */}
                   <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                    <h3 className="text-xl mb-3">
                       {escort.username || 'Unbekannt'}
                     </h3>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <div className="flex items-center gap-3 text-sm text-text-secondary">
                       {/* Entfernung anzeigen */}
                       {filters.useRadius && filters.userLatitude && filters.userLongitude && escort.location && (
                         <span className="flex items-center gap-1">
