@@ -273,6 +273,41 @@ export default function MembersPage() {
     return true;
   });
 
+  // Sortierung nach Entfernung (aufsteigend - nächste zuerst)
+  const sortedEscorts = [...filteredEscorts].sort((a, b) => {
+    // Nur sortieren wenn Radius-Filter aktiv ist
+    if (filters.useRadius && filters.userLatitude && filters.userLongitude) {
+      const aCoords = a.location?.coordinates;
+      const bCoords = b.location?.coordinates;
+
+      // Escorts ohne Location ans Ende
+      if (!aCoords || aCoords.length !== 2) return 1;
+      if (!bCoords || bCoords.length !== 2) return -1;
+
+      const [aLon, aLat] = aCoords;
+      const [bLon, bLat] = bCoords;
+
+      const distanceA = calculateDistance(
+        filters.userLatitude,
+        filters.userLongitude,
+        aLat,
+        aLon
+      );
+
+      const distanceB = calculateDistance(
+        filters.userLatitude,
+        filters.userLongitude,
+        bLat,
+        bLon
+      );
+
+      return distanceA - distanceB; // Aufsteigend sortieren
+    }
+
+    // Keine Sortierung wenn Radius-Filter inaktiv
+    return 0;
+  });
+
   // Funktion zum Navigieren zum Profil
   const handleProfileClick = (username?: string) => {
     if (username) {
@@ -348,7 +383,7 @@ export default function MembersPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800">Member Directory</h1>
           <p className="text-gray-600 mt-2">
-            {filteredEscorts.length} von {escorts.length}{' '}
+            {sortedEscorts.length} von {escorts.length}{' '}
             {escorts.length === 1 ? 'Escort' : 'Escorts'}
             {hasActiveFilters() && ' (gefiltert)'}
           </p>
@@ -380,7 +415,7 @@ export default function MembersPage() {
         </div>
 
         {/* Escorts Grid */}
-        {filteredEscorts.length === 0 ? (
+        {sortedEscorts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg mb-4">
               {hasActiveFilters()
@@ -398,7 +433,7 @@ export default function MembersPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEscorts.map((escort) => {
+            {sortedEscorts.map((escort) => {
               const age = calculateAge(escort.birthDate);
 
               return (
