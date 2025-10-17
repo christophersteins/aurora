@@ -23,7 +23,7 @@ export default function LoginPage() {
     try {
       const response = await authService.login({ email, password });
       setAuth(response.user, response.access_token);
-      router.push('/'); // Redirect zur Homepage
+      router.push('/');
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
@@ -35,64 +35,76 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Aurora</h1>
-          <p className="text-gray-600">Melde dich an</p>
+          <h1 className="text-5xl font-bold gradient-text mb-2">Aurora</h1>
+          <p className="text-text-secondary">Melde dich an, um fortzufahren</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="deine@email.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Passwort
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="********"
-            />
-          </div>
+        {/* Login Card */}
+        <div className="bg-bg-primary border-depth rounded-lg p-8">
+          <h2 className="text-2xl mb-6">Anmelden</h2>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-500 bg-opacity-10 border border-red-500 rounded-lg">
+              <p className="text-red-500 text-sm">{error}</p>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Lädt...' : 'Anmelden'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-text-heading mb-2">
+                E-Mail
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="deine@email.de"
+                className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+              />
+            </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Noch kein Konto?{' '}
-            <Link href="/register" className="text-blue-500 hover:underline font-medium">
-              Jetzt registrieren
-            </Link>
-          </p>
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-text-heading mb-2">
+                Passwort
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full btn-base btn-primary"
+            >
+              {loading ? 'Lädt...' : 'Anmelden'}
+            </button>
+          </form>
+
+          {/* Register Link */}
+          <div className="mt-6 text-center">
+            <p className="text-text-secondary">
+              Noch kein Konto?{' '}
+              <Link href="/register" className="font-medium hover:opacity-80 transition" style={{ color: '#00d4ff' }}>
+                Jetzt registrieren
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
