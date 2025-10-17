@@ -15,7 +15,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const username = params.id as string; // params.id enthält jetzt den Username
+        const username = params.id as string;
         const data = await escortService.getEscortByUsername(username);
         setEscort(data);
       } catch (err) {
@@ -43,9 +43,9 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen p-8 bg-gray-50">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <p className="text-gray-600">Lädt...</p>
+      <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+        <div className="max-w-4xl mx-auto">
+          <p style={{ color: 'var(--text-secondary)' }}>Lädt...</p>
         </div>
       </main>
     );
@@ -53,14 +53,14 @@ export default function ProfilePage() {
 
   if (error || !escort) {
     return (
-      <main className="min-h-screen p-8 bg-gray-50">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="p-4 bg-red-50 border border-red-200 rounded mb-4">
-            <p className="text-red-700">{error || 'Profil nicht gefunden'}</p>
+      <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-secondary)', borderColor: 'var(--color-primary)' }}>
+            <p style={{ color: 'var(--color-primary)' }}>{error || 'Profil nicht gefunden'}</p>
           </div>
           <button
             onClick={() => router.push('/members')}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="btn-base btn-primary"
           >
             Zurück zur Übersicht
           </button>
@@ -72,20 +72,22 @@ export default function ProfilePage() {
   const age = calculateAge(escort.birthDate);
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-        {/* Zurück Button */}
+    <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
         <button
           onClick={() => router.push('/members')}
-          className="mb-6 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+          className="mb-6 btn-base btn-secondary"
         >
           ← Zurück
         </button>
 
-        {/* Profil Card */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Header mit Profilbild */}
-          <div className="relative h-96 bg-gradient-to-br from-purple-400 to-pink-400">
+        {/* Profile Card */}
+        <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-secondary)' }}>
+          {/* Header with Profile Picture */}
+          <div className="relative h-96" style={{ 
+            background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
+          }}>
             {escort.profilePicture ? (
               <img
                 src={escort.profilePicture}
@@ -94,129 +96,182 @@ export default function ProfilePage() {
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="text-white text-9xl font-bold">
+                <div className="text-9xl font-bold gradient-text">
                   {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Profil Details */}
+          {/* Profile Details */}
           <div className="p-8">
-            {/* Name und Basis-Info */}
+            {/* Name and Basic Info */}
             <div className="mb-6">
-              <h1 className="text-4xl font-bold mb-2">
+              <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-heading)' }}>
                 {escort.firstName && escort.lastName
                   ? `${escort.firstName} ${escort.lastName}`
                   : escort.username || 'Unbekannt'}
               </h1>
-              <p className="text-gray-600 text-lg">@{escort.username}</p>
+              <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>@{escort.username}</p>
             </div>
 
-            {/* Basis-Informationen */}
+            {/* Basic Information Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-3">
-                <h2 className="text-xl font-semibold mb-4">Basis-Informationen</h2>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Basis-Informationen
+                </h2>
                 
                 {age && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">🎂 Alter:</span>
-                    <span className="font-medium">{age} Jahre</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>🎂 Alter:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
                   </div>
                 )}
 
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600">📍 Stadt:</span>
-                  <span className="font-medium">Stadt unbekannt</span>
-                </div>
-
                 {escort.nationalities && escort.nationalities.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">🌍 Nationalität:</span>
-                    <span className="font-medium">{escort.nationalities.join(', ')}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>🌍 Nationalität:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>
+                      {escort.nationalities.join(', ')}
+                    </span>
                   </div>
                 )}
 
                 {escort.languages && escort.languages.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">💬 Sprachen:</span>
-                    <span className="font-medium">{escort.languages.join(', ')}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>💬 Sprachen:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>
+                      {escort.languages.join(', ')}
+                    </span>
+                  </div>
+                )}
+
+                {escort.type && (
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: 'var(--text-secondary)' }}>✨ Typ:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.type}</span>
                   </div>
                 )}
               </div>
 
-              {/* Aussehen */}
+              {/* Physical Attributes */}
               <div className="space-y-3">
-                <h2 className="text-xl font-semibold mb-4">Aussehen</h2>
-                
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Aussehen
+                </h2>
+
                 {escort.height && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">📏 Größe:</span>
-                    <span className="font-medium">{escort.height} cm</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>📏 Größe:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.height} cm</span>
                   </div>
                 )}
 
                 {escort.weight && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">⚖️ Gewicht:</span>
-                    <span className="font-medium">{escort.weight} kg</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>⚖️ Gewicht:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.weight} kg</span>
                   </div>
                 )}
 
                 {escort.bodyType && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">💪 Körpertyp:</span>
-                    <span className="font-medium">{escort.bodyType}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>💃 Figur:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.bodyType}</span>
+                  </div>
+                )}
+
+                {escort.cupSize && (
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: 'var(--text-secondary)' }}>👗 Oberweite:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.cupSize}</span>
                   </div>
                 )}
 
                 {escort.hairColor && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">💇 Haarfarbe:</span>
-                    <span className="font-medium">{escort.hairColor}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>💇 Haarfarbe:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.hairColor}</span>
+                  </div>
+                )}
+
+                {escort.hairLength && (
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: 'var(--text-secondary)' }}>✂️ Haarlänge:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.hairLength}</span>
                   </div>
                 )}
 
                 {escort.eyeColor && (
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-600">👁️ Augenfarbe:</span>
-                    <span className="font-medium">{escort.eyeColor}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>👁️ Augenfarbe:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.eyeColor}</span>
+                  </div>
+                )}
+
+                {escort.intimateHair && (
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: 'var(--text-secondary)' }}>🌸 Intimbereich:</span>
+                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.intimateHair}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Beschreibung */}
-            {escort.description && (
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Über mich</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {escort.description}
-                </p>
-              </div>
-            )}
+            {/* Additional Info */}
+            <div className="mb-8 space-y-3">
+              <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                Weitere Informationen
+              </h2>
 
-            {/* Zusätzliche Details */}
-            <div className="border-t pt-6">
-              <h2 className="text-xl font-semibold mb-4">Weitere Details</h2>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 {escort.hasTattoos && (
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                    Tattoos
+                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
+                    style={{ 
+                      background: 'var(--background-primary)', 
+                      color: 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)'
+                    }}>
+                    🎨 Tattoos
                   </span>
                 )}
+
                 {escort.hasPiercings && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                    Piercings
+                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
+                    style={{ 
+                      background: 'var(--background-primary)', 
+                      color: 'var(--color-secondary)',
+                      borderColor: 'var(--color-secondary)'
+                    }}>
+                    💎 Piercings
                   </span>
                 )}
+
                 {escort.isSmoker && (
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                    Raucher
+                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
+                    style={{ 
+                      background: 'var(--background-primary)', 
+                      color: 'var(--color-tertiary)',
+                      borderColor: 'var(--color-tertiary)'
+                    }}>
+                    🚬 Raucher/in
                   </span>
                 )}
               </div>
             </div>
+
+            {/* Description */}
+            {escort.description && (
+              <div>
+                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Über mich
+                </h2>
+                <p className="leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                  {escort.description}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
