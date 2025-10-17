@@ -133,20 +133,25 @@ export default function EscortProfileForm() {
 
   if (user?.role !== 'escort') {
     return (
-      <div className="p-6 border rounded-lg bg-white shadow-sm">
-        <p className="text-red-600">Nur Benutzer mit der Rolle &quot;Escort&quot; können dieses Profil bearbeiten.</p>
+      <div className="p-6 rounded-lg border-depth" style={{ background: 'var(--background-secondary)' }}>
+        <p style={{ color: 'var(--color-primary)' }}>
+          Nur Benutzer mit der Rolle &quot;Escort&quot; können dieses Profil bearbeiten.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 border rounded-lg bg-white shadow-sm max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Escort-Profil bearbeiten</h2>
+    <div className="p-8 rounded-lg border-depth max-w-4xl mx-auto" style={{ background: 'var(--background-secondary)' }}>
+      <h2 className="text-3xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
+        Escort-Profil bearbeiten
+      </h2>
 
-      <div className="mb-6 p-4 border rounded-lg bg-gray-50">
-        <h3 className="text-lg font-semibold mb-4">Profilbild</h3>
+      {/* Profile Picture Section */}
+      <div className="mb-8 p-6 rounded-lg border-depth" style={{ background: 'var(--background-primary)' }}>
+        <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>Profilbild</h3>
         
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col md:flex-row items-start gap-6">
           <div className="flex-shrink-0">
             {profilePicturePreview ? (
               <img
@@ -155,29 +160,32 @@ export default function EscortProfileForm() {
                 className="w-32 h-32 object-cover rounded-full"
               />
             ) : (
-              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-gray-400">Kein Bild</span>
+              <div 
+                className="w-32 h-32 rounded-full flex items-center justify-center"
+                style={{ 
+                  background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
+                }}
+              >
+                <span className="text-white font-bold text-2xl">
+                  {user?.firstName?.[0] || user?.username?.[0] || '?'}
+                </span>
               </div>
             )}
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <input
               type="file"
               accept="image/*"
               onChange={handleProfilePictureChange}
-              className="mb-3 block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-lg file:border-0
-                file:text-sm file:font-semibold
-                file:bg-purple-50 file:text-purple-700
-                hover:file:bg-purple-100"
+              className="mb-3 block w-full text-sm"
+              style={{ color: 'var(--text-regular)' }}
             />
             <button
               type="button"
               onClick={handleUploadProfilePicture}
               disabled={!profilePicture || uploadingPicture}
-              className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="btn-base btn-primary"
             >
               {uploadingPicture ? 'Lädt hoch...' : 'Profilbild hochladen'}
             </button>
@@ -185,33 +193,48 @@ export default function EscortProfileForm() {
         </div>
       </div>
 
+      {/* Success/Error Messages */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700">{error}</p>
+        <div className="mb-6 p-4 rounded-lg border-depth" style={{ 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          borderColor: '#ef4444' 
+        }}>
+          <p style={{ color: '#ef4444' }}>{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-700">Profil erfolgreich gespeichert!</p>
+        <div className="mb-6 p-4 rounded-lg border-depth" style={{ 
+          background: 'rgba(16, 185, 129, 0.1)', 
+          borderColor: '#10b981' 
+        }}>
+          <p style={{ color: '#10b981' }}>Profil erfolgreich gespeichert!</p>
         </div>
       )}
 
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Birth Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Geburtsdatum {age !== null && <span className="text-gray-500">({age} Jahre)</span>}
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
+            Geburtsdatum {age !== null && <span style={{ color: 'var(--text-secondary)' }}>({age} Jahre)</span>}
           </label>
           <input
             type="date"
             value={formData.birthDate || ''}
             onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 rounded-lg border"
+            style={{ 
+              background: 'var(--background-primary)', 
+              color: 'var(--text-regular)',
+              borderColor: 'var(--border)'
+            }}
           />
         </div>
 
+        {/* Nationalities */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
             Nationalitäten
           </label>
           <MultiSelectDropdown
@@ -222,8 +245,9 @@ export default function EscortProfileForm() {
           />
         </div>
 
+        {/* Languages */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
             Sprachen
           </label>
           <MultiSelectDropdown
@@ -234,15 +258,21 @@ export default function EscortProfileForm() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Height and Weight */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Größe (cm)
             </label>
             <select
               value={formData.height || ''}
               onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {HEIGHTS.map((h) => (
@@ -252,13 +282,18 @@ export default function EscortProfileForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Gewicht (kg)
             </label>
             <select
               value={formData.weight || ''}
               onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {WEIGHTS.map((w) => (
@@ -268,15 +303,21 @@ export default function EscortProfileForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Body Type and Cup Size */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Körpertyp
             </label>
             <select
               value={formData.bodyType || ''}
               onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {BODY_TYPES.map((type) => (
@@ -286,13 +327,18 @@ export default function EscortProfileForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Körbchengröße
             </label>
             <select
               value={formData.cupSize || ''}
               onChange={(e) => setFormData({ ...formData, cupSize: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {CUP_SIZES.map((size) => (
@@ -302,15 +348,21 @@ export default function EscortProfileForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        {/* Hair Color, Length, Eye Color */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Haarfarbe
             </label>
             <select
               value={formData.hairColor || ''}
               onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {HAIR_COLORS.map((color) => (
@@ -320,13 +372,18 @@ export default function EscortProfileForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Haarlänge
             </label>
             <select
               value={formData.hairLength || ''}
               onChange={(e) => setFormData({ ...formData, hairLength: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {HAIR_LENGTHS.map((length) => (
@@ -336,13 +393,18 @@ export default function EscortProfileForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
               Augenfarbe
             </label>
             <select
               value={formData.eyeColor || ''}
               onChange={(e) => setFormData({ ...formData, eyeColor: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg border"
+              style={{ 
+                background: 'var(--background-primary)', 
+                color: 'var(--text-regular)',
+                borderColor: 'var(--border)'
+              }}
             >
               <option value="">Bitte wählen</option>
               {EYE_COLORS.map((color) => (
@@ -352,55 +414,66 @@ export default function EscortProfileForm() {
           </div>
         </div>
 
+        {/* Checkboxes */}
         <div className="space-y-3">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.hasTattoos}
               onChange={(e) => setFormData({ ...formData, hasTattoos: e.target.checked })}
-              className="w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: 'var(--color-primary)' }}
             />
-            <span className="text-sm text-gray-700">Hat Tattoos</span>
+            <span style={{ color: 'var(--text-regular)' }}>Hat Tattoos</span>
           </label>
 
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.hasPiercings}
               onChange={(e) => setFormData({ ...formData, hasPiercings: e.target.checked })}
-              className="w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: 'var(--color-secondary)' }}
             />
-            <span className="text-sm text-gray-700">Hat Piercings</span>
+            <span style={{ color: 'var(--text-regular)' }}>Hat Piercings</span>
           </label>
 
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.isSmoker}
               onChange={(e) => setFormData({ ...formData, isSmoker: e.target.checked })}
-              className="w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
+              className="w-5 h-5 rounded"
+              style={{ accentColor: 'var(--color-tertiary)' }}
             />
-            <span className="text-sm text-gray-700">Raucher/in</span>
+            <span style={{ color: 'var(--text-regular)' }}>Raucher/in</span>
           </label>
         </div>
 
+        {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-regular)' }}>
             Beschreibung
           </label>
           <textarea
             value={formData.description || ''}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={6}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 rounded-lg border"
+            style={{ 
+              background: 'var(--background-primary)', 
+              color: 'var(--text-regular)',
+              borderColor: 'var(--border)'
+            }}
             placeholder="Beschreibe dich selbst..."
           />
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold"
+          className="w-full btn-base btn-primary font-semibold text-lg"
         >
           {loading ? 'Speichert...' : 'Profil speichern'}
         </button>

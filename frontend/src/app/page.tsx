@@ -17,20 +17,31 @@ export default function Home() {
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated) {
-    return null; // Wird redirected
+    return null;
   }
 
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
   return (
-    <main className="min-h-screen p-8">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}></div>
+    <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+      <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold gradient-text">Aurora</h1>
-            <p className="text-[#71767b] mt-1">
+            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
               Willkommen, {user?.username || user?.email}!
             </p>
           </div>
+          <button
+            onClick={handleLogout}
+            className="btn-base btn-secondary"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Content */}
