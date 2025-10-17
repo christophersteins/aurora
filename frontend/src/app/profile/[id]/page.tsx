@@ -11,6 +11,13 @@ export default function ProfilePage() {
   const [escort, setEscort] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Placeholder images - später durch echte Fotos ersetzen
+  const photos = escort?.profilePicture 
+    ? [escort.profilePicture, escort.profilePicture, escort.profilePicture] 
+    : [];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,6 +36,24 @@ export default function ProfilePage() {
     fetchProfile();
   }, [params.id]);
 
+  // Keyboard navigation for fullscreen gallery
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFullscreen(false);
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen, selectedImageIndex]);
+
   const calculateAge = (birthDate: string | undefined): number | null => {
     if (!birthDate) return null;
     const birth = new Date(birthDate);
@@ -41,10 +66,28 @@ export default function ProfilePage() {
     return age;
   };
 
+  const handlePrevImage = () => {
+    setSelectedImageIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleMessageClick = () => {
+    // TODO: Navigate to chat
+    console.log('Navigate to chat');
+  };
+
+  const handleDateClick = () => {
+    // TODO: Open date booking modal
+    console.log('Open date booking');
+  };
+
   if (loading) {
     return (
       <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
           <p style={{ color: 'var(--text-secondary)' }}>Lädt...</p>
         </div>
       </main>
@@ -54,14 +97,11 @@ export default function ProfilePage() {
   if (error || !escort) {
     return (
       <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-secondary)', borderColor: 'var(--color-primary)' }}>
             <p style={{ color: 'var(--color-primary)' }}>{error || 'Profil nicht gefunden'}</p>
           </div>
-          <button
-            onClick={() => router.push('/members')}
-            className="btn-base btn-primary"
-          >
+          <button onClick={() => router.push('/members')} className="btn-base btn-primary">
             Zurück zur Übersicht
           </button>
         </div>
@@ -73,207 +113,286 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Back Button */}
-        <button
-          onClick={() => router.push('/members')}
-          className="mb-6 btn-base btn-secondary"
-        >
+        <button onClick={() => router.push('/members')} className="mb-6 btn-base btn-secondary">
           ← Zurück
         </button>
 
-        {/* Profile Card */}
-        <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-secondary)' }}>
-          {/* Header with Profile Picture */}
-          <div className="relative h-96" style={{ 
-            background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
-          }}>
-            {escort.profilePicture ? (
-              <img
-                src={escort.profilePicture}
-                alt={escort.username || 'Profilbild'}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-9xl font-bold gradient-text">
-                  {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
-                </div>
+        {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Photo Gallery - 2/3 width */}
+          <div className="lg:col-span-2">
+            <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-secondary)' }}>
+              {/* Main Image */}
+              <div className="relative aspect-[4/3] bg-gradient-to-br" style={{
+                background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
+              }}>
+                {photos.length > 0 ? (
+                  <>
+                    <img
+                      src={photos[selectedImageIndex]}
+                      alt={`Foto ${selectedImageIndex + 1}`}
+                      className="w-full h-full object-cover cursor-pointer"
+                      onClick={() => setIsFullscreen(true)}
+                    />
+                    
+                    {/* Navigation Arrows */}
+                    {photos.length > 1 && (
+                      <>
+                        <button
+                          onClick={handlePrevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                          style={{ 
+                            background: 'rgba(0, 0, 0, 0.5)',
+                            color: 'var(--text-button)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={handleNextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all"
+                          style={{ 
+                            background: 'rgba(0, 0, 0, 0.5)',
+                            color: 'var(--text-button)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                        >
+                          ›
+                        </button>
+                      </>
+                    )}
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-sm font-medium"
+                      style={{ 
+                        background: 'rgba(0, 0, 0, 0.7)',
+                        color: 'var(--text-button)'
+                      }}>
+                      {selectedImageIndex + 1} / {photos.length}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-9xl font-bold gradient-text">
+                      {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Thumbnail Gallery */}
+              {photos.length > 1 && (
+                <div className="p-4 flex gap-2 overflow-x-auto">
+                  {photos.map((photo, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all"
+                      style={{
+                        border: selectedImageIndex === index 
+                          ? '2px solid var(--color-primary)' 
+                          : '2px solid transparent',
+                        opacity: selectedImageIndex === index ? 1 : 0.6
+                      }}
+                    >
+                      <img
+                        src={photo}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Profile Details */}
-          <div className="p-8">
-            {/* Name and Basic Info */}
-            <div className="mb-6">
-              <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-heading)' }}>
-                {escort.firstName && escort.lastName
-                  ? `${escort.firstName} ${escort.lastName}`
-                  : escort.username || 'Unbekannt'}
-              </h1>
-              <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>@{escort.username}</p>
-            </div>
+          {/* Profile Info - 1/3 width */}
+          <div className="lg:col-span-1">
+            <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-secondary)' }}>
+              {/* Name & Username */}
+              <div>
+                <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text-heading)' }}>
+                  {escort.firstName && escort.lastName
+                    ? `${escort.firstName} ${escort.lastName}`
+                    : escort.username || 'Unbekannt'}
+                </h1>
+                <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
+                  @{escort.username}
+                </p>
+              </div>
 
-            {/* Basic Information Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="space-y-3">
-                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Basis-Informationen
-                </h2>
-                
+              {/* Basic Info */}
+              <div className="space-y-3 pb-6" style={{ borderBottom: '1px solid var(--border)' }}>
                 {age && (
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>🎂 Alter:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>🎂</span>
+                    <span style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
                   </div>
                 )}
 
                 {escort.nationalities && escort.nationalities.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>🌍 Nationalität:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>
-                      {escort.nationalities.join(', ')}
-                    </span>
+                    <span style={{ color: 'var(--text-secondary)' }}>🌍</span>
+                    <span style={{ color: 'var(--text-regular)' }}>{escort.nationalities.join(', ')}</span>
                   </div>
                 )}
 
                 {escort.languages && escort.languages.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>💬 Sprachen:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>
-                      {escort.languages.join(', ')}
-                    </span>
+                    <span style={{ color: 'var(--text-secondary)' }}>💬</span>
+                    <span style={{ color: 'var(--text-regular)' }}>{escort.languages.join(', ')}</span>
                   </div>
                 )}
-
-                {escort.type && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>✨ Typ:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.type}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Physical Attributes */}
-              <div className="space-y-3">
-                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Aussehen
-                </h2>
 
                 {escort.height && (
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>📏 Größe:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.height} cm</span>
-                  </div>
-                )}
-
-                {escort.weight && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>⚖️ Gewicht:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.weight} kg</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>📏</span>
+                    <span style={{ color: 'var(--text-regular)' }}>{escort.height} cm</span>
                   </div>
                 )}
 
                 {escort.bodyType && (
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>💃 Figur:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.bodyType}</span>
-                  </div>
-                )}
-
-                {escort.cupSize && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>👗 Oberweite:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.cupSize}</span>
-                  </div>
-                )}
-
-                {escort.hairColor && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>💇 Haarfarbe:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.hairColor}</span>
-                  </div>
-                )}
-
-                {escort.hairLength && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>✂️ Haarlänge:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.hairLength}</span>
-                  </div>
-                )}
-
-                {escort.eyeColor && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>👁️ Augenfarbe:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.eyeColor}</span>
-                  </div>
-                )}
-
-                {escort.intimateHair && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>🌸 Intimbereich:</span>
-                    <span className="font-medium" style={{ color: 'var(--text-regular)' }}>{escort.intimateHair}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>💃</span>
+                    <span style={{ color: 'var(--text-regular)' }}>{escort.bodyType}</span>
                   </div>
                 )}
               </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleMessageClick}
+                  className="w-full btn-base btn-primary"
+                >
+                  💬 Nachricht schreiben
+                </button>
+                <button
+                  onClick={handleDateClick}
+                  className="w-full btn-base btn-secondary"
+                >
+                  📅 Date vereinbaren
+                </button>
+              </div>
+
+              {/* Tags */}
+              {(escort.hasTattoos || escort.hasPiercings || escort.isSmoker) && (
+                <div className="flex flex-wrap gap-2 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                  {escort.hasTattoos && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium"
+                      style={{ 
+                        background: 'rgba(0, 212, 255, 0.1)',
+                        color: 'var(--color-primary)'
+                      }}>
+                      🎨 Tattoos
+                    </span>
+                  )}
+                  {escort.hasPiercings && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium"
+                      style={{ 
+                        background: 'rgba(77, 124, 254, 0.1)',
+                        color: 'var(--color-secondary)'
+                      }}>
+                      💎 Piercings
+                    </span>
+                  )}
+                  {escort.isSmoker && (
+                    <span className="px-3 py-1 rounded-full text-xs font-medium"
+                      style={{ 
+                        background: 'rgba(184, 69, 237, 0.1)',
+                        color: 'var(--color-tertiary)'
+                      }}>
+                      🚬 Raucher/in
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
-
-            {/* Additional Info */}
-            <div className="mb-8 space-y-3">
-              <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                Weitere Informationen
-              </h2>
-
-              <div className="flex flex-wrap gap-3">
-                {escort.hasTattoos && (
-                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
-                    style={{ 
-                      background: 'var(--background-primary)', 
-                      color: 'var(--color-primary)',
-                      borderColor: 'var(--color-primary)'
-                    }}>
-                    🎨 Tattoos
-                  </span>
-                )}
-
-                {escort.hasPiercings && (
-                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
-                    style={{ 
-                      background: 'var(--background-primary)', 
-                      color: 'var(--color-secondary)',
-                      borderColor: 'var(--color-secondary)'
-                    }}>
-                    💎 Piercings
-                  </span>
-                )}
-
-                {escort.isSmoker && (
-                  <span className="px-4 py-2 rounded-full text-sm font-medium border-depth" 
-                    style={{ 
-                      background: 'var(--background-primary)', 
-                      color: 'var(--color-tertiary)',
-                      borderColor: 'var(--color-tertiary)'
-                    }}>
-                    🚬 Raucher/in
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Description */}
-            {escort.description && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Über mich
-                </h2>
-                <p className="leading-relaxed" style={{ color: 'var(--text-regular)' }}>
-                  {escort.description}
-                </p>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Service Information Section - Full Width */}
+        <div className="rounded-lg p-8 border-depth" style={{ background: 'var(--background-secondary)' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
+            Service & Angebote
+          </h2>
+          <p style={{ color: 'var(--text-secondary)' }}>
+            Dieser Bereich wird in einem späteren Schritt implementiert.
+          </p>
+        </div>
+
+        {/* Fullscreen Gallery Modal */}
+        {isFullscreen && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center mobile-menu-backdrop"
+            style={{ background: 'rgba(0, 0, 0, 0.95)' }}
+            onClick={() => setIsFullscreen(false)}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all"
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: 'var(--text-button)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Image */}
+            <div className="relative max-w-7xl max-h-[90vh] w-full mx-4">
+              <img
+                src={photos[selectedImageIndex]}
+                alt={`Foto ${selectedImageIndex + 1}`}
+                className="w-full h-full object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              {/* Navigation */}
+              {photos.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all"
+                    style={{ 
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: 'var(--text-button)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all"
+                    style={{ 
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: 'var(--text-button)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)'
+                    }}
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+
+              {/* Counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full text-base font-medium"
+                style={{ 
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  color: 'var(--text-button)'
+                }}>
+                {selectedImageIndex + 1} / {photos.length}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
