@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { authService } from '@/services/auth.service';
-import { Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -148,8 +147,7 @@ export default function LoginPage() {
 
             {/* Password (shown after email) */}
             {showPasswordField && (
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
+              <div>
                 <input
                   type="password"
                   value={password}
@@ -157,7 +155,7 @@ export default function LoginPage() {
                   required
                   placeholder="Passwort"
                   autoFocus
-                  className="w-full pl-10 pr-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+                  className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
                 />
               </div>
             )}

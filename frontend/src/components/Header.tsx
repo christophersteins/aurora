@@ -26,47 +26,48 @@ export default function Header() {
       <header className="bg-[#000000] border-b border-[#2f3336] sticky top-0 z-40">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex justify-between items-center h-16">
-            {/* Logo - Links */}
-            <div className="flex items-center">
+            {/* Logo + Desktop Navigation - Links */}
+            <div className="flex items-center space-x-8">
+              {/* Logo */}
               <Link href="/" className="flex items-center">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
                   <span className="text-[#0f1419] font-bold text-xl">A</span>
                 </div>
                 <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
               </Link>
-            </div>
 
-            {/* Desktop Navigation - Mitte */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/"
-                className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-              >
-                Home
-              </Link>
-              <Link
-                href="/members"
-                className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-              >
-                Members
-              </Link>
-              {isAuthenticated && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/escort-profile"
-                    className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-                  >
-                    Mein Profil
-                  </Link>
-                </>
-              )}
-            </nav>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center space-x-6">
+                <Link
+                  href="/"
+                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/members"
+                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                >
+                  Members
+                </Link>
+                {isAuthenticated && (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/escort-profile"
+                      className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                    >
+                      Mein Profil
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </div>
 
             {/* Desktop Buttons - Rechts */}
             <div className="hidden md:flex items-center space-x-3">

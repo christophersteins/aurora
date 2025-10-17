@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth.service';
-import Link from 'next/link';
 
 interface User {
   id: string;
@@ -33,24 +32,19 @@ export default function DashboardPage() {
     fetchProfile();
   }, [router]);
 
-  const handleLogout = () => {
-    authService.logout();
-    router.push('/login');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Lädt...</div>
+        <div className="text-xl text-[#e7e9ea]">Lädt...</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen">
-        <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 'var(--max-content-width)' }}></main>
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         <div className="bg-[#15202b] border-depth rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">Willkommen im Dashboard!</h2>
+          <h2 className="text-2xl font-bold mb-6 text-[#e7e9ea]">Willkommen im Dashboard!</h2>
 
           <div className="space-y-4">
             <div>
