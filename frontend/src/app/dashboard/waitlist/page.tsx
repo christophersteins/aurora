@@ -254,7 +254,7 @@ export default function WaitlistDashboardPage() {
       )}
 
       <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-8">
               <h1 className="text-2xl font-bold text-indigo-600">Aurora</h1>
@@ -283,7 +283,7 @@ export default function WaitlistDashboardPage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         <div className="bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <div>

@@ -44,7 +44,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <main className="min-h-screen p-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <p className="text-gray-600">Lädt...</p>
         </div>
       </main>
@@ -54,7 +54,7 @@ export default function ProfilePage() {
   if (error || !escort) {
     return (
       <main className="min-h-screen p-8 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="p-4 bg-red-50 border border-red-200 rounded mb-4">
             <p className="text-red-700">{error || 'Profil nicht gefunden'}</p>
           </div>
@@ -73,7 +73,7 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen p-8 bg-gray-50">
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Zurück Button */}
         <button
           onClick={() => router.push('/members')}
