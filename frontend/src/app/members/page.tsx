@@ -69,6 +69,7 @@ export default function MembersPage() {
   const [error, setError] = useState<string | null>(null);
   const [filterSidebarOpen, setFilterSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [sortBy, setSortBy] = useState<'distance' | 'none'>('none');
 
   // Lade Filter aus LocalStorage beim Mount
   useEffect(() => {
@@ -275,8 +276,8 @@ export default function MembersPage() {
 
   // Sortierung nach Entfernung (aufsteigend - nächste zuerst)
   const sortedEscorts = [...filteredEscorts].sort((a, b) => {
-    // Nur sortieren wenn Radius-Filter aktiv ist
-    if (filters.useRadius && filters.userLatitude && filters.userLongitude) {
+    // Sortierung nach Entfernung
+    if (sortBy === 'distance' && filters.useRadius && filters.userLatitude && filters.userLongitude) {
       const aCoords = a.location?.coordinates;
       const bCoords = b.location?.coordinates;
 
@@ -304,7 +305,7 @@ export default function MembersPage() {
       return distanceA - distanceB; // Aufsteigend sortieren
     }
 
-    // Keine Sortierung wenn Radius-Filter inaktiv
+    // Keine Sortierung
     return 0;
   });
 
@@ -414,6 +415,24 @@ export default function MembersPage() {
           )}
         </div>
 
+        {/* Sortierung Select */}
+        <div className="mb-6">
+          <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-2">
+            Sortieren nach
+          </label>
+          <select
+            id="sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'distance' | 'none')}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+          >
+            <option value="none">Standard</option>
+            {filters.useRadius && (
+              <option value="distance">Entfernung (aufsteigend)</option>
+            )}
+          </select>
+        </div>
+
         {/* Escorts Grid */}
         {sortedEscorts.length === 0 ? (
           <div className="text-center py-12">
@@ -486,7 +505,7 @@ export default function MembersPage() {
                               escortLon
                             );
                             
-                            return `${distance.toFixed(1)}km`;
+                            return `${Math.round(distance)}km`;
                           })()}
                         </span>
                       )}
