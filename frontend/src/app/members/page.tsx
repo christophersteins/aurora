@@ -389,30 +389,33 @@ export default function MembersPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold gradient-text">Escorts</h1>
+          <h1 className="text-4xl">Escorts</h1>
         </div>
 
         {/* Toolbar: Filter, Sortierung, View Switcher */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          {/* Linke Seite: Filter Button und Sortierung */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          {/* Linke Seite: Filter Button */}
+          <div className="flex items-center">
             {/* Filter Button */}
             <button
               onClick={() => setFilterSidebarOpen(true)}
-              className="btn-base btn-primary flex items-center justify-center gap-2"
+              className="btn-base btn-secondary flex items-center justify-center gap-2"
             >
               <Filter className="w-5 h-5" />
               Filter
               {hasActiveFilters() && (
                 <span 
                   className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-                  style={{ backgroundColor: '#000000', color: '#00d4ff' }}
+                  style={{ backgroundColor: '#00d4ff', color: '#0f1419' }}
                 >
                   Aktiv
                 </span>
               )}
             </button>
+          </div>
 
+          {/* Rechte Seite: Sortierung und View Switcher */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {/* Sortierung Select */}
             <div className="relative">
               <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
@@ -425,34 +428,34 @@ export default function MembersPage() {
                 <option value="distance">Entfernung aufsteigend</option>
               </select>
             </div>
-          </div>
 
-          {/* Rechte Seite: View Switcher */}
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setGridView('compact')}
-              className={`p-2 rounded-lg border transition ${
-                gridView === 'compact'
-                  ? 'text-white border-secondary'
-                  : 'bg-bg-primary text-text-secondary border-border hover:border-secondary hover:text-secondary'
-              }`}
-              style={gridView === 'compact' ? { backgroundColor: '#4d7cfe' } : {}}
-              title="Kompakte Ansicht (weniger pro Reihe)"
-            >
-              <LayoutGrid className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setGridView('comfortable')}
-              className={`p-2 rounded-lg border transition ${
-                gridView === 'comfortable'
-                  ? 'text-white border-secondary'
-                  : 'bg-bg-primary text-text-secondary border-border hover:border-secondary hover:text-secondary'
-              }`}
-              style={gridView === 'comfortable' ? { backgroundColor: '#4d7cfe' } : {}}
-              title="Komfortable Ansicht (mehr pro Reihe)"
-            >
-              <Grid3x3 className="w-5 h-5" />
-            </button>
+            {/* View Switcher */}
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setGridView('compact')}
+                className={`p-2 rounded-lg border transition ${
+                  gridView === 'compact'
+                    ? 'text-black border-primary'
+                    : 'bg-bg-primary text-text-secondary border-border hover:border-primary hover:text-primary'
+                }`}
+                style={gridView === 'compact' ? { backgroundColor: '#00d4ff' } : {}}
+                title="Kompakte Ansicht (weniger pro Reihe)"
+              >
+                <LayoutGrid className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setGridView('comfortable')}
+                className={`p-2 rounded-lg border transition ${
+                  gridView === 'comfortable'
+                    ? 'text-black border-primary'
+                    : 'bg-bg-primary text-text-secondary border-border hover:border-primary hover:text-primary'
+                }`}
+                style={gridView === 'comfortable' ? { backgroundColor: '#00d4ff' } : {}}
+                title="Komfortable Ansicht (mehr pro Reihe)"
+              >
+                <Grid3x3 className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -461,8 +464,7 @@ export default function MembersPage() {
           <div className="mb-6">
             <button
               onClick={handleResetFilters}
-              className="text-sm font-medium hover:opacity-80 transition"
-              style={{ color: '#b845ed' }}
+              className="text-sm text-text-secondary font-medium hover:text-text-heading transition"
             >
               Alle Filter zurücksetzen
             </button>

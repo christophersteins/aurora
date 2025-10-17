@@ -153,3 +153,21 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
   background-color: rgba(47, 51, 54, 0.3);
 }
+
+/* ========================================
+   FOCUS STATES (Dezent)
+   ======================================== */
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--border);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
+}
+
+/* Dezenter Focus Ring für alle fokussierbaren Elemente */
+*:focus-visible {
+  outline: 2px solid rgba(0, 212, 255, 0.3);
+  outline-offset: 2px;
+}
