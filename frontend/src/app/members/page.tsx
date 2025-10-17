@@ -1,12 +1,64 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
-import { Filter } from 'lucide-react';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { MemberFilters, initialFilters } from '@/types/filter.types';
+import { Filter, MapPin } from 'lucide-react';
+
+// Filter-Interface
+interface Filters {
+  searchQuery: string;
+  ageMin: number | null;
+  ageMax: number | null;
+  nationalities: string[];
+  languages: string[];
+  types: string[];
+  heightMin: number | null;
+  heightMax: number | null;
+  weightMin: number | null;
+  weightMax: number | null;
+  bodyTypes: string[];
+  cupSizes: string[];
+  hairColors: string[];
+  hairLengths: string[];
+  eyeColors: string[];
+  intimateHair: string[];
+  hasTattoos: 'all' | 'yes' | 'no';
+  hasPiercings: 'all' | 'yes' | 'no';
+  isSmoker: 'all' | 'yes' | 'no';
+  useRadius: boolean;
+  radiusKm: number;
+  userLatitude: number | null;
+  userLongitude: number | null;
+}
+
+const initialFilters: Filters = {
+  searchQuery: '',
+  ageMin: null,
+  ageMax: null,
+  nationalities: [],
+  languages: [],
+  types: [],
+  heightMin: null,
+  heightMax: null,
+  weightMin: null,
+  weightMax: null,
+  bodyTypes: [],
+  cupSizes: [],
+  hairColors: [],
+  hairLengths: [],
+  eyeColors: [],
+  intimateHair: [],
+  hasTattoos: 'all',
+  hasPiercings: 'all',
+  isSmoker: 'all',
+  useRadius: false,
+  radiusKm: 10,
+  userLatitude: null,
+  userLongitude: null,
+};
 
 const FILTER_STORAGE_KEY = 'aurora_member_filters';
 
@@ -16,16 +68,40 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterSidebarOpen, setFilterSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState<MemberFilters>(initialFilters);
-  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  const [filters, setFilters] = useState<Filters>(initialFilters);
 
+  // Lade Filter aus LocalStorage beim Mount
+  useEffect(() => {
+    try {
+      const savedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
+      if (savedFilters) {
+        const parsed = JSON.parse(savedFilters);
+        setFilters({ ...initialFilters, ...parsed });
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden der Filter aus LocalStorage:', error);
+    }
+  }, []);
+
+  // Speichere Filter in LocalStorage bei Änderungen
+  useEffect(() => {
+    try {
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+    } catch (error) {
+      console.error('Fehler beim Speichern der Filter in LocalStorage:', error);
+    }
+  }, [filters]);
+
+  // Lade alle Escorts beim Mount
   useEffect(() => {
     const fetchEscorts = async () => {
       try {
+        setLoading(true);
         const data = await escortService.getAllEscorts();
         setEscorts(data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Fehler beim Laden der Escorts');
+      } catch (err) {
+        setError('Fehler beim Laden der Escorts');
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -34,40 +110,8 @@ export default function MembersPage() {
     fetchEscorts();
   }, []);
 
-  // Filter aus LocalStorage laden beim Mount
-  useEffect(() => {
-    const loadFiltersFromStorage = () => {
-      try {
-        const storedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
-        if (storedFilters) {
-          const parsed = JSON.parse(storedFilters);
-          // Merge mit initialFilters um neue Felder zu garantieren
-          setFilters({ ...initialFilters, ...parsed });
-        }
-      } catch (error) {
-        console.error('Fehler beim Laden der Filter aus LocalStorage:', error);
-      } finally {
-        setFiltersLoaded(true);
-      }
-    };
-
-    loadFiltersFromStorage();
-  }, []);
-
-  // Filter in LocalStorage speichern bei Änderungen
-  useEffect(() => {
-    // Nur speichern, wenn Filter bereits geladen wurden (nicht beim initialen Mount)
-    if (filtersLoaded) {
-      try {
-        localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
-      } catch (error) {
-        console.error('Fehler beim Speichern der Filter in LocalStorage:', error);
-      }
-    }
-  }, [filters, filtersLoaded]);
-
-  // Funktion zur Altersberechnung
-  const calculateAge = (birthDate?: string): number | null => {
+  // Berechne Alter aus Geburtsdatum
+  const calculateAge = (birthDate: string | undefined): number | null => {
     if (!birthDate) return null;
     const birth = new Date(birthDate);
     const today = new Date();
@@ -386,27 +430,34 @@ export default function MembersPage() {
 
                   {/* Informationen */}
                   <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-1">
-                      {escort.firstName && escort.lastName
-                        ? `${escort.firstName} ${escort.lastName}`
-                        : escort.username || 'Unbekannt'}
+                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                      {escort.username || 'Unbekannt'}
                     </h3>
 
-                    <p className="text-sm text-gray-500 mb-3">
-                      @{escort.username || escort.email}
-                    </p>
-
-                    <div className="space-y-1 text-sm text-gray-600">
-                      {age && (
-                        <p>
-                          <span className="font-medium">Alter:</span> {age} Jahre
-                        </p>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      {/* Entfernung anzeigen */}
+                      {filters.useRadius && filters.userLatitude && filters.userLongitude && escort.location && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {(() => {
+                            const coords = escort.location.coordinates;
+                            if (!coords || coords.length !== 2) return 'N/A';
+                            
+                            const [escortLon, escortLat] = coords;
+                            const distance = calculateDistance(
+                              filters.userLatitude,
+                              filters.userLongitude,
+                              escortLat,
+                              escortLon
+                            );
+                            
+                            return `${distance.toFixed(1)}km`;
+                          })()}
+                        </span>
                       )}
 
-                      <p>
-                        <span className="font-medium">Stadt:</span>{' '}
-                        {escort.location ? 'Verfügbar' : 'Nicht angegeben'}
-                      </p>
+                      {/* Alter */}
+                      {age && <span>{age} Jahre</span>}
                     </div>
                   </div>
                 </div>
