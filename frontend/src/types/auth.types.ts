@@ -5,7 +5,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   profilePicture?: string;
-  role?: 'customer' | 'escort' | 'business';
+  role?: 'customer' | 'escort' | 'business' | 'admin';
   location?: {
     type: string;
     coordinates: [number, number];
