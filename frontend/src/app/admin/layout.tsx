@@ -11,14 +11,30 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { user, isLoading } = useAuthStore();
+  const { user, isLoading, _hasHydrated } = useAuthStore();
 
   useEffect(() => {
+    // Wait for store to hydrate before checking auth
+    if (!_hasHydrated) {
+      return;
+    }
+
+    // Now we can safely check if user is admin
     if (!isLoading && (!user || user.role !== 'admin')) {
       router.push('/');
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, _hasHydrated, router]);
 
+  // Show loading while hydrating
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-gray-600">Lädt...</div>
+      </div>
+    );
+  }
+
+  // Show loading while checking auth after hydration
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
@@ -27,6 +43,7 @@ export default function AdminLayout({
     );
   }
 
+  // Don't render anything if redirecting
   if (!user || user.role !== 'admin') {
     return null;
   }
@@ -51,6 +68,12 @@ export default function AdminLayout({
                   className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Benutzer
+                </Link>
+                <Link
+                  href="/admin/waitlist"
+                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Warteliste
                 </Link>
               </div>
             </div>

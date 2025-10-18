@@ -2,11 +2,13 @@ import { Controller, Post, Body, Get, UseGuards, Header, Patch, Param, Delete } 
 import { WaitlistService } from './waitlist.service';
 import { JoinWaitlistDto } from './dto/join-waitlist.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 @Controller('waitlist')
 export class WaitlistController {
   constructor(private readonly waitlistService: WaitlistService) {}
 
+  // Public endpoint - kein Guard
   @Post('join')
   async join(@Body() joinWaitlistDto: JoinWaitlistDto) {
     const entry = await this.waitlistService.join(joinWaitlistDto);
@@ -16,19 +18,21 @@ export class WaitlistController {
     };
   }
 
+  // Public endpoint - kein Guard
   @Get('count')
   async getCount() {
     const count = await this.waitlistService.getCount();
     return { count };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // Admin-only endpoints
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
   async getAll() {
     return this.waitlistService.getAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('export/csv')
   @Header('Content-Type', 'text/csv')
   @Header('Content-Disposition', 'attachment; filename="waitlist.csv"')
@@ -46,13 +50,13 @@ export class WaitlistController {
     return csv;
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch(':id/notified')
   async toggleNotified(@Param('id') id: string, @Body() body: { notified: boolean }) {
     return this.waitlistService.updateNotified(id, body.notified);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch('bulk/notified')
   async bulkUpdateNotified(@Body() body: { ids: string[]; notified: boolean }) {
     const affected = await this.waitlistService.bulkUpdateNotified(body.ids, body.notified);
@@ -62,7 +66,7 @@ export class WaitlistController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.waitlistService.delete(id);
@@ -71,7 +75,7 @@ export class WaitlistController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('bulk/delete')
   async bulkDelete(@Body() body: { ids: string[] }) {
     const affected = await this.waitlistService.bulkDelete(body.ids);
