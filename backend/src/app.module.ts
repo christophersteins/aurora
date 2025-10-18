@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { WaitlistModule } from './waitlist/waitlist.module';
 import { ChatModule } from './chat/chat.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { ChatModule } from './chat/chat.module';
     UsersModule,
     AuthModule,
     WaitlistModule,
-    ChatModule, // ← Neu hinzugefügt
+    ChatModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
