@@ -3,9 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/auth.service';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { setAuth } = useAuthStore();
   
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,19 +16,14 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setLoading(true);
 
     try {
-      // TODO: Hier später die API-Anfrage zum Senden der Bestätigungs-Email implementieren
-      console.log('Sende Bestätigungs-Email an:', email);
-      
-      // Temporärer Platzhalter - später durch echten API-Call ersetzen
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Zeige Erfolgs-Nachricht oder leite weiter
-      alert(`Eine Bestätigungs-Email wurde an ${email} gesendet. Bitte überprüfe deinen Posteingang.`);
-      
+      // TODO: Later implement email verification flow
+      // For now, just show a placeholder message
+      console.log('Email submitted for registration:', email);
+      setError('Email-Verifizierung wird später implementiert');
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
@@ -36,8 +34,8 @@ export default function RegisterPage() {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`${provider} Login - wird später implementiert`);
+  const handleSocialRegister = (provider: string) => {
+    console.log(`${provider} Registration - wird später implementiert`);
   };
 
   return (
@@ -45,26 +43,26 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold gradient-text mb-2">Aurora</h1>
-          <p className="text-text-secondary">Erstelle dein Konto</p>
+          <h1 className="text-5xl font-bold text-heading mb-2">Aurora</h1>
+          <p className="text-muted">Erstelle dein Konto</p>
         </div>
 
         {/* Register Card */}
-        <div className="bg-bg-primary border-depth rounded-lg p-8">
-          <h2 className="text-2xl mb-6">Registrieren</h2>
+        <div className="bg-page-secondary border-depth rounded-lg p-8">
+          <h2 className="text-2xl mb-6 text-heading">Registrieren</h2>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-500 bg-opacity-10 border border-red-500 rounded-lg">
-              <p className="text-red-500 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-error-light border border-error rounded-lg">
+              <p className="text-error text-sm">{error}</p>
             </div>
           )}
 
-          {/* Social Login Buttons */}
+          {/* Social Register Buttons */}
           <div className="space-y-3 mb-6">
             {/* X (Twitter) */}
             <button
               type="button"
-              onClick={() => handleSocialLogin('X')}
+              onClick={() => handleSocialRegister('X')}
               className="w-full btn-base btn-secondary flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -76,7 +74,7 @@ export default function RegisterPage() {
             {/* Google */}
             <button
               type="button"
-              onClick={() => handleSocialLogin('Google')}
+              onClick={() => handleSocialRegister('Google')}
               className="w-full btn-base btn-secondary flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -91,7 +89,7 @@ export default function RegisterPage() {
             {/* Apple */}
             <button
               type="button"
-              onClick={() => handleSocialLogin('Apple')}
+              onClick={() => handleSocialRegister('Apple')}
               className="w-full btn-base btn-secondary flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -104,14 +102,14 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full border-t border-default"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-bg-primary text-text-secondary">oder</span>
+              <span className="px-2 bg-page-secondary text-muted">oder</span>
             </div>
           </div>
 
-          {/* Email Registration Form */}
+          {/* Email Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
@@ -121,7 +119,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="Email"
-                className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+                className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
               />
             </div>
 
@@ -137,9 +135,9 @@ export default function RegisterPage() {
 
           {/* Login Link */}
           <div className="mt-6 text-center">
-            <p className="text-text-secondary">
+            <p className="text-muted">
               Bereits ein Konto?{' '}
-              <Link href="/login" className="font-medium hover:opacity-80 transition" style={{ color: '#00d4ff' }}>
+              <Link href="/login" className="link-default">
                 Jetzt anmelden
               </Link>
             </p>
