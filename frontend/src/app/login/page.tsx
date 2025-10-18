@@ -59,21 +59,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-page-primary">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold gradient-text mb-2">Aurora</h1>
-          <p className="text-text-secondary">Melde dich an, um fortzufahren</p>
+          <h1 className="text-5xl font-bold text-heading mb-2">Aurora</h1>
+          <p className="text-muted">Melde dich an, um fortzufahren</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-bg-primary border-depth rounded-lg p-8">
-          <h2 className="text-2xl mb-6">Anmelden</h2>
+        <div className="bg-page-secondary border-depth rounded-lg p-8">
+          <h2 className="text-2xl mb-6 text-heading">Anmelden</h2>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-500 bg-opacity-10 border border-red-500 rounded-lg">
-              <p className="text-red-500 text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-error-light border border-error rounded-lg">
+              <p className="text-error text-sm">{error}</p>
             </div>
           )}
 
@@ -122,10 +122,10 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full border-t border-default"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-bg-primary text-text-secondary">oder</span>
+              <span className="px-2 bg-page-secondary text-muted">oder</span>
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export default function LoginPage() {
                 onKeyDown={handleEmailKeyDown}
                 required
                 placeholder="Email"
-                className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+                className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function LoginPage() {
                   required
                   placeholder="Passwort"
                   autoFocus
-                  className="w-full px-4 py-3 bg-bg-primary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-text-regular"
+                  className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
                 />
               </div>
             )}
@@ -172,9 +172,9 @@ export default function LoginPage() {
 
           {/* Register Link */}
           <div className="mt-6 text-center">
-            <p className="text-text-secondary">
+            <p className="text-muted">
               Noch kein Konto?{' '}
-              <Link href="/register" className="font-medium hover:opacity-80 transition" style={{ color: '#00d4ff' }}>
+              <Link href="/register" className="link-default">
                 Jetzt registrieren
               </Link>
             </p>

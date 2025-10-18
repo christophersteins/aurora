@@ -2,13 +2,13 @@
 
 :root {
   /* ========================================
-     HINTERGRUNDFARBEN
+     BACKGROUND COLORS
      ======================================== */
   --background-primary: #000000;
   --background-secondary: #15202b;
   
   /* ========================================
-     TEXTFARBEN
+     TEXT COLORS
      ======================================== */
   --text-heading: #e7e9ea;
   --text-regular: #e7e9ea;
@@ -17,20 +17,30 @@
   --text-button-primary: #eff3f4;
   
   /* ========================================
-     BORDER & SCHATTEN
+     BORDER & SHADOW
      ======================================== */
   --border: #2f3336;
   --border-width: 1px;
   --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   
   /* ========================================
-     AKTIONSFARBEN
+     ACTION COLORS
      ======================================== */
   --color-primary: #8b5cf6;
   --color-primary-hover: #7c3aed;
   
   --color-secondary: #0ea5e9;
   --color-secondary-hover: #0284c7;
+  
+  /* ========================================
+     STATUS & FEEDBACK COLORS
+     ======================================== */
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
 }
 
 @theme inline {
@@ -54,6 +64,14 @@
   --color-secondary: var(--color-secondary);
   --color-secondary-hover: var(--color-secondary-hover);
   
+  /* Status Colors */
+  --color-success: var(--color-success);
+  --color-success-hover: var(--color-success-hover);
+  --color-error: var(--color-error);
+  --color-error-hover: var(--color-error-hover);
+  --color-warning: var(--color-warning);
+  --color-warning-hover: var(--color-warning-hover);
+  
   /* System Fonts */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -72,7 +90,7 @@ body {
 }
 
 /* ========================================
-   TYPOGRAFIE
+   TYPOGRAPHY
    ======================================== */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
@@ -83,10 +101,155 @@ h1, h2, h3, h4, h5, h6 {
    UTILITIES
    ======================================== */
 
-/* Border mit Schatten - Standard für Container/Cards */
+/* Border with shadow - standard for containers/cards */
 .border-depth {
   border: var(--border-width) solid var(--border);
   box-shadow: var(--box-shadow);
+}
+
+/* ========================================
+   BACKGROUND UTILITIES
+   ======================================== */
+
+/* Page Backgrounds */
+.bg-page-primary {
+  background-color: var(--background-primary);
+}
+
+.bg-page-secondary {
+  background-color: var(--background-secondary);
+}
+
+/* Card/Container Backgrounds */
+.bg-card {
+  background-color: #ffffff;
+}
+
+.bg-card-dark {
+  background-color: var(--background-secondary);
+}
+
+/* Action Backgrounds */
+.bg-action-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-action-primary-hover:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.bg-action-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-action-secondary-hover:hover {
+  background-color: var(--color-secondary-hover);
+}
+
+/* Status Backgrounds */
+.bg-success {
+  background-color: var(--color-success);
+}
+
+.bg-success-hover:hover {
+  background-color: var(--color-success-hover);
+}
+
+.bg-error {
+  background-color: var(--color-error);
+}
+
+.bg-error-hover:hover {
+  background-color: var(--color-error-hover);
+}
+
+.bg-warning {
+  background-color: var(--color-warning);
+}
+
+.bg-warning-hover:hover {
+  background-color: var(--color-warning-hover);
+}
+
+/* Light Status Backgrounds (for alerts, badges, etc.) */
+.bg-success-light {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.bg-error-light {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.bg-warning-light {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.bg-primary-light {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+/* ========================================
+   TEXT COLOR UTILITIES
+   ======================================== */
+
+.text-heading {
+  color: var(--text-heading);
+}
+
+.text-body {
+  color: var(--text-regular);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.text-action-primary {
+  color: var(--color-primary);
+}
+
+.text-action-primary-hover:hover {
+  color: var(--color-primary-hover);
+}
+
+.text-action-secondary {
+  color: var(--color-secondary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+/* ========================================
+   BORDER UTILITIES
+   ======================================== */
+
+.border-default {
+  border-color: var(--border);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+.border-success {
+  border-color: var(--color-success);
+}
+
+.border-error {
+  border-color: var(--color-error);
+}
+
+.border-warning {
+  border-color: var(--color-warning);
 }
 
 /* ========================================
@@ -121,6 +284,13 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 
+.btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 /* Secondary Button */
 .btn-secondary {
   background-color: transparent;
@@ -140,22 +310,161 @@ h1, h2, h3, h4, h5, h6 {
   background-color: rgba(47, 51, 54, 0.3);
 }
 
+.btn-secondary:disabled {
+  background-color: transparent;
+  color: #9ca3af;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Success Button */
+.btn-success {
+  background-color: var(--color-success);
+  color: var(--text-button-primary);
+}
+
+.btn-success:hover {
+  background-color: var(--color-success-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-success:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Error/Danger Button */
+.btn-error {
+  background-color: var(--color-error);
+  color: var(--text-button-primary);
+}
+
+.btn-error:hover {
+  background-color: var(--color-error-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-error:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.btn-error:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 /* ========================================
-   FOCUS STATES (Dezent)
+   INPUT & FORM UTILITIES
+   ======================================== */
+
+.input-base {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #1f2937;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.input-base::placeholder {
+  color: #9ca3af;
+}
+
+.input-base:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Label Styles */
+.label-base {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* ========================================
+   FOCUS STATES
    ======================================== */
 
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--border);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
-/* Dezenter Focus Ring für alle fokussierbaren Elemente */
+/* Subtle focus ring for all focusable elements */
 *:focus-visible {
   outline: 2px solid rgba(139, 92, 246, 0.3);
   outline-offset: 2px;
+}
+
+/* ========================================
+   LINKS
+   ======================================== */
+
+.link-default {
+  color: var(--text-button);
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.link-default:hover {
+  color: var(--text-heading);
+  text-decoration: underline;
+}
+
+.link-primary {
+  color: var(--color-primary);
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.link-primary:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* ========================================
+   CARDS & CONTAINERS
+   ======================================== */
+
+.card-base {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.card-bordered {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
 }
 
 /* ========================================
