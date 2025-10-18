@@ -1,28 +1,35 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import GeolocationTest from '@/components/GeolocationTest';
 import NearbyUsers from '@/components/NearbyUsers';
+import LandingPage from '@/components/LandingPage';
 
 export default function Home() {
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, router]);
+    setIsClient(true);
+  }, []);
 
-  if (!isAuthenticated) {
-    return null; // Wird redirected
+  // Wait for hydration
+  if (!isClient || !_hasHydrated) {
+    return null;
   }
 
+  // Show landing page for non-authenticated users
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
+  // Show app for authenticated users
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   return (
