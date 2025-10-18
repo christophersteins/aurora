@@ -14,7 +14,7 @@
   --text-regular: #e7e9ea;
   --text-secondary: #71767b;
   --text-button: #eff3f4;
-  --text-button-primary: #0f1419;
+  --text-button-primary: #eff3f4;
   
   /* ========================================
      BORDER & SCHATTEN
@@ -26,21 +26,11 @@
   /* ========================================
      AKTIONSFARBEN
      ======================================== */
-  --color-primary: #00d4ff;
-  --color-primary-hover: #00b8e6;
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #7c3aed;
   
-  --color-secondary: #4d7cfe;
-  --color-secondary-hover: #3d6ce8;
-  
-  --color-tertiary: #b845ed;
-  --color-tertiary-hover: #a030d9;
-  
-  /* ========================================
-     GRADIENT
-     ======================================== */
-  --gradient-cyan: #00d4ff;
-  --gradient-blue: #4d7cfe;
-  --gradient-purple: #b845ed;
+  --color-secondary: #0ea5e9;
+  --color-secondary-hover: #0284c7;
 }
 
 @theme inline {
@@ -63,8 +53,6 @@
   --color-primary-hover: var(--color-primary-hover);
   --color-secondary: var(--color-secondary);
   --color-secondary-hover: var(--color-secondary-hover);
-  --color-tertiary: var(--color-tertiary);
-  --color-tertiary-hover: var(--color-tertiary-hover);
   
   /* System Fonts */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -95,15 +83,6 @@ h1, h2, h3, h4, h5, h6 {
    UTILITIES
    ======================================== */
 
-/* Gradient Text */
-.gradient-text {
-  background: linear-gradient(90deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
 /* Border mit Schatten - Standard für Container/Cards */
 .border-depth {
   border: var(--border-width) solid var(--border);
@@ -116,7 +95,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Base Button Styles */
 .btn-base {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
@@ -134,12 +113,12 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background-color: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 212, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
 }
 
 /* Secondary Button */
@@ -162,78 +141,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ========================================
-   FORM INPUTS - GLOBAL STYLES
-   ======================================== */
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="tel"],
-input[type="url"],
-select,
-textarea {
-  background: transparent;
-  color: var(--text-regular);
-  border: var(--border-width) solid var(--border);
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  transition: all 0.2s ease-in-out;
-  width: 100%;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus,
-input[type="tel"]:focus,
-input[type="url"]:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-secondary);
-}
-
-/* Select-Dropdown Styling */
-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2371767b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
-}
-
-select option {
-  background: var(--background-secondary);
-  color: var(--text-regular);
-}
-
-/* File Input */
-input[type="file"] {
-  border: var(--border-width) dashed var(--border);
-  background: transparent;
-  cursor: pointer;
-  padding: 1rem;
-}
-
-input[type="file"]:hover {
-  border-color: var(--color-primary);
-}
-
-/* ========================================
    FOCUS STATES (Dezent)
    ======================================== */
 
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--border);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+/* Dezenter Focus Ring für alle fokussierbaren Elemente */
 *:focus-visible {
-  outline: 2px solid rgba(0, 212, 255, 0.3);
+  outline: 2px solid rgba(139, 92, 246, 0.3);
   outline-offset: 2px;
 }
 

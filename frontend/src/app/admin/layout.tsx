@@ -28,8 +28,8 @@ export default function AdminLayout({
   // Show loading while hydrating
   if (!_hasHydrated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-gray-600">Lädt...</div>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="text-text-secondary">Lädt...</div>
       </div>
     );
   }
@@ -37,8 +37,8 @@ export default function AdminLayout({
   // Show loading while checking auth after hydration
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-gray-600">Authentifizierung wird überprüft...</div>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="text-text-secondary">Authentifizierung wird überprüft...</div>
       </div>
     );
   }
@@ -49,39 +49,39 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-bg-primary">
       {/* Admin Navigation */}
-      <nav className="bg-white shadow-md">
+      <nav className="bg-bg-secondary border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-bold text-purple-600">Aurora Admin</h1>
+              <h1 className="text-xl font-bold gradient-text">Aurora Admin</h1>
               <div className="hidden md:flex space-x-4">
                 <Link
                   href="/admin"
-                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-text-regular hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/admin/users"
-                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-text-regular hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Benutzer
                 </Link>
                 <Link
                   href="/admin/waitlist"
-                  className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-text-regular hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Warteliste
                 </Link>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Admin: {user.username || user.email}</span>
+              <span className="text-sm text-text-secondary">Admin: {user.username || user.email}</span>
               <button
-                onClick={() => router.push('/dashboard')}
-                className="text-sm text-gray-700 hover:text-purple-600"
+                onClick={() => router.push('/')}
+                className="text-sm text-text-regular hover:text-primary transition-colors"
               >
                 Zur App
               </button>

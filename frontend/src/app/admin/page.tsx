@@ -53,8 +53,8 @@ export default function AdminDashboard() {
 
   if (isLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-gray-600">Lade Dashboard...</div>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="text-text-secondary">Lade Dashboard...</div>
       </div>
     );
   }
@@ -64,57 +64,57 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="min-h-screen bg-bg-primary">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Willkommen zurück, {user.username || user.email}</p>
+          <h1 className="text-3xl font-bold text-text-heading mb-2">Admin Dashboard</h1>
+          <p className="text-text-secondary">Willkommen zurück, {user.username || user.email}</p>
         </div>
 
         {/* Statistics Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-sm font-medium text-gray-500 mb-2">Gesamt Benutzer</div>
-              <div className="text-3xl font-bold text-purple-600">{stats.totalUsers}</div>
+            <div className="bg-bg-secondary border-depth rounded-lg p-6">
+              <div className="text-sm font-medium text-text-secondary mb-2">Gesamt Benutzer</div>
+              <div className="text-3xl font-bold text-primary">{stats.totalUsers}</div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-sm font-medium text-gray-500 mb-2">Kunden</div>
-              <div className="text-3xl font-bold text-blue-600">{stats.usersByRole.customer}</div>
+            <div className="bg-bg-secondary border-depth rounded-lg p-6">
+              <div className="text-sm font-medium text-text-secondary mb-2">Kunden</div>
+              <div className="text-3xl font-bold text-secondary">{stats.usersByRole.customer}</div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-sm font-medium text-gray-500 mb-2">Escorts</div>
-              <div className="text-3xl font-bold text-pink-600">{stats.usersByRole.escort}</div>
+            <div className="bg-bg-secondary border-depth rounded-lg p-6">
+              <div className="text-sm font-medium text-text-secondary mb-2">Escorts</div>
+              <div className="text-3xl font-bold text-tertiary">{stats.usersByRole.escort}</div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-sm font-medium text-gray-500 mb-2">Business</div>
-              <div className="text-3xl font-bold text-green-600">{stats.usersByRole.business}</div>
+            <div className="bg-bg-secondary border-depth rounded-lg p-6">
+              <div className="text-sm font-medium text-text-secondary mb-2">Business</div>
+              <div className="text-3xl font-bold text-primary-hover">{stats.usersByRole.business}</div>
             </div>
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Schnellzugriff</h2>
+        <div className="bg-bg-secondary border-depth rounded-lg p-6">
+          <h2 className="text-xl font-bold text-text-heading mb-4">Schnellzugriff</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               onClick={() => router.push('/admin/users')}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="btn-base btn-primary"
             >
               Benutzer verwalten
             </button>
             <button
-              onClick={() => router.push('/admin/reports')}
-              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              onClick={() => router.push('/admin/waitlist')}
+              className="btn-base btn-secondary"
             >
-              Berichte ansehen
+              Warteliste ansehen
             </button>
             <button
               onClick={() => router.push('/admin/settings')}
-              className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="btn-base btn-secondary"
             >
               Einstellungen
             </button>
