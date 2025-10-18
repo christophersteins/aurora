@@ -4,8 +4,17 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
+  OneToMany,
 } from 'typeorm';
-import { UserRole } from '../enums/user-role.enum';
+
+import { GalleryPhoto } from './gallery-photo.entity';
+
+export enum UserRole {
+  CUSTOMER = 'customer',
+  ESCORT = 'escort',
+  BUSINESS = 'business',
+}
 
 @Entity('users')
 export class User {
@@ -15,11 +24,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Column({ unique: true, nullable: true })
+  username: string;
+
   @Column()
   password: string;
-
-  @Column({ nullable: true })
-  username: string;
 
   @Column({ nullable: true })
   firstName: string;
@@ -30,7 +39,6 @@ export class User {
   @Column({ nullable: true })
   profilePicture: string;
 
-  // Benutzerrolle
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -38,40 +46,39 @@ export class User {
   })
   role: UserRole;
 
-  // Geolocation-Feld für PostGIS
   @Column({
-    type: 'geometry',
+    type: 'geography',
     spatialFeatureType: 'Point',
     srid: 4326,
     nullable: true,
   })
+  @Index({ spatial: true })
   location: string;
 
-  // === ESCORT-SPEZIFISCHE FELDER ===
-  
+  // Escort-spezifische Felder
   @Column({ type: 'date', nullable: true })
   birthDate: Date;
 
-  @Column('text', { array: true, nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   nationalities: string[];
 
-  @Column('text', { array: true, nullable: true })
+  @Column({ type: 'simple-array', nullable: true })
   languages: string[];
 
   @Column({ nullable: true })
-  type: string; // Typ (Afrikanisch, Asiatisch, etc.)
+  type: string;
 
   @Column({ type: 'int', nullable: true })
-  height: number; // in cm
+  height: number;
 
   @Column({ type: 'int', nullable: true })
-  weight: number; // in kg
+  weight: number;
 
   @Column({ nullable: true })
-  bodyType: string; // Figur
+  bodyType: string;
 
   @Column({ nullable: true })
-  cupSize: string; // Oberweite
+  cupSize: string;
 
   @Column({ nullable: true })
   hairColor: string;
@@ -83,19 +90,23 @@ export class User {
   eyeColor: string;
 
   @Column({ nullable: true })
-  intimateHair: string; // Intimbereich
+  intimateHair: string;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   hasTattoos: boolean;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   hasPiercings: boolean;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   isSmoker: boolean;
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  // Gallery Photos Relation
+  @OneToMany(() => GalleryPhoto, (photo) => photo.user, { eager: true })
+  galleryPhotos: GalleryPhoto[];
 
   @CreateDateColumn()
   createdAt: Date;

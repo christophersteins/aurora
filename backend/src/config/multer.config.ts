@@ -7,16 +7,36 @@ export const multerConfig = {
     filename: (req, file, callback) => {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const ext = extname(file.originalname);
-      callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+      callback(null, `profile-${uniqueSuffix}${ext}`);
     },
   }),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
   fileFilter: (req, file, callback) => {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+    if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
       return callback(new Error('Only image files are allowed!'), false);
     }
     callback(null, true);
   },
+};
+
+export const galleryMulterConfig = {
+  storage: diskStorage({
+    destination: './uploads/gallery',
+    filename: (req, file, callback) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = extname(file.originalname);
+      callback(null, `gallery-${uniqueSuffix}${ext}`);
+    },
+  }),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+  fileFilter: (req, file, callback) => {
+    if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+      return callback(new Error('Only image files are allowed!'), false);
+    }
+    callback(null, true);
   },
 };
