@@ -58,19 +58,19 @@ export default function MultiSelectDropdown({
 
   return (
     <div>
-      {label && <label className="block text-sm font-medium mb-2">{label}</label>}
+      {label && <label className="block text-sm font-medium mb-2 text-body">{label}</label>}
       
       <div className="relative" ref={dropdownRef}>
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className="min-h-[42px] px-4 py-2 border rounded focus-within:ring-2 focus-within:ring-blue-500 cursor-pointer bg-white"
+          className="min-h-[42px] px-4 py-2 border border-default rounded focus-within:outline-none cursor-pointer bg-page-primary"
         >
           {selectedValues.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {selectedValues.map((value) => (
                 <span
                   key={value}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary-light text-action-primary rounded text-sm"
                 >
                   {value}
                   <button
@@ -79,7 +79,7 @@ export default function MultiSelectDropdown({
                       e.stopPropagation();
                       removeOption(value);
                     }}
-                    className="hover:text-blue-600 font-bold"
+                    className="hover:text-action-primary-hover font-bold"
                   >
                     ×
                   </button>
@@ -87,13 +87,13 @@ export default function MultiSelectDropdown({
               ))}
             </div>
           ) : (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-muted">{placeholder}</span>
           )}
         </div>
 
         {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
-            <div className="p-2 border-b">
+          <div className="absolute z-10 w-full mt-1 bg-page-secondary border border-default rounded shadow-lg">
+            <div className="p-2 border-b border-default">
               <input
                 ref={searchInputRef}
                 type="text"
@@ -101,7 +101,7 @@ export default function MultiSelectDropdown({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Suchen..."
-                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-default rounded focus:outline-none bg-page-primary text-body"
               />
             </div>
 
@@ -110,19 +110,20 @@ export default function MultiSelectDropdown({
                 filteredOptions.map((option) => (
                   <label
                     key={option}
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    className="flex items-center px-4 py-2 hover:bg-page-primary cursor-pointer text-body"
                   >
                     <input
                       type="checkbox"
                       checked={selectedValues.includes(option)}
                       onChange={() => toggleOption(option)}
                       className="mr-2"
+                      style={{ accentColor: 'var(--color-primary)' }}
                     />
                     <span>{option}</span>
                   </label>
                 ))
               ) : (
-                <div className="px-4 py-2 text-gray-500 text-center">
+                <div className="px-4 py-2 text-muted text-center">
                   Keine Ergebnisse gefunden
                 </div>
               )}

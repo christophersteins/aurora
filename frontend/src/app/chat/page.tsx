@@ -74,7 +74,7 @@ export default function ChatPage() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-500">Lade Konversationen...</p>
+        <p className="text-muted">Lade Konversationen...</p>
       </div>
     );
   }

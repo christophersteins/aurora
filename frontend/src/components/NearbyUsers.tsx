@@ -68,17 +68,17 @@ export default function NearbyUsers() {
   };
 
   return (
-    <div className="p-6 border rounded-lg bg-white shadow-sm">
-      <h2 className="text-2xl font-bold mb-4">Benutzer in deiner Nähe</h2>
+    <div className="p-6 rounded-lg bg-page-secondary border-depth">
+      <h2 className="text-2xl font-bold mb-4 text-heading">Benutzer in deiner Nähe</h2>
 
       <div className="mb-4">
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-muted mb-2">
           Deine Position: {latitude && longitude 
             ? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` 
             : 'Wird ermittelt...'}
         </p>
 
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-body mb-2">
           Radius: {radius} km
         </label>
         <div className="flex gap-2">
@@ -86,10 +86,10 @@ export default function NearbyUsers() {
             <button
               key={r}
               onClick={() => setRadius(r)}
-              className={`px-3 py-1 rounded ${
+              className={`px-3 py-1 rounded transition ${
                 radius === r
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-action-primary text-button-primary'
+                  : 'bg-page-primary text-body hover:bg-page-secondary'
               }`}
             >
               {r} km
@@ -101,46 +101,46 @@ export default function NearbyUsers() {
       <button
         onClick={searchNearbyUsers}
         disabled={loading || !latitude || !longitude}
-        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400 mb-4"
+        className="btn-base btn-success mb-4"
       >
         {loading ? 'Suche...' : 'Benutzer suchen'}
       </button>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded mb-4">
-          <p className="text-red-700">{error}</p>
+        <div className="p-3 bg-error-light border border-error rounded mb-4">
+          <p className="text-error">{error}</p>
         </div>
       )}
 
       <div>
-        <h3 className="text-lg font-semibold mb-3">
+        <h3 className="text-lg font-semibold mb-3 text-heading">
           {nearbyUsers.length} Benutzer gefunden
         </h3>
         
         {nearbyUsers.length === 0 && !loading && (
-          <p className="text-gray-500">Keine Benutzer in diesem Umkreis gefunden.</p>
+          <p className="text-muted">Keine Benutzer in diesem Umkreis gefunden.</p>
         )}
 
         <div className="space-y-3">
           {nearbyUsers.map((user) => (
             <div
               key={user.id}
-              className="p-4 border rounded-lg hover:bg-gray-50 transition"
+              className="p-4 border border-default rounded-lg hover:bg-page-primary transition"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                <div className="w-12 h-12 bg-action-primary rounded-full flex items-center justify-center text-white font-bold">
                   {user.username?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                 </div>
                 
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-semibold text-body">
                     {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.username || 'Unbekannt'}
                   </p>
-                  <p className="text-sm text-gray-600">@{user.username || user.email}</p>
+                  <p className="text-sm text-muted">@{user.username || user.email}</p>
                   {user.location && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted">
                       📍 {user.location.coordinates[1].toFixed(4)}, {user.location.coordinates[0].toFixed(4)}
                     </p>
                   )}
