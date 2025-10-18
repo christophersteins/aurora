@@ -1,65 +1,47 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import GeolocationTest from '@/components/GeolocationTest';
 import NearbyUsers from '@/components/NearbyUsers';
-import LandingPage from '@/components/LandingPage';
 
 export default function Home() {
   const router = useRouter();
-  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
-  const [isClient, setIsClient] = useState(false);
+  const { user, isAuthenticated, logout } = useAuthStore();
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
-  // Wait for hydration
-  if (!isClient || !_hasHydrated) {
+  if (!isAuthenticated) {
     return null;
   }
 
-  // Show landing page for non-authenticated users
-  if (!isAuthenticated) {
-    return <LandingPage />;
-  }
-
-  // Show app for authenticated users
   const handleLogout = () => {
     logout();
-    router.push('/');
+    router.push('/login');
   };
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50">
+    <main className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800">Aurora</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-4xl font-bold text-heading">Aurora</h1>
+            <p className="text-muted mt-1">
               Willkommen, {user?.username || user?.email}!
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            {/* Admin-Button - nur für Admins sichtbar */}
-            {user?.role === 'admin' && (
-              <button
-                onClick={() => router.push('/admin')}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium"
-              >
-                Admin-Panel
-              </button>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
-          </div>
+          <button
+            onClick={handleLogout}
+            className="btn-base btn-error"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Content */}
