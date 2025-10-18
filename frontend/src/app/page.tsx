@@ -17,7 +17,7 @@ export default function Home() {
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated) {
-    return null;
+    return null; // Wird redirected
   }
 
   const handleLogout = () => {
@@ -26,22 +26,33 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
-      <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
+    <main className="min-h-screen p-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold gradient-text">Aurora</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>
+            <h1 className="text-4xl font-bold text-gray-800">Aurora</h1>
+            <p className="text-gray-600 mt-1">
               Willkommen, {user?.username || user?.email}!
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="btn-base btn-secondary"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Admin-Button - nur für Admins sichtbar */}
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => router.push('/admin')}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium"
+              >
+                Admin-Panel
+              </button>
+            )}
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Content */}
