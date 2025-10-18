@@ -1,16 +1,386 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
+import { Download, Search, Trash2, CheckCircle, XCircle } from 'lucide-react';
+
+interface WaitlistEntry {
+  id: string;
+  email: string;
+  notified: boolean;
+  createdAt: string;
+}
 
 export default function AdminWaitlistPage() {
-  const { user } = useAuthStore();
+  const { token } = useAuthStore();
+  
+  const [entries, setEntries] = useState<WaitlistEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'notified' | 'pending'>('all');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [token]);
+
+  const fetchEntries = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:4000/waitlist', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEntries(data);
+      } else {
+        setError('Fehler beim Laden der Warteliste');
+      }
+    } catch (err) {
+      setError('Verbindungsfehler');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadCsv = async () => {
+    setDownloading(true);
+    try {
+      const response = await fetch('http://localhost:4000/waitlist/export/csv', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `waitlist_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      setError('CSV-Export fehlgeschlagen');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleToggleNotified = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
+    setError('');
+    
+    try {
+      const response = await fetch(`http://localhost:4000/waitlist/${id}/notified`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ notified: !currentStatus }),
+      });
+
+      if (response.ok) {
+        setEntries(entries.map(entry => 
+          entry.id === id ? { ...entry, notified: !currentStatus } : entry
+        ));
+      }
+    } catch (error) {
+      setError('Status konnte nicht aktualisiert werden');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleBulkMarkNotified = async () => {
+    if (selectedIds.length === 0) return;
+    
+    setBulkUpdating(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:4000/waitlist/bulk/notified', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ids: selectedIds, notified: true }),
+      });
+
+      if (response.ok) {
+        setEntries(entries.map(entry => 
+          selectedIds.includes(entry.id) ? { ...entry, notified: true } : entry
+        ));
+        setSelectedIds([]);
+      }
+    } catch (error) {
+      setError('Bulk-Update fehlgeschlagen');
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    
+    if (!confirm(`${selectedIds.length} Einträge wirklich löschen?`)) return;
+    
+    setBulkUpdating(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:4000/waitlist/bulk/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+
+      if (response.ok) {
+        setEntries(entries.filter(entry => !selectedIds.includes(entry.id)));
+        setSelectedIds([]);
+      }
+    } catch (error) {
+      setError('Bulk-Löschung fehlgeschlagen');
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Eintrag wirklich löschen?')) return;
+    
+    try {
+      const response = await fetch(`http://localhost:4000/waitlist/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setEntries(entries.filter(entry => entry.id !== id));
+      }
+    } catch (error) {
+      setError('Löschen fehlgeschlagen');
+    }
+  };
+
+  const filteredEntries = entries.filter(entry => {
+    const matchesSearch = entry.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = 
+      filterStatus === 'all' ||
+      (filterStatus === 'notified' && entry.notified) ||
+      (filterStatus === 'pending' && !entry.notified);
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredEntries.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredEntries.map(e => e.id));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-gray-600">Lade Warteliste...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Warteliste Test</h1>
-        <p className="text-gray-600">User: {user?.email}</p>
-        <p className="text-gray-600">Role: {user?.role}</p>
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Warteliste</h1>
+          <p className="text-gray-600">
+            {entries.length} {entries.length === 1 ? 'Eintrag' : 'Einträge'} insgesamt
+          </p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
+        )}
+
+        {/* Actions Bar */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* Search */}
+            <div className="relative flex-1 w-full md:w-auto">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Nach E-Mail suchen..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="all">Alle</option>
+              <option value="pending">Ausstehend</option>
+              <option value="notified">Benachrichtigt</option>
+            </select>
+
+            {/* CSV Export */}
+            <button
+              onClick={handleDownloadCsv}
+              disabled={downloading}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              {downloading ? 'Exportiere...' : 'CSV Export'}
+            </button>
+          </div>
+
+          {/* Bulk Actions */}
+          {selectedIds.length > 0 && (
+            <div className="mt-4 pt-4 border-t flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                {selectedIds.length} ausgewählt
+              </span>
+              <button
+                onClick={handleBulkMarkNotified}
+                disabled={bulkUpdating}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors text-sm"
+              >
+                <CheckCircle className="w-4 h-4" />
+                Als benachrichtigt markieren
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkUpdating}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 transition-colors text-sm"
+              >
+                <Trash2 className="w-4 h-4" />
+                Löschen
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.length === filteredEntries.length && filteredEntries.length > 0}
+                    onChange={handleSelectAll}
+                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  />
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  E-Mail
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Datum
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Aktionen
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredEntries.map((entry) => (
+                <tr key={entry.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(entry.id)}
+                      onChange={() => {
+                        if (selectedIds.includes(entry.id)) {
+                          setSelectedIds(selectedIds.filter(id => id !== entry.id));
+                        } else {
+                          setSelectedIds([...selectedIds, entry.id]);
+                        }
+                      }}
+                      className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {entry.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => handleToggleNotified(entry.id, entry.notified)}
+                      disabled={updatingId === entry.id}
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                        entry.notified
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      } hover:opacity-80 transition-opacity`}
+                    >
+                      {entry.notified ? (
+                        <>
+                          <CheckCircle className="w-3 h-3" />
+                          Benachrichtigt
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-3 h-3" />
+                          Ausstehend
+                        </>
+                      )}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(entry.createdAt).toLocaleDateString('de-DE')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                    <button
+                      onClick={() => handleDelete(entry.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filteredEntries.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              Keine Einträge gefunden
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
