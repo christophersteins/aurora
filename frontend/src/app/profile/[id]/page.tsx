@@ -4,21 +4,18 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { profilePictureService } from '@/services/profilePictureService';
+import { galleryService, GalleryPhoto } from '@/services/galleryService';
 import { User } from '@/types/auth.types';
 
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const [escort, setEscort] = useState<User | null>(null);
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Generate photos array with full URLs
-  const photos = escort?.profilePicture 
-    ? [profilePictureService.getProfilePictureUrl(escort.profilePicture)] 
-    : [];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -26,6 +23,12 @@ export default function ProfilePage() {
         const username = params.id as string;
         const data = await escortService.getEscortByUsername(username);
         setEscort(data);
+        
+        // Load gallery photos
+        if (data.id) {
+          const photos = await galleryService.getPublicPhotos(data.id);
+          setGalleryPhotos(photos);
+        }
       } catch (err) {
         setError('Fehler beim Laden des Profils');
         console.error(err);
@@ -36,6 +39,23 @@ export default function ProfilePage() {
 
     fetchProfile();
   }, [params.id]);
+
+  // Generate photos array: profile picture first, then gallery photos
+  const photos = (() => {
+    const allPhotos: string[] = [];
+    
+    // Add profile picture first if it exists
+    if (escort?.profilePicture) {
+      allPhotos.push(profilePictureService.getProfilePictureUrl(escort.profilePicture));
+    }
+    
+    // Add gallery photos
+    galleryPhotos.forEach((photo) => {
+      allPhotos.push(galleryService.getPhotoUrl(photo.photoUrl));
+    });
+    
+    return allPhotos;
+  })();
 
   // Keyboard navigation for fullscreen gallery
   useEffect(() => {
@@ -53,7 +73,7 @@ export default function ProfilePage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen, selectedImageIndex]);
+  }, [isFullscreen, selectedImageIndex, photos.length]);
 
   const calculateAge = (birthDate: string | undefined): number | null => {
     if (!birthDate) return null;
