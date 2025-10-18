@@ -363,7 +363,7 @@ export default function MembersPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-text-secondary">Lädt...</p>
+        <p className="text-xl text-muted">Lädt...</p>
       </div>
     );
   }
@@ -372,7 +372,7 @@ export default function MembersPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-red-500 mb-4">{error}</p>
+          <p className="text-xl text-error mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="btn-base btn-primary"
@@ -389,7 +389,7 @@ export default function MembersPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl">Escorts</h1>
+          <h1 className="text-4xl text-heading">Escorts</h1>
         </div>
 
         {/* Toolbar: Filter, Sortierung, View Switcher */}
@@ -404,10 +404,7 @@ export default function MembersPage() {
               <Filter className="w-5 h-5" />
               Filter
               {hasActiveFilters() && (
-                <span 
-                  className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-                  style={{ backgroundColor: '#00d4ff', color: '#0f1419' }}
-                >
+                <span className="ml-1 px-2 py-0.5 bg-action-primary text-button-primary rounded-full text-xs font-semibold">
                   Aktiv
                 </span>
               )}
@@ -418,12 +415,12 @@ export default function MembersPage() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {/* Sortierung Select */}
             <div className="relative">
-              <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary pointer-events-none" />
+              <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" />
               <select
                 id="sort-select"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'distance')}
-                className="pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular appearance-none cursor-pointer"
+                className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-secondary text-body appearance-none cursor-pointer"
               >
                 <option value="distance">Entfernung aufsteigend</option>
               </select>
@@ -435,10 +432,9 @@ export default function MembersPage() {
                 onClick={() => setGridView('compact')}
                 className={`p-2 rounded-lg border transition ${
                   gridView === 'compact'
-                    ? 'text-black border-primary'
-                    : 'bg-bg-primary text-text-secondary border-border hover:border-primary hover:text-primary'
+                    ? 'bg-action-primary text-button-primary border-primary'
+                    : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                 }`}
-                style={gridView === 'compact' ? { backgroundColor: '#00d4ff' } : {}}
                 title="Kompakte Ansicht (weniger pro Reihe)"
               >
                 <LayoutGrid className="w-5 h-5" />
@@ -447,10 +443,9 @@ export default function MembersPage() {
                 onClick={() => setGridView('comfortable')}
                 className={`p-2 rounded-lg border transition ${
                   gridView === 'comfortable'
-                    ? 'text-black border-primary'
-                    : 'bg-bg-primary text-text-secondary border-border hover:border-primary hover:text-primary'
+                    ? 'bg-action-primary text-button-primary border-primary'
+                    : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                 }`}
-                style={gridView === 'comfortable' ? { backgroundColor: '#00d4ff' } : {}}
                 title="Komfortable Ansicht (mehr pro Reihe)"
               >
                 <Grid3x3 className="w-5 h-5" />
@@ -464,7 +459,7 @@ export default function MembersPage() {
           <div className="mb-6">
             <button
               onClick={handleResetFilters}
-              className="text-sm text-text-secondary font-medium hover:text-text-heading transition"
+              className="text-sm link-default"
             >
               Alle Filter zurücksetzen
             </button>
@@ -474,7 +469,7 @@ export default function MembersPage() {
         {/* Escorts Grid */}
         {sortedEscorts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-text-secondary text-lg mb-4">
+            <p className="text-muted text-lg mb-4">
               {hasActiveFilters()
                 ? 'Keine Escorts mit den ausgewählten Filtern gefunden'
                 : 'Keine Escorts gefunden'}
@@ -497,10 +492,10 @@ export default function MembersPage() {
                 <div
                   key={escort.id}
                   onClick={() => handleProfileClick(escort.username)}
-                  className="bg-bg-primary border-depth rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-105"
+                  className="bg-page-secondary border-depth rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-105"
                 >
                   {/* Profilbild */}
-                  <div className="aspect-square bg-bg-secondary flex items-center justify-center">
+                  <div className="aspect-square bg-page-primary flex items-center justify-center">
                     {escort.profilePicture ? (
                       <img
                         src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${
@@ -510,7 +505,7 @@ export default function MembersPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="text-text-secondary text-6xl">
+                      <div className="text-muted text-6xl">
                         {(
                           escort.firstName?.[0] ||
                           escort.username?.[0] ||
@@ -522,11 +517,11 @@ export default function MembersPage() {
 
                   {/* Informationen */}
                   <div className="p-4">
-                    <h3 className="text-xl mb-3">
+                    <h3 className="text-xl mb-3 text-heading">
                       {escort.username || 'Unbekannt'}
                     </h3>
 
-                    <div className="flex items-center gap-3 text-sm text-text-secondary">
+                    <div className="flex items-center gap-3 text-sm text-muted">
                       {/* Entfernung anzeigen */}
                       {filters.useRadius && filters.userLatitude && filters.userLongitude && escort.location && (
                         <span className="flex items-center gap-1">
