@@ -162,18 +162,76 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ========================================
-   FOCUS STATES (Dezent)
+   FORM INPUTS - GLOBAL STYLES
    ======================================== */
 
-input:focus,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+input[type="url"],
+select,
+textarea {
+  background: transparent;
+  color: var(--text-regular);
+  border: var(--border-width) solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
 select:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--border);
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.15);
 }
 
-/* Dezenter Focus Ring für alle fokussierbaren Elemente */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Select-Dropdown Styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2371767b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+select option {
+  background: var(--background-secondary);
+  color: var(--text-regular);
+}
+
+/* File Input */
+input[type="file"] {
+  border: var(--border-width) dashed var(--border);
+  background: transparent;
+  cursor: pointer;
+  padding: 1rem;
+}
+
+input[type="file"]:hover {
+  border-color: var(--color-primary);
+}
+
+/* ========================================
+   FOCUS STATES (Dezent)
+   ======================================== */
+
 *:focus-visible {
   outline: 2px solid rgba(0, 212, 255, 0.3);
   outline-offset: 2px;
