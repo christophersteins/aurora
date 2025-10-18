@@ -16,8 +16,8 @@ export default function RoleSelector({ selectedRole, onChange }: RoleSelectorPro
   ];
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-medium text-text-heading">
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-body">
         Anmelden als
       </label>
       <div className="grid grid-cols-3 gap-3">
@@ -27,20 +27,13 @@ export default function RoleSelector({ selectedRole, onChange }: RoleSelectorPro
             type="button"
             onClick={() => onChange(role.value)}
             className={`
-              px-4 py-3 rounded-full border font-medium transition-all
+              px-4 py-3 rounded-lg border-2 font-medium transition-all
               ${
                 selectedRole === role.value
-                  ? 'text-black border-primary'
-                  : 'bg-transparent text-text-button border-border hover:bg-opacity-50 hover:border-text-secondary'
+                  ? 'border-primary bg-primary-light text-action-primary'
+                  : 'border-default bg-page-secondary text-body hover:border-muted'
               }
             `}
-            style={selectedRole === role.value ? { 
-              backgroundColor: '#00d4ff',
-              borderColor: '#00d4ff' 
-            } : {
-              backgroundColor: 'transparent',
-              borderColor: '#2f3336'
-            }}
           >
             {role.label}
           </button>
