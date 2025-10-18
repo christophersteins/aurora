@@ -63,6 +63,31 @@ export default function MemberFilterSidebar({
     updateFilter(key, newArray);
   };
 
+  // Geolocation Handler
+  const handleEnableRadius = () => {
+    if (!filters.useRadius) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            updateFilter('userLatitude', position.coords.latitude);
+            updateFilter('userLongitude', position.coords.longitude);
+            updateFilter('useRadius', true);
+          },
+          (error) => {
+            console.error('Geolocation error:', error);
+            alert('Standortzugriff wurde verweigert oder ist nicht verfügbar.');
+          }
+        );
+      } else {
+        alert('Geolocation wird von diesem Browser nicht unterstützt.');
+      }
+    } else {
+      updateFilter('useRadius', false);
+      updateFilter('userLatitude', null);
+      updateFilter('userLongitude', null);
+    }
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -75,28 +100,28 @@ export default function MemberFilterSidebar({
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-96 bg-bg-primary shadow-xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed top-0 left-0 h-full w-96 bg-page-secondary shadow-xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border sticky top-0 bg-bg-primary z-10">
-          <h2 className="text-xl">Filter</h2>
+        <div className="flex items-center justify-between p-6 border-b border-default sticky top-0 bg-page-secondary z-10">
+          <h2 className="text-xl font-bold text-heading">Filter</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={onResetFilters}
-              className="p-2 hover:bg-bg-secondary rounded-full transition"
+              className="p-2 hover:bg-page-primary rounded-full transition"
               aria-label="Filter zurücksetzen"
               title="Alle Filter zurücksetzen"
             >
-              <RotateCcw className="w-5 h-5 text-text-secondary" />
+              <RotateCcw className="w-5 h-5 text-muted" />
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-bg-secondary rounded-full transition"
+              className="p-2 hover:bg-page-primary rounded-full transition"
               aria-label="Schließen"
             >
-              <X className="w-5 h-5 text-text-secondary" />
+              <X className="w-5 h-5 text-body" />
             </button>
           </div>
         </div>
@@ -105,88 +130,65 @@ export default function MemberFilterSidebar({
         <div className="p-6 space-y-6">
           {/* Suchfeld */}
           <div>
-            <label className="block text-sm font-medium text-text-heading mb-2">
+            <label className="block text-sm font-medium text-body mb-2">
               Suche
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" />
               <input
                 type="text"
                 value={filters.searchQuery}
                 onChange={(e) => updateFilter('searchQuery', e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Name oder Benutzername..."
-                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
               />
             </div>
           </div>
 
           {/* Umkreissuche */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Umkreissuche
             </label>
             
-            <div className="space-y-3">
-              {/* Toggle */}
-              <label className="flex items-center cursor-pointer">
+            <button
+              onClick={handleEnableRadius}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition ${
+                filters.useRadius
+                  ? 'bg-action-primary text-button-primary border-primary'
+                  : 'bg-page-primary text-body border-default hover:border-primary'
+              }`}
+            >
+              <MapPin className="w-5 h-5" />
+              {filters.useRadius ? 'Umkreissuche aktiv' : 'Umkreissuche aktivieren'}
+            </button>
+
+            {filters.useRadius && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-body mb-2">
+                  Radius: {filters.radiusKm} km
+                </label>
                 <input
-                  type="checkbox"
-                  checked={filters.useRadius}
-                  onChange={(e) => updateFilter('useRadius', e.target.checked)}
-                  className="mr-2 w-4 h-4 rounded"
-                  style={{ accentColor: '#00d4ff' }}
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value={filters.radiusKm}
+                  onChange={(e) => updateFilter('radiusKm', parseInt(e.target.value))}
+                  className="w-full accent-primary"
                 />
-                <span className="text-sm text-text-regular">Umkreissuche aktivieren</span>
-              </label>
-
-              {/* Radius Slider */}
-              {filters.useRadius && (
-                <>
-                  <div>
-                    <label className="block text-sm text-text-secondary mb-2">
-                      Radius: {filters.radiusKm} km
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="100"
-                      value={filters.radiusKm}
-                      onChange={(e) => updateFilter('radiusKm', parseInt(e.target.value))}
-                      className="w-full"
-                      style={{ accentColor: '#00d4ff' }}
-                    />
-                  </div>
-
-                  {/* Standort Button */}
-                  <button
-                    onClick={() => {
-                      if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                          (position) => {
-                            updateFilter('userLatitude', position.coords.latitude);
-                            updateFilter('userLongitude', position.coords.longitude);
-                          },
-                          (error) => {
-                            console.error('Fehler beim Abrufen des Standorts:', error);
-                            alert('Standort konnte nicht ermittelt werden');
-                          }
-                        );
-                      }
-                    }}
-                    className="btn-base btn-secondary w-full flex items-center justify-center gap-2"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    Meinen Standort verwenden
-                  </button>
-                </>
-              )}
-            </div>
+                <div className="flex justify-between text-xs text-muted mt-1">
+                  <span>1 km</span>
+                  <span>100 km</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Alter */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Alter
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -198,7 +200,7 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('ageMin', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="18"
                   max="99"
                 />
@@ -211,7 +213,7 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('ageMax', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="18"
                   max="99"
                 />
@@ -220,71 +222,71 @@ export default function MemberFilterSidebar({
           </div>
 
           {/* Nationalität */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Nationalität
             </label>
-            <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2">
+            <div className="max-h-48 overflow-y-auto border border-default rounded-lg p-3 space-y-2 bg-page-primary">
               {NATIONALITIES.map((nat) => (
-                <label key={nat} className="flex items-center cursor-pointer hover:bg-bg-secondary p-1 rounded">
+                <label key={nat} className="flex items-center cursor-pointer hover:bg-page-secondary p-1 rounded">
                   <input
                     type="checkbox"
                     checked={filters.nationalities.includes(nat)}
                     onChange={() => toggleArrayItem('nationalities', nat)}
                     className="mr-2 w-4 h-4 rounded"
-                    style={{ accentColor: '#00d4ff' }}
+                    style={{ accentColor: 'var(--color-primary)' }}
                   />
-                  <span className="text-sm text-text-regular">{nat}</span>
+                  <span className="text-sm text-body">{nat}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Sprachen */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Sprachen
             </label>
-            <div className="max-h-48 overflow-y-auto border border-border rounded-lg p-3 space-y-2">
+            <div className="max-h-48 overflow-y-auto border border-default rounded-lg p-3 space-y-2 bg-page-primary">
               {LANGUAGES.map((lang) => (
-                <label key={lang} className="flex items-center cursor-pointer hover:bg-bg-secondary p-1 rounded">
+                <label key={lang} className="flex items-center cursor-pointer hover:bg-page-secondary p-1 rounded">
                   <input
                     type="checkbox"
                     checked={filters.languages.includes(lang)}
                     onChange={() => toggleArrayItem('languages', lang)}
                     className="mr-2 w-4 h-4 rounded"
-                    style={{ accentColor: '#00d4ff' }}
+                    style={{ accentColor: 'var(--color-primary)' }}
                   />
-                  <span className="text-sm text-text-regular">{lang}</span>
+                  <span className="text-sm text-body">{lang}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Typ */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Typ
             </label>
             <div className="space-y-2">
               {TYPES.map((type) => (
-                <label key={type} className="flex items-center cursor-pointer hover:bg-bg-secondary p-2 rounded">
+                <label key={type} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
                   <input
                     type="checkbox"
                     checked={filters.types.includes(type)}
                     onChange={() => toggleArrayItem('types', type)}
                     className="mr-2 w-4 h-4 rounded"
-                    style={{ accentColor: '#00d4ff' }}
+                    style={{ accentColor: 'var(--color-primary)' }}
                   />
-                  <span className="text-sm text-text-regular">{type}</span>
+                  <span className="text-sm text-body">{type}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Größe */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Größe (cm)
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -296,7 +298,7 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('heightMin', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="140"
                   max="220"
                 />
@@ -309,7 +311,7 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('heightMax', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="140"
                   max="220"
                 />
@@ -318,8 +320,8 @@ export default function MemberFilterSidebar({
           </div>
 
           {/* Gewicht */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Gewicht (kg)
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -331,9 +333,9 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('weightMin', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="40"
-                  max="200"
+                  max="150"
                 />
               </div>
               <div>
@@ -344,51 +346,50 @@ export default function MemberFilterSidebar({
                   onChange={(e) =>
                     updateFilter('weightMax', e.target.value ? parseInt(e.target.value) : null)
                   }
-                  className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-bg-primary text-text-regular"
+                  className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
                   min="40"
-                  max="200"
+                  max="150"
                 />
               </div>
             </div>
           </div>
 
           {/* Figur */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Figur
             </label>
             <div className="space-y-2">
               {BODY_TYPES.map((type) => (
-                <label key={type} className="flex items-center cursor-pointer hover:bg-bg-secondary p-2 rounded">
+                <label key={type} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
                   <input
                     type="checkbox"
                     checked={filters.bodyTypes.includes(type)}
                     onChange={() => toggleArrayItem('bodyTypes', type)}
                     className="mr-2 w-4 h-4 rounded"
-                    style={{ accentColor: '#00d4ff' }}
+                    style={{ accentColor: 'var(--color-primary)' }}
                   />
-                  <span className="text-sm text-text-regular">{type}</span>
+                  <span className="text-sm text-body">{type}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Oberweite */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Oberweite
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="flex flex-wrap gap-2">
               {CUP_SIZES.map((size) => (
                 <button
                   key={size}
                   onClick={() => toggleArrayItem('cupSizes', size)}
                   className={`px-3 py-2 text-sm rounded-lg border transition ${
                     filters.cupSizes.includes(size)
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
+                      ? 'bg-action-primary text-button-primary border-primary'
+                      : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
-                  style={filters.cupSizes.includes(size) ? { backgroundColor: '#00d4ff' } : {}}
                 >
                   {size}
                 </button>
@@ -397,100 +398,92 @@ export default function MemberFilterSidebar({
           </div>
 
           {/* Haarfarbe */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Haarfarbe
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {HAIR_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => toggleArrayItem('hairColors', color)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition ${
-                    filters.hairColors.includes(color)
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
-                  }`}
-                  style={filters.hairColors.includes(color) ? { backgroundColor: '#00d4ff' } : {}}
-                >
-                  {color}
-                </button>
+                <label key={color} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.hairColors.includes(color)}
+                    onChange={() => toggleArrayItem('hairColors', color)}
+                    className="mr-2 w-4 h-4 rounded"
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  <span className="text-sm text-body">{color}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Haarlänge */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Haarlänge
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {HAIR_LENGTHS.map((length) => (
-                <button
-                  key={length}
-                  onClick={() => toggleArrayItem('hairLengths', length)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition ${
-                    filters.hairLengths.includes(length)
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
-                  }`}
-                  style={filters.hairLengths.includes(length) ? { backgroundColor: '#00d4ff' } : {}}
-                >
-                  {length}
-                </button>
+                <label key={length} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.hairLengths.includes(length)}
+                    onChange={() => toggleArrayItem('hairLengths', length)}
+                    className="mr-2 w-4 h-4 rounded"
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  <span className="text-sm text-body">{length}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Augenfarbe */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Augenfarbe
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {EYE_COLORS.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => toggleArrayItem('eyeColors', color)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition ${
-                    filters.eyeColors.includes(color)
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
-                  }`}
-                  style={filters.eyeColors.includes(color) ? { backgroundColor: '#00d4ff' } : {}}
-                >
-                  {color}
-                </button>
+                <label key={color} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.eyeColors.includes(color)}
+                    onChange={() => toggleArrayItem('eyeColors', color)}
+                    className="mr-2 w-4 h-4 rounded"
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  <span className="text-sm text-body">{color}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Intimbereich */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Intimbereich
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-2">
               {INTIMATE_HAIR.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => toggleArrayItem('intimateHair', option)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition ${
-                    filters.intimateHair.includes(option)
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
-                  }`}
-                  style={filters.intimateHair.includes(option) ? { backgroundColor: '#00d4ff' } : {}}
-                >
-                  {option}
-                </button>
+                <label key={option} className="flex items-center cursor-pointer hover:bg-page-primary p-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={filters.intimateHair.includes(option)}
+                    onChange={() => toggleArrayItem('intimateHair', option)}
+                    className="mr-2 w-4 h-4 rounded"
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  <span className="text-sm text-body">{option}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Tattoos */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Tattoos
             </label>
             <div className="flex gap-2">
@@ -500,10 +493,9 @@ export default function MemberFilterSidebar({
                   onClick={() => updateFilter('hasTattoos', option)}
                   className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
                     filters.hasTattoos === option
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
+                      ? 'bg-action-primary text-button-primary border-primary'
+                      : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
-                  style={filters.hasTattoos === option ? { backgroundColor: '#00d4ff' } : {}}
                 >
                   {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>
@@ -512,8 +504,8 @@ export default function MemberFilterSidebar({
           </div>
 
           {/* Piercings */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Piercings
             </label>
             <div className="flex gap-2">
@@ -523,10 +515,9 @@ export default function MemberFilterSidebar({
                   onClick={() => updateFilter('hasPiercings', option)}
                   className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
                     filters.hasPiercings === option
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
+                      ? 'bg-action-primary text-button-primary border-primary'
+                      : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
-                  style={filters.hasPiercings === option ? { backgroundColor: '#00d4ff' } : {}}
                 >
                   {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>
@@ -535,8 +526,8 @@ export default function MemberFilterSidebar({
           </div>
 
           {/* Raucher/in */}
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-heading mb-3">
+          <div className="pt-4 border-t border-default">
+            <label className="block text-sm font-medium text-body mb-3">
               Raucher/in
             </label>
             <div className="flex gap-2">
@@ -546,10 +537,9 @@ export default function MemberFilterSidebar({
                   onClick={() => updateFilter('isSmoker', option)}
                   className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
                     filters.isSmoker === option
-                      ? 'text-black border-primary'
-                      : 'bg-bg-primary text-text-regular border-border hover:border-primary'
+                      ? 'bg-action-primary text-button-primary border-primary'
+                      : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
-                  style={filters.isSmoker === option ? { backgroundColor: '#00d4ff' } : {}}
                 >
                   {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>

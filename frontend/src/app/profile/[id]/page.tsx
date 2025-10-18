@@ -151,7 +151,7 @@ export default function ProfilePage() {
                 style={{
                   minHeight: '500px',
                   maxHeight: '700px',
-                  background: 'linear-gradient(135deg, var(--gradient-cyan) 0%, var(--gradient-blue) 50%, var(--gradient-purple) 100%)'
+                  background: 'var(--color-primary)'
                 }}
               >
                 {photos.length > 0 ? (
@@ -206,7 +206,7 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-9xl font-bold gradient-text">
+                    <div className="text-9xl font-bold" style={{ color: 'var(--text-heading)' }}>
                       {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
                     </div>
                   </div>
@@ -315,7 +315,7 @@ export default function ProfilePage() {
                   {escort.hasTattoos && (
                     <span className="px-3 py-1 rounded-full text-xs font-medium"
                       style={{ 
-                        background: 'rgba(0, 212, 255, 0.1)',
+                        background: 'rgba(139, 92, 246, 0.1)',
                         color: 'var(--color-primary)'
                       }}>
                       🎨 Tattoos
@@ -324,8 +324,8 @@ export default function ProfilePage() {
                   {escort.hasPiercings && (
                     <span className="px-3 py-1 rounded-full text-xs font-medium"
                       style={{ 
-                        background: 'rgba(77, 124, 254, 0.1)',
-                        color: 'var(--color-secondary)'
+                        background: 'rgba(139, 92, 246, 0.1)',
+                        color: 'var(--color-primary)'
                       }}>
                       💎 Piercings
                     </span>
@@ -333,8 +333,8 @@ export default function ProfilePage() {
                   {escort.isSmoker && (
                     <span className="px-3 py-1 rounded-full text-xs font-medium"
                       style={{ 
-                        background: 'rgba(184, 69, 237, 0.1)',
-                        color: 'var(--color-tertiary)'
+                        background: 'rgba(113, 118, 123, 0.1)',
+                        color: 'var(--text-secondary)'
                       }}>
                       🚬 Raucher/in
                     </span>
