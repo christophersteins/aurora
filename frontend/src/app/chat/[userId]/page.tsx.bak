@@ -32,7 +32,7 @@ export default function ChatPage() {
           const conversation = await response.json();
           setConversationId(conversation.id);
         } else {
-          setError('Could not load conversation');
+          setError('Konversation konnte nicht geladen werden');
         }
       } catch (err) {
         setError('Netzwerkfehler beim Laden der Konversation');

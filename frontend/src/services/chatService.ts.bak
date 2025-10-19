@@ -8,7 +8,7 @@ const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-// Interceptor for auth token
+// Interceptor für Auth-Token
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {

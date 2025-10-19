@@ -87,7 +87,7 @@ export default function MembersPage() {
     }
   }, []);
 
-  // Save filters to LocalStorage on changes
+  // Speichere Filter in LocalStorage bei Änderungen
   useEffect(() => {
     try {
       localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
@@ -96,7 +96,7 @@ export default function MembersPage() {
     }
   }, [filters]);
 
-  // Load all escorts on mount
+  // Lade alle Escorts beim Mount
   useEffect(() => {
     const fetchEscorts = async () => {
       try {
@@ -191,7 +191,7 @@ export default function MembersPage() {
     if (filters.ageMin !== null && (age === null || age < filters.ageMin)) return false;
     if (filters.ageMax !== null && (age === null || age > filters.ageMax)) return false;
 
-    // Nationality
+    // Nationalität
     if (filters.nationalities.length > 0) {
       if (!escort.nationalities || escort.nationalities.length === 0) return false;
       const hasMatchingNationality = escort.nationalities.some((nat) =>
@@ -214,7 +214,7 @@ export default function MembersPage() {
       if (!escort.type || !filters.types.includes(escort.type)) return false;
     }
 
-    // Height
+    // Größe
     if (filters.heightMin !== null && (escort.height === null || escort.height === undefined || escort.height < filters.heightMin)) return false;
     if (filters.heightMax !== null && (escort.height === null || escort.height === undefined || escort.height > filters.heightMax)) return false;
 
@@ -237,7 +237,7 @@ export default function MembersPage() {
       if (!escort.hairColor || !filters.hairColors.includes(escort.hairColor)) return false;
     }
 
-    // Hair length
+    // Haarlänge
     if (filters.hairLengths.length > 0) {
       if (!escort.hairLength || !filters.hairLengths.includes(escort.hairLength)) return false;
     }
@@ -276,7 +276,7 @@ export default function MembersPage() {
     return true;
   });
 
-  // Sort by distance (ascending - nearest first)
+  // Sortierung nach Entfernung (aufsteigend - nächste zuerst)
   const sortedEscorts = [...filteredEscorts].sort((a, b) => {
     if (sortBy === 'distance' && filters.useRadius && filters.userLatitude && filters.userLongitude) {
       const aCoords = a.location?.coordinates;
@@ -315,7 +315,7 @@ export default function MembersPage() {
     }
   };
 
-  // Reset filters
+  // Filter zurücksetzen
   const handleResetFilters = () => {
     setFilters(initialFilters);
     try {
@@ -325,7 +325,7 @@ export default function MembersPage() {
     }
   };
 
-  // Check if filters are active
+  // Prüfe ob Filter aktiv sind
   const hasActiveFilters = () => {
     return (
       filters.searchQuery.trim() !== '' ||
@@ -454,14 +454,14 @@ export default function MembersPage() {
           </div>
         </div>
 
-        {/* Reset filters (if active) */}
+        {/* Filter zurücksetzen (wenn aktiv) */}
         {hasActiveFilters() && (
           <div className="mb-6">
             <button
               onClick={handleResetFilters}
               className="text-sm link-default"
             >
-              Reset all filters
+              Alle Filter zurücksetzen
             </button>
           </div>
         )}

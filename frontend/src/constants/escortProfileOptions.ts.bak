@@ -42,7 +42,7 @@ export const LANGUAGES = [
   'Thailändisch',
 ];
 
-// Height in cm (140-220)
+// Größe in cm (140-220)
 export const HEIGHTS = Array.from({ length: 81 }, (_, i) => 140 + i);
 
 // Gewicht in kg (40-200)

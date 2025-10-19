@@ -13,7 +13,7 @@ export class ChatService {
     private messageRepository: Repository<Message>,
   ) {}
 
-  // ===== OLD METHODS (retained) =====
+  // ===== ALTE METHODEN (beibehalten) =====
   async createConversation(userId: string, otherUserId: string): Promise<Conversation> {
     const conversation = this.conversationRepository.create({
       participants: [userId, otherUserId],
@@ -44,7 +44,7 @@ export class ChatService {
     return await this.messageRepository.save(message);
   }
 
-  // ===== NEW METHODS (added) =====
+  // ===== NEUE METHODEN (hinzugefügt) =====
   async createMessage(data: {
     conversationId: string;
     senderId: string;
@@ -72,7 +72,7 @@ export class ChatService {
       .orderBy('conversation.updatedAt', 'DESC')
       .getMany();
 
-    // Load the last message for each conversation
+    // Für jede Konversation die letzte Nachricht laden
     const conversationsWithMessages = await Promise.all(
       conversations.map(async (conv) => {
         const lastMessage = await this.messageRepository.findOne({
@@ -88,13 +88,13 @@ export class ChatService {
           },
         });
 
-        // Determine other participants
+        // Andere Teilnehmer ermitteln
         const otherUserId = conv.participants.find(p => p !== userId);
 
         return {
           id: conv.id,
           otherUserId,
-          otherUserName: `User ${otherUserId}`, // TODO: Replace with actual user data later
+          otherUserName: `User ${otherUserId}`, // TODO: Später mit echten User-Daten ersetzen
           lastMessage: lastMessage?.content || null,
           lastMessageTime: lastMessage?.createdAt || conv.updatedAt,
           unreadCount,

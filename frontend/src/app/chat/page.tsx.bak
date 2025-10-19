@@ -59,7 +59,7 @@ export default function ChatPage() {
         // Liste aktualisieren
         await fetchConversations();
         
-        // Open new conversation directly
+        // Neue Konversation direkt öffnen
         setSelectedConversationId(newConversation.id);
       } else {
         console.error('❌ Fehler beim Erstellen der Konversation');

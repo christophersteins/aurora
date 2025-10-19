@@ -20,10 +20,10 @@ export class UsersService {
     lastName?: string;
     role?: UserRole;
   }): Promise<User> {
-    // Hash the password
+    // Hash das Passwort
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    // Create user with all data including role
+    // Erstelle User mit allen Daten inklusive role
     const user = this.usersRepository.create({
       email: userData.email,
       username: userData.username,
@@ -87,7 +87,7 @@ export class UsersService {
     latitude: number,
     longitude: number,
   ): Promise<User> {
-    // Validation
+    // Validierung
     if (latitude < -90 || latitude > 90) {
       throw new Error('Latitude must be between -90 and 90');
     }
@@ -95,10 +95,10 @@ export class UsersService {
       throw new Error('Longitude must be between -180 and 180');
     }
 
-    // PostGIS Point in WKT format (Well-Known Text)
+    // PostGIS Point im WKT-Format (Well-Known Text)
     const point = `SRID=4326;POINT(${longitude} ${latitude})`;
 
-    // Update user
+    // User aktualisieren
     const result = await this.usersRepository
       .createQueryBuilder()
       .update(User)
@@ -110,7 +110,7 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    // Return updated user
+    // Aktualisierten User zurückgeben
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -147,17 +147,17 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Check if user has ESCORT role
+    // Prüfe, ob User die Rolle ESCORT hat
     if (user.role !== UserRole.ESCORT) {
       throw new Error('Only users with ESCORT role can update escort profile');
     }
 
-    // Convert birthDate from string to Date if present
+    // Konvertiere birthDate von string zu Date, falls vorhanden
     if (updateData.birthDate) {
       user.birthDate = new Date(updateData.birthDate);
     }
 
-    // Update other fields
+    // Aktualisiere die anderen Felder
     if (updateData.nationalities !== undefined) user.nationalities = updateData.nationalities;
     if (updateData.languages !== undefined) user.languages = updateData.languages;
     if (updateData.type !== undefined) user.type = updateData.type;

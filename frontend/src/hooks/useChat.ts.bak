@@ -36,7 +36,7 @@ export const useChat = (userId?: string) => {
       addMessage(data.conversationId, data);
     };
 
-    // Message was sent (confirmation)
+    // Nachricht wurde gesendet (Bestätigung)
     const handleMessageReceived = (data: Message & { conversationId: string }) => {
       console.log('✅ Message sent confirmation:', data);
       addMessage(data.conversationId, data);
@@ -45,7 +45,7 @@ export const useChat = (userId?: string) => {
     // User tippt gerade
     const handleUserTyping = (data: { conversationId: string; userId: string }) => {
       console.log('⌨️ User typing:', data);
-      // Here you could show a "typing indicator" in the UI
+      // Hier könntest du einen "typing indicator" im UI anzeigen
     };
 
     // Als gelesen markiert
@@ -109,7 +109,7 @@ export const useChat = (userId?: string) => {
     [setMessages, setLoading, setError]
   );
 
-  // Send message via socket
+  // Nachricht senden über Socket
   const sendMessage = useCallback(
     (conversationId: string, receiverId: string, content: string) => {
       if (!socket || !userId || !content.trim()) return;

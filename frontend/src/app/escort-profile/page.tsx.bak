@@ -16,7 +16,7 @@ export default function EscortProfilePage() {
       return;
     }
 
-    // Now we can safely check
+    // Jetzt können wir sicher prüfen
     if (!isAuthenticated) {
       router.push('/login');
     } else {
@@ -24,7 +24,7 @@ export default function EscortProfilePage() {
     }
   }, [isAuthenticated, _hasHydrated, router]);
 
-  // Show loading during hydration or redirect
+  // Zeige Loading während Hydration oder Redirect
   if (!_hasHydrated || isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -33,7 +33,7 @@ export default function EscortProfilePage() {
     );
   }
 
-  // If not authenticated, show nothing (redirect in progress)
+  // Wenn nicht authentifiziert, zeige nichts (Redirect läuft)
   if (!isAuthenticated) {
     return null;
   }

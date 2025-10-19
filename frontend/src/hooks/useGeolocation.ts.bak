@@ -34,7 +34,7 @@ export const useGeolocation = (autoRequest: boolean = false) => {
       (position) => {
         const accuracy = position.coords.accuracy;
         
-        // Log for debugging
+        // Log für Debugging
         console.log('📍 GPS-Position erhalten:', {
           lat: position.coords.latitude.toFixed(6),
           lng: position.coords.longitude.toFixed(6),

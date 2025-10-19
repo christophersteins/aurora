@@ -44,7 +44,7 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-heading mb-2">Aurora</h1>
-          <p className="text-muted">Create your account</p>
+          <p className="text-muted">Erstelle dein Konto</p>
         </div>
 
         {/* Register Card */}

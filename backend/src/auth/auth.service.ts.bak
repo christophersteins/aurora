@@ -12,16 +12,16 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    // Check if email already exists
+    // Prüfe ob Email bereits existiert
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
 
-    // Create new user (password will be hashed in UsersService)
+    // Erstelle neuen User (Passwort wird im UsersService gehasht)
     const user = await this.usersService.create(registerDto);
 
-    // Generate JWT token
+    // Generiere JWT-Token
     const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = this.jwtService.sign(payload);
 
@@ -39,13 +39,13 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // Find user
+    // Finde User
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Validate password
+    // Validiere Passwort
     const isPasswordValid = await this.usersService.validatePassword(
       loginDto.password,
       user.password,
@@ -54,7 +54,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generate JWT token
+    // Generiere JWT-Token
     const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = this.jwtService.sign(payload);
 

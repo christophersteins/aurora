@@ -30,7 +30,7 @@ export default function MemberFilterSidebar({
   onFiltersChange,
   onResetFilters,
 }: MemberFilterSidebarProps) {
-  // Prevent body scroll when sidebar is open
+  // Verhindere Body-Scroll wenn Sidebar offen ist
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -42,7 +42,7 @@ export default function MemberFilterSidebar({
     };
   }, [isOpen]);
 
-  // Handler for Enter key
+  // Handler für Enter-Taste
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       onClose();
@@ -75,11 +75,11 @@ export default function MemberFilterSidebar({
           },
           (error) => {
             console.error('Geolocation error:', error);
-            alert('Location access was denied or is not available.');
+            alert('Standortzugriff wurde verweigert oder ist nicht verfügbar.');
           }
         );
       } else {
-        alert('Geolocation is not supported by this browser.');
+        alert('Geolocation wird von diesem Browser nicht unterstützt.');
       }
     } else {
       updateFilter('useRadius', false);
@@ -111,15 +111,15 @@ export default function MemberFilterSidebar({
             <button
               onClick={onResetFilters}
               className="p-2 hover:bg-page-primary rounded-full transition"
-              aria-label="Reset filters"
-              title="Reset all filters"
+              aria-label="Filter zurücksetzen"
+              title="Alle Filter zurücksetzen"
             >
               <RotateCcw className="w-5 h-5 text-muted" />
             </button>
             <button
               onClick={onClose}
               className="p-2 hover:bg-page-primary rounded-full transition"
-              aria-label="Close"
+              aria-label="Schließen"
             >
               <X className="w-5 h-5 text-body" />
             </button>
@@ -140,7 +140,7 @@ export default function MemberFilterSidebar({
                 value={filters.searchQuery}
                 onChange={(e) => updateFilter('searchQuery', e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Name or username..."
+                placeholder="Name oder Benutzername..."
                 className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
               />
             </div>
@@ -161,7 +161,7 @@ export default function MemberFilterSidebar({
               }`}
             >
               <MapPin className="w-5 h-5" />
-              {filters.useRadius ? 'Radius search active' : 'Enable radius search'}
+              {filters.useRadius ? 'Umkreissuche aktiv' : 'Umkreissuche aktivieren'}
             </button>
 
             {filters.useRadius && (
@@ -195,7 +195,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="From"
+                  placeholder="Von"
                   value={filters.ageMin || ''}
                   onChange={(e) =>
                     updateFilter('ageMin', e.target.value ? parseInt(e.target.value) : null)
@@ -208,7 +208,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="To"
+                  placeholder="Bis"
                   value={filters.ageMax || ''}
                   onChange={(e) =>
                     updateFilter('ageMax', e.target.value ? parseInt(e.target.value) : null)
@@ -293,7 +293,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="From"
+                  placeholder="Von"
                   value={filters.heightMin || ''}
                   onChange={(e) =>
                     updateFilter('heightMin', e.target.value ? parseInt(e.target.value) : null)
@@ -306,7 +306,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="To"
+                  placeholder="Bis"
                   value={filters.heightMax || ''}
                   onChange={(e) =>
                     updateFilter('heightMax', e.target.value ? parseInt(e.target.value) : null)
@@ -328,7 +328,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="From"
+                  placeholder="Von"
                   value={filters.weightMin || ''}
                   onChange={(e) =>
                     updateFilter('weightMin', e.target.value ? parseInt(e.target.value) : null)
@@ -341,7 +341,7 @@ export default function MemberFilterSidebar({
               <div>
                 <input
                   type="number"
-                  placeholder="To"
+                  placeholder="Bis"
                   value={filters.weightMax || ''}
                   onChange={(e) =>
                     updateFilter('weightMax', e.target.value ? parseInt(e.target.value) : null)
@@ -497,7 +497,7 @@ export default function MemberFilterSidebar({
                       : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
                 >
-                  {option === 'all' ? 'All' : option === 'yes' ? 'Yes' : 'No'}
+                  {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>
               ))}
             </div>
@@ -519,7 +519,7 @@ export default function MemberFilterSidebar({
                       : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
                 >
-                  {option === 'all' ? 'All' : option === 'yes' ? 'Yes' : 'No'}
+                  {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>
               ))}
             </div>
@@ -541,7 +541,7 @@ export default function MemberFilterSidebar({
                       : 'bg-page-primary text-body border-default hover:border-primary'
                   }`}
                 >
-                  {option === 'all' ? 'All' : option === 'yes' ? 'Yes' : 'No'}
+                  {option === 'all' ? 'Egal' : option === 'yes' ? 'Ja' : 'Nein'}
                 </button>
               ))}
             </div>

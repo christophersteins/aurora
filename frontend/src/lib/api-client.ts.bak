@@ -7,7 +7,7 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor for JWT token
+// Request-Interceptor für JWT-Token
 apiClient.interceptors.request.use(
   (config) => {
     // Hole Token aus Zustand persist storage
@@ -30,12 +30,12 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
+// Response-Interceptor für Error-Handling
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear entire auth state on 401
+      // Lösche gesamten Auth-State bei 401
       localStorage.removeItem('aurora-auth-storage');
       window.location.href = '/login';
     }

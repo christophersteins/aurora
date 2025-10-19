@@ -99,7 +99,7 @@ export default function AdminWaitlistPage() {
         ));
       }
     } catch (error) {
-      setError('Could not update status');
+      setError('Status konnte nicht aktualisiert werden');
     } finally {
       setUpdatingId(null);
     }
