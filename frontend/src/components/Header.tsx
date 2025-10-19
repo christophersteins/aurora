@@ -4,9 +4,10 @@ import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
+import UserMenu from './UserMenu';
 
 export default function Header() {
   const router = useRouter();
@@ -89,12 +90,7 @@ export default function Header() {
                   </Link>
                 </>
               ) : (
-                <button
-                  onClick={handleLogout}
-                  className="btn-base btn-secondary"
-                >
-                  {t('logout')}
-                </button>
+                <UserMenu />
               )}
             </div>
 
@@ -104,7 +100,7 @@ export default function Header() {
               className="md:hidden p-2 text-[#e7e9ea] hover:text-[#00d4ff] transition"
               aria-label="Menu"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {mobileMenuOpen ? <X size={24} /> : <AlignJustify size={24} />}
             </button>
           </div>
         </div>
@@ -193,10 +189,10 @@ export default function Header() {
               <LanguageSwitcher />
             </div>
 
-            {/* Auth Buttons */}
-            <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-3">
+            {/* Auth Buttons / User Menu */}
+            <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-1">
               {!isAuthenticated ? (
-                <>
+                <div className="space-y-3">
                   <Link href="/login" onClick={closeMobileMenu}>
                     <button className="w-full btn-base btn-secondary">
                       {t('login')}
@@ -207,14 +203,33 @@ export default function Header() {
                       {t('register')}
                     </button>
                   </Link>
-                </>
+                </div>
               ) : (
-                <button
-                  onClick={handleLogout}
-                  className="w-full btn-base btn-secondary"
-                >
-                  {t('logout')}
-                </button>
+                <>
+                  <Link
+                    href="/escort-profile"
+                    onClick={closeMobileMenu}
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                  >
+                    <User size={18} className="text-[#71767b]" />
+                    <span>{t('myProfile')}</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={closeMobileMenu}
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                  >
+                    <Settings size={18} className="text-[#71767b]" />
+                    <span>{t('settings')}</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                  >
+                    <LogOut size={18} className="text-[#71767b]" />
+                    <span>{t('logout')}</span>
+                  </button>
+                </>
               )}
             </div>
           </div>
