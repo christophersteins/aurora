@@ -41,6 +41,30 @@
   --color-error-hover: #dc2626;
   --color-warning: #f59e0b;
   --color-warning-hover: #d97706;
+  
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  --max-content-width: 1280px;
+  
+  /* ========================================
+     RESPONSIVE FONT SIZES
+     ======================================== */
+  --font-size-base: 14px; /* Default: Mobile */
+}
+
+/* Tablet breakpoint (768px and up) */
+@media (min-width: 768px) {
+  :root {
+    --font-size-base: 15px;
+  }
+}
+
+/* Desktop breakpoint (1024px and up) */
+@media (min-width: 1024px) {
+  :root {
+    --font-size-base: 15px;
+  }
 }
 
 @theme inline {
@@ -80,13 +104,7 @@ body {
   background: var(--background-primary);
   color: var(--text-regular);
   font-family: var(--font-sans);
-}
-
-/* ========================================
-   LAYOUT
-   ======================================== */
-:root {
-  --max-content-width: 1400px;
+  font-size: var(--font-size-base);
 }
 
 /* ========================================
@@ -371,11 +389,12 @@ h1, h2, h3, h4, h5, h6 {
    INPUT & FORM UTILITIES
    ======================================== */
 
+/* Base Input Styles - Rounded like buttons with same height */
 .input-base {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.5rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border-radius: 9999px;
   background-color: #ffffff;
   color: #1f2937;
   transition: all 0.2s ease-in-out;
@@ -392,6 +411,34 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .input-base:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Textarea - Rectangular with rounded corners (not fully round) */
+.textarea-base {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: #1f2937;
+  transition: all 0.2s ease-in-out;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea-base:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.textarea-base::placeholder {
+  color: #9ca3af;
+}
+
+.textarea-base:disabled {
   background-color: #f3f4f6;
   cursor: not-allowed;
 }
