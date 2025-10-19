@@ -27,9 +27,9 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#000000] border-b border-[#2f3336] sticky top-0 z-40">
+      <header className="bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] sticky top-0 z-40">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-16">
             {/* Logo + Desktop Navigation - Links */}
             <div className="flex items-center space-x-8">
               {/* Logo */}
@@ -44,13 +44,13 @@ export default function Header() {
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
                   href="/members"
-                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
                 >
                   {t('members')}
                 </Link>
                 <Link
                   href="/clubs"
-                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
                 >
                   {t('clubsAndCo')}
                 </Link>
@@ -63,12 +63,12 @@ export default function Header() {
               {!isAuthenticated ? (
                 <>
                   <Link href="/login">
-                    <button className="btn-base btn-secondary">
+                    <button className="btn-base btn-secondary !py-2 !px-4 text-sm">
                       {t('login')}
                     </button>
                   </Link>
                   <Link href="/register">
-                    <button className="btn-base btn-primary">
+                    <button className="btn-base btn-primary !py-2 !px-4 text-sm">
                       {t('register')}
                     </button>
                   </Link>
@@ -81,7 +81,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#e7e9ea] hover:text-[#00d4ff] transition"
+              className="md:hidden p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition"
               aria-label="Menu"
             >
               {mobileMenuOpen ? <X size={24} /> : <AlignJustify size={24} />}
@@ -106,7 +106,7 @@ export default function Header() {
             <div className="flex justify-end mb-6">
               <button
                 onClick={closeMobileMenu}
-                className="p-2 text-[#e7e9ea] hover:text-[#00d4ff] transition"
+                className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition"
                 aria-label={t('close')}
               >
                 <X size={24} />
@@ -137,14 +137,14 @@ export default function Header() {
               <Link
                 href="/members"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('members')}
               </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('clubsAndCo')}
               </Link>
@@ -175,7 +175,7 @@ export default function Header() {
                   <Link
                     href="/escort-profile"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <User size={18} className="text-[#71767b]" />
                     <span>{t('myProfile')}</span>
@@ -183,14 +183,14 @@ export default function Header() {
                   <Link
                     href="/settings"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <Settings size={18} className="text-[#71767b]" />
                     <span>{t('settings')}</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <LogOut size={18} className="text-[#71767b]" />
                     <span>{t('logout')}</span>
