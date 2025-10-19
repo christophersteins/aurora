@@ -29,7 +29,7 @@ export default function Header() {
     <>
       <header className="bg-[#000000] border-b border-[#2f3336] sticky top-0 z-40">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             {/* Logo + Desktop Navigation - Links */}
             <div className="flex items-center space-x-8">
               {/* Logo */}
@@ -43,33 +43,17 @@ export default function Header() {
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
-                  href="/"
-                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-                >
-                  {t('home')}
-                </Link>
-                <Link
                   href="/members"
                   className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
                 >
                   {t('members')}
                 </Link>
-                {isAuthenticated && (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-                    >
-                      {t('dashboard')}
-                    </Link>
-                    <Link
-                      href="/escort-profile"
-                      className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
-                    >
-                      {t('myProfile')}
-                    </Link>
-                  </>
-                )}
+                <Link
+                  href="/clubs"
+                  className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
+                >
+                  {t('clubsAndCo')}
+                </Link>
               </nav>
             </div>
 
@@ -151,37 +135,19 @@ export default function Header() {
             {/* Navigation Links */}
             <nav className="space-y-1">
               <Link
-                href="/"
-                onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
-              >
-                {t('home')}
-              </Link>
-              <Link
                 href="/members"
                 onClick={closeMobileMenu}
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
               >
                 {t('members')}
               </Link>
-              {isAuthenticated && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
-                  >
-                    {t('dashboard')}
-                  </Link>
-                  <Link
-                    href="/escort-profile"
-                    onClick={closeMobileMenu}
-                    className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
-                  >
-                    {t('myProfile')}
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/clubs"
+                onClick={closeMobileMenu}
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
+              >
+                {t('clubsAndCo')}
+              </Link>
             </nav>
 
             {/* Language Switcher */}
