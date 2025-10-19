@@ -1,0 +1,29 @@
+{
+  "hero": {
+    "title": "Welcome to Aurora",
+    "subtitle": "The modern platform for video content and live chat",
+    "launchingSoon": "We're launching soon! Sign up for the waitlist now and be one of the first to experience Aurora.",
+    "joinWaitlist": "Join the Waitlist",
+    "successTitle": "Successfully registered!",
+    "successMessage": "We'll notify you via email as soon as Aurora is available",
+    "emailPlaceholder": "your@email.com",
+    "submitting": "Saving...",
+    "submitButton": "Sign Up Now",
+    "errorOccurred": "An error occurred",
+    "connectionError": "Connection error. Please try again later"
+  },
+  "features": {
+    "videoFeed": {
+      "title": "Video Feed",
+      "description": "Seamless playback of short videos like TikTok"
+    },
+    "liveChat": {
+      "title": "Live Chat",
+      "description": "Real-time communication with other users"
+    },
+    "geolocation": {
+      "title": "Geolocation",
+      "description": "Find users near you based on your location"
+    }
+  }
+}

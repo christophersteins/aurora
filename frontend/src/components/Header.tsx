@@ -1,15 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header() {
   const router = useRouter();
   const { isAuthenticated, logout, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const t = useTranslations('nav');
 
   const handleLogout = () => {
     logout();
@@ -71,16 +74,17 @@ export default function Header() {
 
             {/* Desktop Buttons - Rechts */}
             <div className="hidden md:flex items-center space-x-3">
+              <LanguageSwitcher />
               {!isAuthenticated ? (
                 <>
                   <Link href="/login">
                     <button className="btn-base btn-secondary">
-                      Anmelden
+                      {t('login')}
                     </button>
                   </Link>
                   <Link href="/register">
                     <button className="btn-base btn-primary">
-                      Registrieren
+                      {t('register')}
                     </button>
                   </Link>
                 </>
@@ -89,7 +93,7 @@ export default function Header() {
                   onClick={handleLogout}
                   className="btn-base btn-secondary"
                 >
-                  Abmelden
+                  {t('logout')}
                 </button>
               )}
             </div>
@@ -123,7 +127,7 @@ export default function Header() {
               <button
                 onClick={closeMobileMenu}
                 className="p-2 text-[#e7e9ea] hover:text-[#00d4ff] transition"
-                aria-label="Schließen"
+                aria-label={t('close') || 'Close'}
               >
                 <X size={24} />
               </button>
@@ -178,11 +182,16 @@ export default function Header() {
                     onClick={closeMobileMenu}
                     className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
                   >
-                    Mein Profil
+                    {t('myProfile')}
                   </Link>
                 </>
               )}
             </nav>
+
+            {/* Language Switcher */}
+            <div className="mt-6 pt-6 border-t border-[#2f3336]">
+              <LanguageSwitcher />
+            </div>
 
             {/* Auth Buttons */}
             <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-3">
@@ -190,12 +199,12 @@ export default function Header() {
                 <>
                   <Link href="/login" onClick={closeMobileMenu}>
                     <button className="w-full btn-base btn-secondary">
-                      Anmelden
+                      {t('login')}
                     </button>
                   </Link>
                   <Link href="/register" onClick={closeMobileMenu}>
                     <button className="w-full btn-base btn-primary">
-                      Registrieren
+                      {t('register')}
                     </button>
                   </Link>
                 </>
@@ -204,7 +213,7 @@ export default function Header() {
                   onClick={handleLogout}
                   className="w-full btn-base btn-secondary"
                 >
-                  Abmelden
+                  {t('logout')}
                 </button>
               )}
             </div>

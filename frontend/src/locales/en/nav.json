@@ -1,0 +1,12 @@
+{
+  "welcome": "Welcome",
+  "myProfile": "My Profile",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout",
+  "adminPanel": "Admin Panel",
+  "close": "Close",
+  "home": "Home",
+  "members": "Members",
+  "dashboard": "Dashboard"
+}

@@ -50,7 +50,7 @@ export default function MemberFilterSidebar({
   };
 
   // Helper: Update Filter
-  const updateFilter = (key: keyof MemberFilters, value: any) => {
+  const updateFilter = (key: keyof MemberFilters, value: MemberFilters[keyof MemberFilters]) => {
     onFiltersChange({ ...filters, [key]: value });
   };
 

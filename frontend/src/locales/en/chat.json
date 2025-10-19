@@ -1,0 +1,12 @@
+{
+  "loadingConversations": "Loading conversations...",
+  "createConversationError": "Error creating conversation",
+  "networkError": "Network error",
+  "selectConversation": "Select a conversation",
+  "connected": "Connected",
+  "disconnected": "Disconnected",
+  "loadingMessages": "Loading messages...",
+  "noMessages": "No messages yet",
+  "messagePlaceholder": "Enter message...",
+  "send": "Send"
+}

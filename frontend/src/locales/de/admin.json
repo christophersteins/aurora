@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "loading": "Lade Dashboard...",
+    "title": "Admin Dashboard",
+    "welcomeBack": "Willkommen zurück",
+    "totalUsers": "Gesamt Benutzer",
+    "customers": "Kunden",
+    "escorts": "Escorts",
+    "business": "Business",
+    "quickAccess": "Schnellzugriff",
+    "manageUsers": "Benutzer verwalten",
+    "viewWaitlist": "Warteliste ansehen",
+    "settings": "Einstellungen"
+  },
+  "waitlist": {
+    "loading": "Lade Warteliste...",
+    "title": "Warteliste",
+    "totalEntries": "Eintrag insgesamt",
+    "totalEntriesPlural": "Einträge insgesamt",
+    "loadError": "Fehler beim Laden der Warteliste",
+    "connectionError": "Verbindungsfehler",
+    "searchPlaceholder": "Nach E-Mail suchen...",
+    "statusAll": "Alle",
+    "statusPending": "Ausstehend",
+    "statusNotified": "Benachrichtigt",
+    "exporting": "Exportiere...",
+    "csvExport": "CSV Export",
+    "csvExportFailed": "CSV-Export fehlgeschlagen",
+    "selected": "ausgewählt",
+    "markAsNotified": "Als benachrichtigt markieren",
+    "delete": "Löschen",
+    "bulkUpdateFailed": "Bulk-Update fehlgeschlagen",
+    "bulkDeleteFailed": "Bulk-Löschung fehlgeschlagen",
+    "deleteConfirmSingle": "Eintrag wirklich löschen?",
+    "deleteConfirmMultiple": "Einträge wirklich löschen?",
+    "deleteFailed": "Löschen fehlgeschlagen",
+    "email": "E-Mail",
+    "status": "Status",
+    "date": "Datum",
+    "actions": "Aktionen",
+    "noEntriesFound": "Keine Einträge gefunden"
+  }
+}

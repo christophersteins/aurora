@@ -1,9 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 
 export default function LandingPage() {
+  const t = useTranslations('landing.hero');
+  const tFeatures = useTranslations('landing.features');
+  const tNav = useTranslations('nav');
+  const tFooter = useTranslations('footer');
+
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -30,10 +36,10 @@ export default function LandingPage() {
         setSuccess(true);
         setEmail('');
       } else {
-        setError(data.message || 'Ein Fehler ist aufgetreten');
+        setError(data.message || t('errorOccurred'));
       }
     } catch (err) {
-      setError('Verbindungsfehler. Bitte versuche es später erneut.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -56,13 +62,13 @@ export default function LandingPage() {
                 href="/login"
                 className="text-white hover:text-purple-200 transition-colors"
               >
-                Anmelden
+                {tNav('login')}
               </Link>
               <Link
                 href="/register"
                 className="px-6 py-2 bg-white text-purple-600 rounded-full font-medium hover:bg-purple-50 transition-colors"
               >
-                Registrieren
+                {tNav('register')}
               </Link>
             </div>
           </div>
@@ -74,29 +80,29 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Main Heading */}
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Willkommen bei Aurora
+            {t('title')}
           </h1>
           <p className="text-xl md:text-2xl text-white/90 mb-4">
-            Die moderne Plattform für Video-Content und Live-Chat
+            {t('subtitle')}
           </p>
           <p className="text-lg text-white/80 mb-12">
-            Wir launchen bald! Trage dich jetzt in die Warteliste ein und sei einer der Ersten, die Zugang erhalten.
+            {t('launchingSoon')}
           </p>
 
           {/* Waitlist Form */}
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-2xl shadow-2xl p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Zur Warteliste anmelden
+                {t('joinWaitlist')}
               </h2>
 
               {success ? (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-green-700 font-medium">
-                    ✓ Erfolgreich angemeldet!
+                    ✓ {t('successTitle')}
                   </p>
                   <p className="text-green-600 text-sm mt-1">
-                    Wir benachrichtigen dich per E-Mail, sobald Aurora verfügbar ist.
+                    {t('successMessage')}
                   </p>
                 </div>
               ) : (
@@ -107,7 +113,7 @@ export default function LandingPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      placeholder="deine@email.com"
+                      placeholder={t('emailPlaceholder')}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                     />
                   </div>
@@ -123,13 +129,13 @@ export default function LandingPage() {
                     disabled={loading}
                     className="w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Wird gespeichert...' : 'Jetzt anmelden'}
+                    {loading ? t('submitting') : t('submitButton')}
                   </button>
                 </form>
               )}
 
               <p className="text-sm text-gray-600 mt-4">
-                Bereits Zugang? <Link href="/login" className="text-purple-600 hover:underline font-medium">Hier anmelden</Link>
+                Bereits Zugang? <Link href="/login" className="text-purple-600 hover:underline font-medium">{tNav('login')}</Link>
               </p>
             </div>
           </div>
@@ -140,9 +146,9 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📹</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">Video-Feed</h3>
+              <h3 className="text-xl font-bold mb-2">{tFeatures('videoFeed.title')}</h3>
               <p className="text-white/80">
-                Nahtlose Wiedergabe von Kurzvideos wie bei TikTok
+                {tFeatures('videoFeed.description')}
               </p>
             </div>
 
@@ -150,9 +156,9 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">💬</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">Live-Chat</h3>
+              <h3 className="text-xl font-bold mb-2">{tFeatures('liveChat.title')}</h3>
               <p className="text-white/80">
-                Echtzeit-Kommunikation mit anderen Benutzern
+                {tFeatures('liveChat.description')}
               </p>
             </div>
 
@@ -160,9 +166,9 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📍</span>
               </div>
-              <h3 className="text-xl font-bold mb-2">Geolocation</h3>
+              <h3 className="text-xl font-bold mb-2">{tFeatures('geolocation.title')}</h3>
               <p className="text-white/80">
-                Finde Benutzer in deiner Nähe basierend auf deinem Standort
+                {tFeatures('geolocation.description')}
               </p>
             </div>
           </div>
@@ -172,7 +178,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-black/20 backdrop-blur-sm py-8 mt-20">
         <div className="container mx-auto px-4 text-center text-white/80">
-          <p>&copy; 2025 Aurora. Alle Rechte vorbehalten.</p>
+          <p>&copy; 2025 Aurora. {tFooter('allRightsReserved')}.</p>
         </div>
       </footer>
     </div>

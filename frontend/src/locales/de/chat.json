@@ -1,0 +1,12 @@
+{
+  "loadingConversations": "Lade Konversationen...",
+  "createConversationError": "Fehler beim Erstellen der Konversation",
+  "networkError": "Netzwerkfehler",
+  "selectConversation": "Wähle eine Konversation aus",
+  "connected": "Verbunden",
+  "disconnected": "Getrennt",
+  "loadingMessages": "Lade Nachrichten...",
+  "noMessages": "Noch keine Nachrichten",
+  "messagePlaceholder": "Nachricht eingeben...",
+  "send": "Senden"
+}

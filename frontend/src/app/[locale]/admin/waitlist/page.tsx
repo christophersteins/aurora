@@ -244,7 +244,7 @@ export default function AdminWaitlistPage() {
             {/* Filter */}
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'pending' | 'notified')}
             >
               <option value="all">Alle</option>
               <option value="pending">Ausstehend</option>

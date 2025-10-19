@@ -1,0 +1,100 @@
+{
+  "nationalities": {
+    "german": "German",
+    "austrian": "Austrian",
+    "swiss": "Swiss",
+    "italian": "Italian",
+    "french": "French",
+    "spanish": "Spanish",
+    "portuguese": "Portuguese",
+    "dutch": "Dutch",
+    "belgian": "Belgian",
+    "polish": "Polish",
+    "czech": "Czech",
+    "russian": "Russian",
+    "ukrainian": "Ukrainian",
+    "romanian": "Romanian",
+    "bulgarian": "Bulgarian",
+    "hungarian": "Hungarian",
+    "turkish": "Turkish",
+    "greek": "Greek",
+    "albanian": "Albanian",
+    "serbian": "Serbian",
+    "croatian": "Croatian",
+    "slovenian": "Slovenian",
+    "slovakian": "Slovakian",
+    "brazilian": "Brazilian",
+    "colombian": "Colombian",
+    "venezuelan": "Venezuelan",
+    "thai": "Thai",
+    "filipino": "Filipino",
+    "chinese": "Chinese",
+    "japanese": "Japanese",
+    "korean": "Korean",
+    "other": "Other"
+  },
+  "languages": {
+    "german": "German",
+    "english": "English",
+    "french": "French",
+    "spanish": "Spanish",
+    "italian": "Italian",
+    "portuguese": "Portuguese",
+    "dutch": "Dutch",
+    "polish": "Polish",
+    "czech": "Czech",
+    "russian": "Russian",
+    "turkish": "Turkish",
+    "greek": "Greek",
+    "arabic": "Arabic",
+    "chinese": "Chinese",
+    "japanese": "Japanese",
+    "korean": "Korean",
+    "thai": "Thai",
+    "vietnamese": "Vietnamese"
+  },
+  "types": {
+    "african": "African",
+    "asian": "Asian",
+    "exotic": "Exotic",
+    "latina": "Latina",
+    "european": "European",
+    "middleEastern": "Middle Eastern",
+    "mixed": "Mixed"
+  },
+  "bodyTypes": {
+    "verySlim": "Very Slim",
+    "slim": "Slim",
+    "medium": "Medium",
+    "curvy": "Curvy",
+    "bbw": "BBW"
+  },
+  "hairColors": {
+    "blonde": "Blonde",
+    "brown": "Brown",
+    "black": "Black",
+    "red": "Red",
+    "gray": "Gray",
+    "white": "White",
+    "colored": "Colored"
+  },
+  "hairLengths": {
+    "short": "Short",
+    "shoulder": "Shoulder Length",
+    "long": "Long",
+    "veryLong": "Very Long"
+  },
+  "eyeColors": {
+    "blue": "Blue",
+    "green": "Green",
+    "brown": "Brown",
+    "gray": "Gray",
+    "other": "Other"
+  },
+  "intimateHair": {
+    "shaved": "Completely Shaved",
+    "trimmed": "Trimmed",
+    "natural": "Natural",
+    "full": "Full"
+  }
+}

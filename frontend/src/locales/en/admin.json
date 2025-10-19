@@ -1,0 +1,43 @@
+{
+  "dashboard": {
+    "loading": "Loading dashboard...",
+    "title": "Admin Dashboard",
+    "welcomeBack": "Welcome back",
+    "totalUsers": "Total Users",
+    "customers": "Customers",
+    "escorts": "Escorts",
+    "business": "Business",
+    "quickAccess": "Quick Access",
+    "manageUsers": "Manage Users",
+    "viewWaitlist": "View Waitlist",
+    "settings": "Settings"
+  },
+  "waitlist": {
+    "loading": "Loading waitlist...",
+    "title": "Waitlist",
+    "totalEntries": "total entry",
+    "totalEntriesPlural": "total entries",
+    "loadError": "Error loading waitlist",
+    "connectionError": "Connection error",
+    "searchPlaceholder": "Search by email...",
+    "statusAll": "All",
+    "statusPending": "Pending",
+    "statusNotified": "Notified",
+    "exporting": "Exporting...",
+    "csvExport": "CSV Export",
+    "csvExportFailed": "CSV export failed",
+    "selected": "selected",
+    "markAsNotified": "Mark as Notified",
+    "delete": "Delete",
+    "bulkUpdateFailed": "Bulk update failed",
+    "bulkDeleteFailed": "Bulk delete failed",
+    "deleteConfirmSingle": "Really delete entry?",
+    "deleteConfirmMultiple": "Really delete entries?",
+    "deleteFailed": "Delete failed",
+    "email": "Email",
+    "status": "Status",
+    "date": "Date",
+    "actions": "Actions",
+    "noEntriesFound": "No entries found"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "nationalities": {
+    "german": "Deutsch",
+    "austrian": "Österreichisch",
+    "swiss": "Schweizerisch",
+    "italian": "Italienisch",
+    "french": "Französisch",
+    "spanish": "Spanisch",
+    "portuguese": "Portugiesisch",
+    "dutch": "Niederländisch",
+    "belgian": "Belgisch",
+    "polish": "Polnisch",
+    "czech": "Tschechisch",
+    "russian": "Russisch",
+    "ukrainian": "Ukrainisch",
+    "romanian": "Rumänisch",
+    "bulgarian": "Bulgarisch",
+    "hungarian": "Ungarisch",
+    "turkish": "Türkisch",
+    "greek": "Griechisch",
+    "albanian": "Albanisch",
+    "serbian": "Serbisch",
+    "croatian": "Kroatisch",
+    "slovenian": "Slowenisch",
+    "slovakian": "Slowakisch",
+    "brazilian": "Brasilianisch",
+    "colombian": "Kolumbianisch",
+    "venezuelan": "Venezolanisch",
+    "thai": "Thailändisch",
+    "filipino": "Philippinisch",
+    "chinese": "Chinesisch",
+    "japanese": "Japanisch",
+    "korean": "Koreanisch",
+    "other": "Andere"
+  },
+  "languages": {
+    "german": "Deutsch",
+    "english": "Englisch",
+    "french": "Französisch",
+    "spanish": "Spanisch",
+    "italian": "Italienisch",
+    "portuguese": "Portugiesisch",
+    "dutch": "Niederländisch",
+    "polish": "Polnisch",
+    "czech": "Tschechisch",
+    "russian": "Russisch",
+    "turkish": "Türkisch",
+    "greek": "Griechisch",
+    "arabic": "Arabisch",
+    "chinese": "Chinesisch",
+    "japanese": "Japanisch",
+    "korean": "Koreanisch",
+    "thai": "Thailändisch",
+    "vietnamese": "Vietnamesisch"
+  },
+  "types": {
+    "african": "Afrikanisch",
+    "asian": "Asiatisch",
+    "exotic": "Exotisch",
+    "latina": "Latina",
+    "european": "Europäisch",
+    "middleEastern": "Orientalisch",
+    "mixed": "Gemischt"
+  },
+  "bodyTypes": {
+    "verySlim": "Sehr schlank",
+    "slim": "Schlank",
+    "medium": "Mittel",
+    "curvy": "Mollig",
+    "bbw": "Sehr mollig"
+  },
+  "hairColors": {
+    "blonde": "Blond",
+    "brown": "Braun",
+    "black": "Schwarz",
+    "red": "Rot",
+    "gray": "Grau",
+    "white": "Weiß",
+    "colored": "Gefärbt"
+  },
+  "hairLengths": {
+    "short": "Kurz",
+    "shoulder": "Schulterlang",
+    "long": "Lang",
+    "veryLong": "Sehr lang"
+  },
+  "eyeColors": {
+    "blue": "Blau",
+    "green": "Grün",
+    "brown": "Braun",
+    "gray": "Grau",
+    "other": "Andere"
+  },
+  "intimateHair": {
+    "shaved": "Total rasiert",
+    "trimmed": "Teilrasiert",
+    "natural": "Behaart",
+    "full": "Stark behaart"
+  }
+}
