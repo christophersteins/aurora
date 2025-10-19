@@ -3,8 +3,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { SocketProvider } from '@/contexts/SocketContext';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import LocaleDetector from '@/components/LocaleDetector';
 import { locales } from '@/i18n';
 
@@ -36,11 +34,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <LocaleDetector />
           <SocketProvider>
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
+            {children}
           </SocketProvider>
         </NextIntlClientProvider>
       </body>
