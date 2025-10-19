@@ -8,7 +8,7 @@ export default function Footer() {
   const t = useTranslations('footer');
 
   return (
-    <footer className="bg-[#15202b] border-t border-[#2f3336] mt-auto">
+    <footer className="bg-page-primary border-t border-[#2f3336] mt-auto">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-12" style={{ maxWidth: 'var(--max-content-width)' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1">
@@ -27,22 +27,22 @@ export default function Footer() {
             <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('product')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/features" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/features" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('features')}
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/pricing" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('pricing')}
                 </Link>
               </li>
               <li>
-                <Link href="/roadmap" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/roadmap" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('roadmap')}
                 </Link>
               </li>
               <li>
-                <Link href="/changelog" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/changelog" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('changelog')}
                 </Link>
               </li>
@@ -53,22 +53,22 @@ export default function Footer() {
             <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('company')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/about" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('about')}
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/blog" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('blog')}
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/careers" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('careers')}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/contact" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('contact')}
                 </Link>
               </li>
@@ -79,22 +79,22 @@ export default function Footer() {
             <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('legal')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/privacy" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/privacy" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('privacy')}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/terms" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('terms')}
                 </Link>
               </li>
               <li>
-                <Link href="/imprint" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/imprint" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('imprint')}
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
+                <Link href="/cookies" className="text-[#71767b] hover:text-[#8b5cf6] transition text-sm">
                   {t('cookies')}
                 </Link>
               </li>
@@ -107,16 +107,16 @@ export default function Footer() {
             © {currentYear} Aurora. {t('allRightsReserved')}
           </p>
           <div className="flex items-center space-x-6">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#00d4ff] transition" aria-label="Twitter">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#8b5cf6] transition" aria-label="Twitter">
               <span className="text-xl">𝕏</span>
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#00d4ff] transition" aria-label="GitHub">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#8b5cf6] transition" aria-label="GitHub">
               <span className="text-xl">GitHub</span>
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#00d4ff] transition" aria-label="LinkedIn">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#8b5cf6] transition" aria-label="LinkedIn">
               <span className="text-xl">LinkedIn</span>
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#00d4ff] transition" aria-label="Instagram">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#8b5cf6] transition" aria-label="Instagram">
               <span className="text-xl">Instagram</span>
             </a>
           </div>
