@@ -1,0 +1,47 @@
+{
+  "title": "Impressum",
+  "provider": {
+    "title": "Angaben gemäß § 5 TMG",
+    "companyName": "Aurora GmbH",
+    "address": "Musterstraße 123",
+    "city": "12345 Musterstadt, Deutschland"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "phone": "Telefon",
+    "phoneNumber": "+49 (0) 123 456789",
+    "email": "E-Mail",
+    "emailAddress": "kontakt@aurora-app.de"
+  },
+  "representative": {
+    "title": "Vertreten durch",
+    "name": "Max Mustermann, Geschäftsführer"
+  },
+  "register": {
+    "title": "Registereintrag",
+    "court": "Registergericht",
+    "courtName": "Amtsgericht Musterstadt",
+    "number": "Registernummer",
+    "registerNumber": "HRB 12345"
+  },
+  "vat": {
+    "title": "Umsatzsteuer-ID",
+    "id": "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz",
+    "vatNumber": "DE123456789"
+  },
+  "disclaimer": {
+    "title": "Haftungsausschluss",
+    "content": {
+      "title": "Haftung für Inhalte",
+      "text": "Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich."
+    },
+    "links": {
+      "title": "Haftung für Links",
+      "text": "Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich."
+    },
+    "copyright": {
+      "title": "Urheberrecht",
+      "text": "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers."
+    }
+  }
+}

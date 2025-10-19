@@ -1,0 +1,59 @@
+{
+  "title": "Privacy Policy",
+  "intro": {
+    "title": "Introduction",
+    "text": "With the following privacy policy, we would like to inform you about what types of your personal data (hereinafter also referred to as \"data\") we process for what purposes and to what extent. The privacy policy applies to all processing of personal data carried out by us."
+  },
+  "controller": {
+    "title": "Controller",
+    "companyName": "Aurora GmbH",
+    "address": "Sample Street 123",
+    "city": "12345 Sample City, Germany",
+    "email": "Email",
+    "emailAddress": "privacy@aurora-app.de"
+  },
+  "dataCollection": {
+    "title": "Collection and Storage of Personal Data",
+    "personal": {
+      "title": "Personal Data",
+      "text": "We collect personal data when you voluntarily provide it to us as part of your registration, when contacting us (e.g. via contact form or email) or when using our service. Personal data includes, for example, name, email address, telephone number and other data you provide."
+    },
+    "usage": {
+      "title": "Usage Data",
+      "text": "When you use our website, information is automatically collected that your browser transmits to our server. This includes, for example, browser type and version, operating system used, referrer URL, host name of the accessing computer, time of the server request and IP address. This data is required to ensure a smooth connection and comfortable use of our website."
+    },
+    "location": {
+      "title": "Location Data",
+      "text": "When you use the location-based services, we may collect location data via your device. This data is only collected with your express consent. You can deactivate this function at any time in your device settings."
+    }
+  },
+  "cookies": {
+    "title": "Cookies",
+    "text": "Our website uses cookies. Cookies are small text files that are stored in the Internet browser or by the Internet browser on the user's computer system. When a user accesses a website, a cookie may be stored on the user's operating system. This cookie contains a characteristic string of characters that enables unique identification of the browser when the website is accessed again."
+  },
+  "thirdParty": {
+    "title": "Disclosure of Data to Third Parties",
+    "text": "Your personal data will not be transferred to third parties for purposes other than those listed below. We only pass on your personal data to third parties if you have given your express consent, the transfer is necessary for the assertion, exercise or defense of legal claims, or there is a legal obligation to do so."
+  },
+  "rights": {
+    "title": "Your Rights",
+    "access": "• Right to information about your data stored with us",
+    "rectification": "• Right to rectification of incorrect data",
+    "erasure": "• Right to erasure of your data",
+    "restriction": "• Right to restriction of data processing",
+    "portability": "• Right to data portability",
+    "objection": "• Right to object to processing"
+  },
+  "security": {
+    "title": "Data Security",
+    "text": "We use the common SSL (Secure Socket Layer) procedure in connection with the highest level of encryption supported by your browser when visiting the website. Whether a single page of our website is transmitted in encrypted form can be recognized by the closed display of the key or lock symbol in the lower status bar of your browser."
+  },
+  "changes": {
+    "title": "Changes to this Privacy Policy",
+    "text": "We reserve the right to occasionally adapt this privacy policy so that it always complies with current legal requirements or to implement changes to our services in the privacy policy. Your next visit will be subject to the new privacy policy."
+  },
+  "contact": {
+    "title": "Contact",
+    "text": "For questions about the collection, processing or use of your personal data, for information, correction, blocking or deletion of data as well as revocation of consent given, please contact: privacy@aurora-app.de"
+  }
+}

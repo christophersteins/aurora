@@ -1,0 +1,59 @@
+{
+  "title": "Datenschutzerklärung",
+  "intro": {
+    "title": "Einleitung",
+    "text": "Mit der folgenden Datenschutzerklärung möchten wir Sie darüber aufklären, welche Arten Ihrer personenbezogenen Daten (nachfolgend auch kurz als \"Daten\" bezeichnet) wir zu welchen Zwecken und in welchem Umfang verarbeiten. Die Datenschutzerklärung gilt für alle von uns durchgeführten Verarbeitungen personenbezogener Daten."
+  },
+  "controller": {
+    "title": "Verantwortlicher",
+    "companyName": "Aurora GmbH",
+    "address": "Musterstraße 123",
+    "city": "12345 Musterstadt, Deutschland",
+    "email": "E-Mail",
+    "emailAddress": "datenschutz@aurora-app.de"
+  },
+  "dataCollection": {
+    "title": "Erhebung und Speicherung personenbezogener Daten",
+    "personal": {
+      "title": "Personenbezogene Daten",
+      "text": "Wir erheben personenbezogene Daten, wenn Sie uns diese im Rahmen Ihrer Registrierung, bei der Kontaktaufnahme mit uns (z.B. per Kontaktformular oder E-Mail) oder bei der Nutzung unseres Dienstes freiwillig mitteilen. Zu den personenbezogenen Daten gehören z.B. Name, E-Mail-Adresse, Telefonnummer und weitere von Ihnen angegebene Daten."
+    },
+    "usage": {
+      "title": "Nutzungsdaten",
+      "text": "Bei der Nutzung unserer Webseite werden automatisch Informationen erhoben, die Ihr Browser an unseren Server übermittelt. Dies sind z.B. Browsertyp und -version, verwendetes Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners, Uhrzeit der Serveranfrage und IP-Adresse. Diese Daten werden zur Gewährleistung eines reibungslosen Verbindungsaufbaus und einer komfortablen Nutzung unserer Webseite benötigt."
+    },
+    "location": {
+      "title": "Standortdaten",
+      "text": "Wenn Sie die standortbasierten Dienste nutzen, können wir Standortdaten über Ihr Gerät erheben. Die Erhebung dieser Daten erfolgt nur mit Ihrer ausdrücklichen Einwilligung. Sie können diese Funktion jederzeit in Ihren Geräteeinstellungen deaktivieren."
+    }
+  },
+  "cookies": {
+    "title": "Cookies",
+    "text": "Unsere Webseite verwendet Cookies. Cookies sind kleine Textdateien, die im Internetbrowser bzw. vom Internetbrowser auf dem Computersystem eines Nutzers gespeichert werden. Ruft ein Nutzer eine Website auf, so kann ein Cookie auf dem Betriebssystem des Nutzers gespeichert werden. Dieser Cookie enthält eine charakteristische Zeichenfolge, die eine eindeutige Identifizierung des Browsers beim erneuten Aufrufen der Website ermöglicht."
+  },
+  "thirdParty": {
+    "title": "Weitergabe von Daten an Dritte",
+    "text": "Eine Übermittlung Ihrer persönlichen Daten an Dritte zu anderen als den im Folgenden aufgeführten Zwecken findet nicht statt. Wir geben Ihre persönlichen Daten nur an Dritte weiter, wenn Sie Ihre ausdrückliche Einwilligung erteilt haben, die Weitergabe zur Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen erforderlich ist oder eine gesetzliche Verpflichtung hierzu besteht."
+  },
+  "rights": {
+    "title": "Ihre Rechte",
+    "access": "• Recht auf Auskunft über Ihre bei uns gespeicherten Daten",
+    "rectification": "• Recht auf Berichtigung unrichtiger Daten",
+    "erasure": "• Recht auf Löschung Ihrer Daten",
+    "restriction": "• Recht auf Einschränkung der Datenverarbeitung",
+    "portability": "• Recht auf Datenübertragbarkeit",
+    "objection": "• Widerspruchsrecht gegen die Verarbeitung"
+  },
+  "security": {
+    "title": "Datensicherheit",
+    "text": "Wir verwenden innerhalb des Website-Besuchs das verbreitete SSL-Verfahren (Secure Socket Layer) in Verbindung mit der jeweils höchsten Verschlüsselungsstufe, die von Ihrem Browser unterstützt wird. Ob eine einzelne Seite unseres Internetauftrittes verschlüsselt übertragen wird, erkennen Sie an der geschlossenen Darstellung des Schüssel- beziehungsweise Schloss-Symbols in der unteren Statusleiste Ihres Browsers."
+  },
+  "changes": {
+    "title": "Änderungen dieser Datenschutzerklärung",
+    "text": "Wir behalten uns vor, diese Datenschutzerklärung gelegentlich anzupassen, damit sie stets den aktuellen rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen in der Datenschutzerklärung umzusetzen. Für Ihren erneuten Besuch gilt dann die neue Datenschutzerklärung."
+  },
+  "contact": {
+    "title": "Kontakt",
+    "text": "Fragen zur Erhebung, Verarbeitung oder Nutzung Ihrer personenbezogenen Daten, bei Auskünften, Berichtigung, Sperrung oder Löschung von Daten sowie Widerruf erteilter Einwilligungen wenden Sie sich bitte an: datenschutz@aurora-app.de"
+  }
+}

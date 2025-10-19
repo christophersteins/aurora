@@ -8,6 +8,8 @@ import options from './options.json';
 import chat from './chat.json';
 import admin from './admin.json';
 import footer from './footer.json';
+import imprint from './imprint.json';
+import privacy from './privacy.json';
 
 const messages = {
   common,
@@ -19,7 +21,9 @@ const messages = {
   options,
   chat,
   admin,
-  footer
+  footer,
+  imprint,
+  privacy
 };
 
 export default messages;

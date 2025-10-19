@@ -1,0 +1,47 @@
+{
+  "title": "Imprint",
+  "provider": {
+    "title": "Information according to § 5 TMG",
+    "companyName": "Aurora GmbH",
+    "address": "Sample Street 123",
+    "city": "12345 Sample City, Germany"
+  },
+  "contact": {
+    "title": "Contact",
+    "phone": "Phone",
+    "phoneNumber": "+49 (0) 123 456789",
+    "email": "Email",
+    "emailAddress": "contact@aurora-app.de"
+  },
+  "representative": {
+    "title": "Represented by",
+    "name": "Max Mustermann, Managing Director"
+  },
+  "register": {
+    "title": "Register Entry",
+    "court": "Register Court",
+    "courtName": "District Court Sample City",
+    "number": "Register Number",
+    "registerNumber": "HRB 12345"
+  },
+  "vat": {
+    "title": "VAT ID",
+    "id": "Value Added Tax Identification Number according to § 27 a Value Added Tax Act",
+    "vatNumber": "DE123456789"
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "content": {
+      "title": "Liability for Content",
+      "text": "The contents of our pages were created with the greatest care. However, we cannot guarantee the accuracy, completeness and timeliness of the content. As a service provider, we are responsible for our own content on these pages in accordance with § 7 paragraph 1 TMG under general laws."
+    },
+    "links": {
+      "title": "Liability for Links",
+      "text": "Our offer contains links to external websites of third parties, on whose contents we have no influence. Therefore, we cannot assume any liability for these external contents. The respective provider or operator of the pages is always responsible for the contents of the linked pages."
+    },
+    "copyright": {
+      "title": "Copyright",
+      "text": "The content and works created by the site operators on these pages are subject to German copyright law. The reproduction, editing, distribution and any kind of exploitation outside the limits of copyright require the written consent of the respective author or creator."
+    }
+  }
+}
