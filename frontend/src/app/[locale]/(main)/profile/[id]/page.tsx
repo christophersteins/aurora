@@ -119,7 +119,7 @@ export default function ProfilePage() {
     return (
       <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
         <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-secondary)', borderColor: 'var(--color-primary)' }}>
+          <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-primary)', borderColor: 'var(--color-primary)' }}>
             <p style={{ color: 'var(--color-primary)' }}>{error || 'Profile not found'}</p>
           </div>
           <button onClick={() => router.push('/members')} className="btn-base btn-primary">
@@ -144,14 +144,14 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Photo Gallery - 2/3 width */}
           <div className="lg:col-span-2">
-            <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-secondary)' }}>
+            <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-primary)' }}>
               {/* Main Image - flexible height, no cropping */}
-              <div 
-                className="relative w-full flex items-center justify-center" 
+              <div
+                className="relative w-full flex items-center justify-center"
                 style={{
                   minHeight: '500px',
                   maxHeight: '700px',
-                  background: 'var(--color-primary)'
+                  background: 'var(--background-secondary)'
                 }}
               >
                 {photos.length > 0 ? (
@@ -242,7 +242,7 @@ export default function ProfilePage() {
 
           {/* Profile Info - 1/3 width */}
           <div className="lg:col-span-1">
-            <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-secondary)' }}>
+            <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
                 <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text-heading)' }}>
@@ -346,7 +346,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Service Information Section - Full Width */}
-        <div className="rounded-lg p-8 border-depth" style={{ background: 'var(--background-secondary)' }}>
+        <div className="rounded-lg p-8 border-depth" style={{ background: 'var(--background-primary)' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
             Service & Angebote
           </h2>
