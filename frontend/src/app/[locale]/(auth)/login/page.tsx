@@ -13,7 +13,7 @@ export default function LoginPage() {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
 
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,13 +21,13 @@ export default function LoginPage() {
 
   const handleEmailSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (email.trim()) {
+    if (emailOrUsername.trim()) {
       setShowPasswordField(true);
     }
   };
 
   const handleEmailBlur = () => {
-    if (email.trim() && !showPasswordField) {
+    if (emailOrUsername.trim() && !showPasswordField) {
       setShowPasswordField(true);
     }
   };
@@ -44,7 +44,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await authService.login({ email, password });
+      const response = await authService.login({ emailOrUsername, password });
       setAuth(response.user, response.access_token);
       router.push('/');
     } catch (err) {
@@ -136,16 +136,16 @@ export default function LoginPage() {
 
           {/* Email/Password Form */}
           <form onSubmit={showPasswordField ? handleFinalSubmit : handleEmailSubmit} className="space-y-4">
-            {/* Email */}
+            {/* Email or Username */}
             <div>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
                 onBlur={handleEmailBlur}
                 onKeyDown={handleEmailKeyDown}
                 required
-                placeholder={t('email')}
+                placeholder={t('emailOrUsername')}
                 className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
               />
             </div>

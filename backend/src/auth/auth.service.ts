@@ -39,8 +39,17 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // Find user
-    const user = await this.usersService.findByEmail(loginDto.email);
+    // Determine if input is email or username (simple check: contains @)
+    const isEmail = loginDto.emailOrUsername.includes('@');
+
+    // Find user by email or username
+    let user;
+    if (isEmail) {
+      user = await this.usersService.findByEmail(loginDto.emailOrUsername);
+    } else {
+      user = await this.usersService.findByUsername(loginDto.emailOrUsername);
+    }
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

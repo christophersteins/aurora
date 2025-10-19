@@ -19,7 +19,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: Logi
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
 
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,7 +30,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: Logi
     setError('');
 
     try {
-      const response = await authService.login({ email, password });
+      const response = await authService.login({ emailOrUsername, password });
       setAuth(response.user, response.access_token);
       onClose();
       router.push('/');
@@ -134,14 +134,14 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: Logi
 
           {/* Email/Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
+            {/* Email or Username */}
             <div>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
                 required
-                placeholder={t('email')}
+                placeholder={t('emailOrUsername')}
                 className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
               />
             </div>
