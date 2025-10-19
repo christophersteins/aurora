@@ -45,13 +45,13 @@ export default function Header() {
                   href="/"
                   className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
                 >
-                  Home
+                  {t('home')}
                 </Link>
                 <Link
                   href="/members"
                   className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
                 >
-                  Members
+                  {t('members')}
                 </Link>
                 {isAuthenticated && (
                   <>
@@ -59,13 +59,13 @@ export default function Header() {
                       href="/dashboard"
                       className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
                     >
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <Link
                       href="/escort-profile"
                       className="text-[#e7e9ea] hover:text-[#00d4ff] font-medium transition"
                     >
-                      Mein Profil
+                      {t('myProfile')}
                     </Link>
                   </>
                 )}
@@ -127,7 +127,7 @@ export default function Header() {
               <button
                 onClick={closeMobileMenu}
                 className="p-2 text-[#e7e9ea] hover:text-[#00d4ff] transition"
-                aria-label={t('close') || 'Close'}
+                aria-label={t('close')}
               >
                 <X size={24} />
               </button>
@@ -159,14 +159,14 @@ export default function Header() {
                 onClick={closeMobileMenu}
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
               >
-                Home
+                {t('home')}
               </Link>
               <Link
                 href="/members"
                 onClick={closeMobileMenu}
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
               >
-                Members
+                {t('members')}
               </Link>
               {isAuthenticated && (
                 <>
@@ -175,7 +175,7 @@ export default function Header() {
                     onClick={closeMobileMenu}
                     className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#00d4ff] rounded-lg transition font-medium"
                   >
-                    Dashboard
+                    {t('dashboard')}
                   </Link>
                   <Link
                     href="/escort-profile"

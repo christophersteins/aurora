@@ -1,7 +1,11 @@
-import Link from 'next/link';
+'use client';
+
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const t = useTranslations('footer');
 
   return (
     <footer className="bg-[#15202b] border-t border-[#2f3336] mt-auto">
@@ -15,83 +19,83 @@ export default function Footer() {
               <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
             </div>
             <p className="text-[#71767b] text-sm">
-              Moderne, schnelle und sichere Web-Anwendung für die Zukunft.
+              {t('tagline')}
             </p>
           </div>
 
           <div>
-            <h3 className="text-[#e7e9ea] font-semibold mb-4">Produkt</h3>
+            <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('product')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/features" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Features
+                  {t('features')}
                 </Link>
               </li>
               <li>
                 <Link href="/pricing" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Preise
+                  {t('pricing')}
                 </Link>
               </li>
               <li>
                 <Link href="/roadmap" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Roadmap
+                  {t('roadmap')}
                 </Link>
               </li>
               <li>
                 <Link href="/changelog" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Changelog
+                  {t('changelog')}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-[#e7e9ea] font-semibold mb-4">Unternehmen</h3>
+            <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('company')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/about" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Über uns
+                  {t('about')}
                 </Link>
               </li>
               <li>
                 <Link href="/blog" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Blog
+                  {t('blog')}
                 </Link>
               </li>
               <li>
                 <Link href="/careers" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Karriere
+                  {t('careers')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Kontakt
+                  {t('contact')}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-[#e7e9ea] font-semibold mb-4">Rechtliches</h3>
+            <h3 className="text-[#e7e9ea] font-semibold mb-4">{t('legal')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/privacy" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Datenschutz
+                  {t('privacy')}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Nutzungsbedingungen
+                  {t('terms')}
                 </Link>
               </li>
               <li>
                 <Link href="/imprint" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Impressum
+                  {t('imprint')}
                 </Link>
               </li>
               <li>
                 <Link href="/cookies" className="text-[#71767b] hover:text-[#00d4ff] transition text-sm">
-                  Cookie-Richtlinie
+                  {t('cookies')}
                 </Link>
               </li>
             </ul>
@@ -100,9 +104,8 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-[#2f3336] flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#71767b] text-sm">
-            © {currentYear} Aurora. Alle Rechte vorbehalten.
+            © {currentYear} Aurora. {t('allRightsReserved')}
           </p>
-
           <div className="flex items-center space-x-6">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#71767b] hover:text-[#00d4ff] transition" aria-label="Twitter">
               <span className="text-xl">𝕏</span>
