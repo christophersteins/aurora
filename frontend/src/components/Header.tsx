@@ -8,11 +8,15 @@ import { AlignJustify, X, User, Settings, LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
+import LoginModal from './LoginModal';
+import RegisterModal from './RegisterModal';
 
 export default function Header() {
   const router = useRouter();
   const { isAuthenticated, logout, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const t = useTranslations('nav');
 
   const handleLogout = () => {
@@ -23,6 +27,23 @@ export default function Header() {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
+  };
+
+  const openLoginModal = () => {
+    setLoginModalOpen(true);
+    setRegisterModalOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const openRegisterModal = () => {
+    setRegisterModalOpen(true);
+    setLoginModalOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const closeModals = () => {
+    setLoginModalOpen(false);
+    setRegisterModalOpen(false);
   };
 
   return (
@@ -62,16 +83,18 @@ export default function Header() {
               <LanguageSwitcher />
               {!isAuthenticated ? (
                 <>
-                  <Link href="/login">
-                    <button className="btn-base btn-secondary !py-2 !px-4 text-sm">
-                      {t('login')}
-                    </button>
-                  </Link>
-                  <Link href="/register">
-                    <button className="btn-base btn-primary !py-2 !px-4 text-sm">
-                      {t('register')}
-                    </button>
-                  </Link>
+                  <button
+                    onClick={openLoginModal}
+                    className="btn-base btn-secondary !py-2 !px-4 text-sm"
+                  >
+                    {t('login')}
+                  </button>
+                  <button
+                    onClick={openRegisterModal}
+                    className="btn-base btn-primary !py-2 !px-4 text-sm"
+                  >
+                    {t('register')}
+                  </button>
                 </>
               ) : (
                 <UserMenu />
@@ -159,16 +182,18 @@ export default function Header() {
             <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-1">
               {!isAuthenticated ? (
                 <div className="space-y-3">
-                  <Link href="/login" onClick={closeMobileMenu}>
-                    <button className="w-full btn-base btn-secondary">
-                      {t('login')}
-                    </button>
-                  </Link>
-                  <Link href="/register" onClick={closeMobileMenu}>
-                    <button className="w-full btn-base btn-primary">
-                      {t('register')}
-                    </button>
-                  </Link>
+                  <button
+                    onClick={openLoginModal}
+                    className="w-full btn-base btn-secondary"
+                  >
+                    {t('login')}
+                  </button>
+                  <button
+                    onClick={openRegisterModal}
+                    className="w-full btn-base btn-primary"
+                  >
+                    {t('register')}
+                  </button>
                 </div>
               ) : (
                 <>
@@ -201,6 +226,20 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={closeModals}
+        onSwitchToRegister={openRegisterModal}
+      />
+
+      {/* Register Modal */}
+      <RegisterModal
+        isOpen={registerModalOpen}
+        onClose={closeModals}
+        onSwitchToLogin={openLoginModal}
+      />
     </>
   );
 }
