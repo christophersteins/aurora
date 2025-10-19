@@ -1,0 +1,19 @@
+{
+  "title": "Häufig gestellte Fragen",
+  "subtitle": "Finden Sie Antworten auf die am häufigsten gestellten Fragen",
+  "question1": "Wie erstelle ich ein Konto?",
+  "answer1": "Um ein Konto zu erstellen, klicken Sie auf den 'Registrieren'-Button oben rechts und folgen Sie den Anweisungen. Sie können sich mit Ihrer E-Mail-Adresse oder über soziale Medien wie Google, Apple oder X registrieren.",
+  "question2": "Ist die Registrierung kostenlos?",
+  "answer2": "Ja, die Registrierung ist komplett kostenlos. Sie können ein Basisprofil erstellen und die Plattform erkunden, ohne dafür zu bezahlen. Premium-Features sind optional verfügbar.",
+  "question3": "Wie kann ich mein Profil bearbeiten?",
+  "answer3": "Nach dem Login können Sie auf Ihr Profil-Icon klicken und 'Mein Profil' auswählen. Dort können Sie alle Informationen bearbeiten, Fotos hochladen und Ihre Präferenzen anpassen.",
+  "question4": "Wie funktioniert die Nachrichtenfunktion?",
+  "answer4": "Sie können über den Chat direkt mit anderen Mitgliedern kommunizieren. Klicken Sie auf das Profil eines Mitglieds und wählen Sie 'Nachricht senden'. Die Nachrichten werden in Echtzeit zugestellt.",
+  "question5": "Wie schützt Aurora meine Privatsphäre?",
+  "answer5": "Wir nehmen Datenschutz sehr ernst. Alle Daten werden verschlüsselt übertragen und gespeichert. Sie haben volle Kontrolle über die Sichtbarkeit Ihres Profils und können entscheiden, welche Informationen öffentlich sind.",
+  "question6": "Wie kann ich mein Konto löschen?",
+  "answer6": "Wenn Sie Ihr Konto löschen möchten, gehen Sie zu den Einstellungen und wählen Sie 'Konto löschen'. Bitte beachten Sie, dass diese Aktion nicht rückgängig gemacht werden kann.",
+  "contactTitle": "Weitere Fragen?",
+  "contactText": "Haben Sie eine Frage, die hier nicht beantwortet wurde? Kontaktieren Sie uns gerne!",
+  "contactButton": "Kontakt aufnehmen"
+}

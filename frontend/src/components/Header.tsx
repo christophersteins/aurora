@@ -75,6 +75,12 @@ export default function Header() {
                 >
                   {t('clubsAndCo')}
                 </Link>
+                <Link
+                  href="/faq"
+                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                >
+                  {t('faq')}
+                </Link>
               </nav>
             </div>
 
@@ -170,6 +176,13 @@ export default function Header() {
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('clubsAndCo')}
+              </Link>
+              <Link
+                href="/faq"
+                onClick={closeMobileMenu}
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+              >
+                {t('faq')}
               </Link>
             </nav>
 

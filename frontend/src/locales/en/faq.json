@@ -1,0 +1,19 @@
+{
+  "title": "Frequently Asked Questions",
+  "subtitle": "Find answers to the most commonly asked questions",
+  "question1": "How do I create an account?",
+  "answer1": "To create an account, click on the 'Register' button in the top right corner and follow the instructions. You can register with your email address or through social media like Google, Apple, or X.",
+  "question2": "Is registration free?",
+  "answer2": "Yes, registration is completely free. You can create a basic profile and explore the platform without paying anything. Premium features are optionally available.",
+  "question3": "How can I edit my profile?",
+  "answer3": "After logging in, click on your profile icon and select 'My Profile'. There you can edit all information, upload photos, and adjust your preferences.",
+  "question4": "How does the messaging feature work?",
+  "answer4": "You can communicate directly with other members via chat. Click on a member's profile and select 'Send Message'. Messages are delivered in real-time.",
+  "question5": "How does Aurora protect my privacy?",
+  "answer5": "We take data protection very seriously. All data is transmitted and stored encrypted. You have full control over your profile visibility and can decide which information is public.",
+  "question6": "How can I delete my account?",
+  "answer6": "If you want to delete your account, go to settings and select 'Delete Account'. Please note that this action cannot be undone.",
+  "contactTitle": "More Questions?",
+  "contactText": "Have a question that wasn't answered here? Feel free to contact us!",
+  "contactButton": "Contact Us"
+}

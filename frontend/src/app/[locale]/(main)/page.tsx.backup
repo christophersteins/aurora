@@ -26,9 +26,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen py-8">
-      {/* Container mit gleicher Struktur wie Header und Footer */}
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+    <main className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
