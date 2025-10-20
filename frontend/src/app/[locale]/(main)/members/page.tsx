@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check } from 'lucide-react';
+import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown } from 'lucide-react';
 
 // Filter-Interface
 interface Filters {
@@ -963,7 +963,7 @@ export default function MembersPage() {
                   className="bg-page-primary border-depth rounded-lg overflow-hidden cursor-pointer transition-all"
                 >
                   {/* Profile Picture */}
-                  <div className="aspect-square bg-page-secondary flex items-center justify-center">
+                  <div className="aspect-square bg-page-secondary flex items-center justify-center relative">
                     {escort.profilePicture ? (
                       <img
                         src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${
@@ -981,6 +981,15 @@ export default function MembersPage() {
                         ).toUpperCase()}
                       </div>
                     )}
+
+                    {/* Premium Badge */}
+                    <div className="absolute top-3 right-3 flex items-center justify-center w-7 h-7 rounded-full backdrop-blur-sm"
+                         style={{
+                           background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%)',
+                           boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
+                         }}>
+                      <Crown className="w-3.5 h-3.5" style={{ color: '#fbbf24', fill: '#fbbf24' }} />
+                    </div>
                   </div>
 
                   {/* Information */}

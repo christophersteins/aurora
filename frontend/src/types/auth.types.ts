@@ -6,6 +6,7 @@ export interface User {
   lastName?: string;
   profilePicture?: string;
   role?: 'customer' | 'escort' | 'business' | 'admin';
+  isPremium?: boolean;
   location?: {
     type: string;
     coordinates: [number, number];
