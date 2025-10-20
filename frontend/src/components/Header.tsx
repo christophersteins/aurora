@@ -10,6 +10,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 export default function Header() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
   const t = useTranslations('nav');
 
   const handleLogout = () => {
@@ -44,11 +46,24 @@ export default function Header() {
   const closeModals = () => {
     setLoginModalOpen(false);
     setRegisterModalOpen(false);
+    setForgotPasswordModalOpen(false);
+  };
+
+  const openForgotPasswordModal = () => {
+    setForgotPasswordModalOpen(true);
+    setLoginModalOpen(false);
+    setRegisterModalOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const handleBackToLoginFromForgotPassword = () => {
+    setForgotPasswordModalOpen(false);
+    setLoginModalOpen(true);
   };
 
   return (
     <>
-      <header className="bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] sticky top-0 z-40">
+      <header className="bg-[#000000]/60 backdrop-blur-md border-b border-[#2f3336] sticky top-0 z-40">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo + Desktop Navigation - Links */}
@@ -62,7 +77,7 @@ export default function Header() {
               </Link>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-6">
+              <nav className="hidden md:flex items-center space-x-10">
                 <Link
                   href="/members"
                   className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
@@ -245,6 +260,7 @@ export default function Header() {
         isOpen={loginModalOpen}
         onClose={closeModals}
         onSwitchToRegister={openRegisterModal}
+        onSwitchToForgotPassword={openForgotPasswordModal}
       />
 
       {/* Register Modal */}
@@ -252,6 +268,13 @@ export default function Header() {
         isOpen={registerModalOpen}
         onClose={closeModals}
         onSwitchToLogin={openLoginModal}
+      />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={forgotPasswordModalOpen}
+        onClose={closeModals}
+        onBackToLogin={handleBackToLoginFromForgotPassword}
       />
     </>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
@@ -79,6 +79,7 @@ type GridView = 'compact' | 'comfortable';
 
 export default function MembersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [escorts, setEscorts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +87,7 @@ export default function MembersPage() {
   const [filters, setFilters] = useState<Filters>(initialFilters);
   const [sortBy, setSortBy] = useState<'distance'>('distance');
   const [gridView, setGridView] = useState<GridView>('comfortable');
-  
+
   // Location search states
   const [locationSearch, setLocationSearch] = useState('');
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
@@ -94,12 +95,60 @@ export default function MembersPage() {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  
+
   // Mobile sort dropdown state
   const [showMobileSortDropdown, setShowMobileSortDropdown] = useState(false);
 
+  // Process URL parameters from home page search
+  useEffect(() => {
+    const lat = searchParams.get('lat');
+    const lon = searchParams.get('lon');
+    const radius = searchParams.get('radius');
+
+    if (lat && lon) {
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+      const radiusKm = radius ? parseInt(radius) : 20;
+
+      // Reverse geocoding to get location name
+      fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          const cityName =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            'Gewählter Standort';
+
+          const postcode = data.address?.postcode || '';
+          const displayName = postcode ? `${postcode} ${cityName}` : cityName;
+
+          setLocationSearch(displayName);
+        })
+        .catch((error) => {
+          console.error('Error reverse geocoding:', error);
+          setLocationSearch('Gewählter Standort');
+        });
+
+      // Set filters with location data
+      setFilters((prev) => ({
+        ...prev,
+        useRadius: true,
+        userLatitude: latitude,
+        userLongitude: longitude,
+        radiusKm: radiusKm,
+      }));
+    }
+  }, [searchParams]);
+
   // Load filters from LocalStorage on mount
   useEffect(() => {
+    // Don't load from localStorage if we have URL parameters
+    const lat = searchParams.get('lat');
+    if (lat) return;
+
     try {
       const savedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
       if (savedFilters) {
@@ -109,7 +158,7 @@ export default function MembersPage() {
     } catch (error) {
       console.error('Error loading filters from LocalStorage:', error);
     }
-  }, []);
+  }, [searchParams]);
 
   // Save filters to LocalStorage on changes
   useEffect(() => {

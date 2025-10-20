@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { authService } from '@/services/auth.service';
 import { useTranslations } from 'next-intl';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,28 +18,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleEmailSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (emailOrUsername.trim()) {
-      setShowPasswordField(true);
-    }
-  };
-
-  const handleEmailBlur = () => {
-    if (emailOrUsername.trim() && !showPasswordField) {
-      setShowPasswordField(true);
-    }
-  };
-
-  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleEmailSubmit();
-    }
-  };
-
-  const handleFinalSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -135,35 +117,48 @@ export default function LoginPage() {
           </div>
 
           {/* Email/Password Form */}
-          <form onSubmit={showPasswordField ? handleFinalSubmit : handleEmailSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email or Username */}
             <div>
               <input
                 type="text"
                 value={emailOrUsername}
                 onChange={(e) => setEmailOrUsername(e.target.value)}
-                onBlur={handleEmailBlur}
-                onKeyDown={handleEmailKeyDown}
                 required
                 placeholder={t('emailOrUsername')}
                 className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
               />
             </div>
 
-            {/* Password (shown after email) */}
-            {showPasswordField && (
-              <div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder={t('password')}
-                  autoFocus
-                  className="w-full px-4 py-3 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
-                />
-              </div>
-            )}
+            {/* Password */}
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder={t('password')}
+                className="w-full px-4 py-3 pr-12 bg-page-secondary border border-default rounded-lg focus:outline-none text-body"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-body transition"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-muted hover:text-body hover:underline transition"
+              >
+                {t('forgotPassword')}
+              </Link>
+            </div>
 
             {/* Submit Button */}
             <button
