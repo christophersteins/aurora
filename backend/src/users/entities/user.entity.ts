@@ -46,8 +46,20 @@ export class User {
     spatialFeatureType: 'Point',
     srid: 4326,
     nullable: true,
+    transformer: {
+      to: (value: any) => value,
+      from: (value: any) => {
+        if (!value) return null;
+        // If already an object with coordinates, return as-is
+        if (typeof value === 'object' && value.coordinates) {
+          return value;
+        }
+        // Otherwise return the raw value
+        return value;
+      },
+    },
   })
-  location: string;
+  location: any;
 
   // === ESCORT-SPEZIFISCHE FELDER ===
   

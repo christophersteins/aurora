@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
+import { GalleryPhoto } from '../users/entities/gallery-photo.entity';
 import { UserRole } from '../users/enums/user-role.enum';
 
 // Lade .env Datei
@@ -499,7 +500,7 @@ async function seedEscorts() {
     username: process.env.DB_USERNAME || 'aurora_user',
     password: process.env.DB_PASSWORD || 'aurora_pw',
     database: process.env.DB_DATABASE || 'aurora_db',
-    entities: [User],
+    entities: [User, GalleryPhoto],
     synchronize: false,
   });
 

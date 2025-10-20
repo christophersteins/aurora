@@ -43,21 +43,47 @@ export class UsersService {
   }
 
   async findAllEscorts(): Promise<User[]> {
-    return this.usersRepository.find({
-      where: { role: UserRole.ESCORT },
-      select: [
-        'id',
-        'email',
-        'username',
-        'firstName',
-        'lastName',
-        'profilePicture',
-        'role',
-        'birthDate',
-        'location',
-        'createdAt',
-        'updatedAt',
-      ],
+    // Use query builder to properly serialize PostGIS geometry as GeoJSON
+    const escorts = await this.usersRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.email',
+        'user.username',
+        'user.firstName',
+        'user.lastName',
+        'user.profilePicture',
+        'user.role',
+        'user.birthDate',
+        'user.nationalities',
+        'user.languages',
+        'user.type',
+        'user.height',
+        'user.weight',
+        'user.bodyType',
+        'user.cupSize',
+        'user.hairColor',
+        'user.hairLength',
+        'user.eyeColor',
+        'user.intimateHair',
+        'user.hasTattoos',
+        'user.hasPiercings',
+        'user.isSmoker',
+        'user.description',
+        'user.createdAt',
+        'user.updatedAt',
+      ])
+      .addSelect('ST_AsGeoJSON(user.location)::json', 'location')
+      .where('user.role = :role', { role: UserRole.ESCORT })
+      .getRawAndEntities();
+
+    // Map the raw location data to the entities
+    return escorts.entities.map((entity, index) => {
+      const rawLocation = escorts.raw[index]?.location;
+      if (rawLocation) {
+        entity.location = rawLocation;
+      }
+      return entity;
     });
   }
 

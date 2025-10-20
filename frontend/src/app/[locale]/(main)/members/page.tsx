@@ -691,6 +691,7 @@ export default function MembersPage() {
                   }}
                   min="5"
                   max="500"
+                  step="5"
                   className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
                   style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                   placeholder="km"
@@ -870,6 +871,7 @@ export default function MembersPage() {
                 }}
                 min="5"
                 max="500"
+                step="5"
                 className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
                 style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                 placeholder="km"
