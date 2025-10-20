@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X } from 'lucide-react';
+import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check } from 'lucide-react';
 
 // Filter-Interface
 interface Filters {
@@ -68,7 +68,7 @@ const initialFilters: Filters = {
   hasPiercings: 'all',
   isSmoker: 'all',
   useRadius: false,
-  radiusKm: 20,
+  radiusKm: 50,
   userLatitude: null,
   userLongitude: null,
 };
@@ -108,7 +108,7 @@ export default function MembersPage() {
     if (lat && lon) {
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
-      const radiusKm = radius ? parseInt(radius) : 20;
+      const radiusKm = radius ? parseInt(radius) : 50;
 
       // Reverse geocoding to get location name
       fetch(
@@ -985,9 +985,14 @@ export default function MembersPage() {
 
                   {/* Information */}
                   <div className="p-4">
-                    <h3 className="text-xl mb-3 text-heading">
-                      {escort.username || 'Unbekannt'}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-base font-normal text-body">
+                        {escort.username || 'Unbekannt'}
+                      </h3>
+                      <div className="flex items-center justify-center w-4 h-4 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                        <Check className="w-2.5 h-2.5" style={{ color: 'var(--text-button)', strokeWidth: 3 }} />
+                      </div>
+                    </div>
 
                     <div className="flex items-center gap-3 text-sm text-muted">
                       {/* Show distance */}
