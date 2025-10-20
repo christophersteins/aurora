@@ -10,6 +10,9 @@ import admin from './admin.json';
 import footer from './footer.json';
 import imprint from './imprint.json';
 import privacy from './privacy.json';
+import faq from './faq.json';
+import videos from './videos.json';
+import premium from './premium.json';
 
 const messages = {
   common,
@@ -23,7 +26,10 @@ const messages = {
   admin,
   footer,
   imprint,
-  privacy
+  privacy,
+  faq,
+  videos,
+  premium
 };
 
 export default messages;

@@ -680,11 +680,19 @@ export default function MembersPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  value={filters.radiusKm}
-                  onChange={(e) => setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 20 })}
-                  min="1"
+                  value={filters.radiusKm || ''}
+                  onChange={(e) => setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })}
+                  onBlur={() => {
+                    if (filters.radiusKm < 5) {
+                      setFilters({ ...filters, radiusKm: 5 });
+                    } else if (filters.radiusKm > 500) {
+                      setFilters({ ...filters, radiusKm: 500 });
+                    }
+                  }}
+                  min="5"
                   max="500"
-                  className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary"
+                  className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                  style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                   placeholder="km"
                 />
                 <span className="text-muted text-sm whitespace-nowrap">km</span>
@@ -851,11 +859,19 @@ export default function MembersPage() {
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                value={filters.radiusKm}
-                onChange={(e) => setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 20 })}
-                min="1"
+                value={filters.radiusKm || ''}
+                onChange={(e) => setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })}
+                onBlur={() => {
+                  if (filters.radiusKm < 5) {
+                    setFilters({ ...filters, radiusKm: 5 });
+                  } else if (filters.radiusKm > 500) {
+                    setFilters({ ...filters, radiusKm: 500 });
+                  }
+                }}
+                min="5"
                 max="500"
-                className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary"
+                className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                 placeholder="km"
               />
               <span className="text-muted text-sm whitespace-nowrap">km</span>
@@ -870,7 +886,7 @@ export default function MembersPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'distance')}
-                className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body appearance-none cursor-pointer"
+                className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-muted appearance-none cursor-pointer"
               >
                 <option value="distance">Entfernung aufsteigend</option>
               </select>

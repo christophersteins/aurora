@@ -1,0 +1,47 @@
+{
+  "title": "Premium Mitgliedschaft",
+  "subtitle": "Hebe dein Profil auf die nächste Stufe",
+  "features": {
+    "title": "Premium-Vorteile",
+    "subtitle": "Erhalte Zugang zu exklusiven Features",
+    "feature1": {
+      "title": "Hervorgehobenes Profil",
+      "description": "Dein Profil wird prominent in den Suchergebnissen angezeigt"
+    },
+    "feature2": {
+      "title": "Unbegrenzte Galerie",
+      "description": "Füge unbegrenzt viele Fotos und Videos zu deinem Profil hinzu"
+    },
+    "feature3": {
+      "title": "Erweiterte Statistiken",
+      "description": "Detaillierte Einblicke in Profilbesuche und Interaktionen"
+    },
+    "feature4": {
+      "title": "Premium-Badge",
+      "description": "Zeige dein Premium-Status mit einem exklusiven Badge"
+    },
+    "feature5": {
+      "title": "Bevorzugter Support",
+      "description": "Schnellere Antwortzeiten und priorisierter Kundensupport"
+    },
+    "feature6": {
+      "title": "Werbefreies Erlebnis",
+      "description": "Nutze die Plattform ohne störende Werbung"
+    }
+  },
+  "plans": {
+    "title": "Wähle deinen Plan",
+    "monthly": "Monatlich",
+    "quarterly": "3 Monate",
+    "yearly": "Jährlich",
+    "perMonth": "pro Monat",
+    "savePercent": "Spare {percent}%",
+    "selectPlan": "Plan wählen",
+    "mostPopular": "Beliebteste"
+  },
+  "cta": {
+    "title": "Bereit für Premium?",
+    "description": "Werde noch heute Premium-Mitglied und profitiere von allen Vorteilen.",
+    "button": "Jetzt upgraden"
+  }
+}

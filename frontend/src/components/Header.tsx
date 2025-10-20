@@ -97,6 +97,12 @@ export default function Header() {
                   {t('videos')}
                 </Link>
                 <Link
+                  href="/premium"
+                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                >
+                  {t('premium')}
+                </Link>
+                <Link
                   href="/faq"
                   className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
                 >
@@ -204,6 +210,13 @@ export default function Header() {
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('videos')}
+              </Link>
+              <Link
+                href="/premium"
+                onClick={closeMobileMenu}
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+              >
+                {t('premium')}
               </Link>
               <Link
                 href="/faq"
