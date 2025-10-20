@@ -107,8 +107,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+        <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
           <p style={{ color: 'var(--text-secondary)' }}>Lädt...</p>
         </div>
       </main>
@@ -117,8 +117,8 @@ export default function ProfilePage() {
 
   if (error || !escort) {
     return (
-      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+        <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-primary)', borderColor: 'var(--color-primary)' }}>
             <p style={{ color: 'var(--color-primary)' }}>{error || 'Profile not found'}</p>
           </div>
@@ -133,8 +133,8 @@ export default function ProfilePage() {
   const age = calculateAge(escort.birthDate);
 
   return (
-    <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+    <main className="min-h-screen p-8" style={{ background: 'var(--background-primary)' }}>
+      <div className="mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Back Button */}
         <button onClick={() => router.push('/members')} className="mb-6 btn-base btn-secondary">
           ← Zurück

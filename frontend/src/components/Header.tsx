@@ -67,7 +67,7 @@ export default function Header() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo + Desktop Navigation - Links */}
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-12">
               {/* Logo */}
               <Link href="/" className="flex items-center">
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
@@ -77,7 +77,7 @@ export default function Header() {
               </Link>
 
               {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-10">
+              <nav className="hidden md:flex items-center space-x-6">
                 <Link
                   href="/members"
                   className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
@@ -89,6 +89,12 @@ export default function Header() {
                   className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
                 >
                   {t('clubsAndCo')}
+                </Link>
+                <Link
+                  href="/videos"
+                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                >
+                  {t('videos')}
                 </Link>
                 <Link
                   href="/faq"
@@ -191,6 +197,13 @@ export default function Header() {
                 className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('clubsAndCo')}
+              </Link>
+              <Link
+                href="/videos"
+                onClick={closeMobileMenu}
+                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+              >
+                {t('videos')}
               </Link>
               <Link
                 href="/faq"

@@ -1,0 +1,13 @@
+{
+  "title": "Videos",
+  "subtitle": "Discover our video gallery",
+  "categories": {
+    "all": "All",
+    "popular": "Popular",
+    "new": "New"
+  },
+  "views": "views",
+  "noVideos": "No videos found",
+  "infoTitle": "About our videos",
+  "infoText": "Here you will find a selection of videos. This feature will be filled with real content soon."
+}

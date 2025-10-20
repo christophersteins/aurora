@@ -1,0 +1,13 @@
+{
+  "title": "Videos",
+  "subtitle": "Entdecke unsere Videogalerie",
+  "categories": {
+    "all": "Alle",
+    "popular": "Beliebt",
+    "new": "Neu"
+  },
+  "views": "Aufrufe",
+  "noVideos": "Keine Videos gefunden",
+  "infoTitle": "Über unsere Videos",
+  "infoText": "Hier findest du eine Auswahl an Videos. Diese Funktion wird in Kürze mit echten Inhalten gefüllt."
+}

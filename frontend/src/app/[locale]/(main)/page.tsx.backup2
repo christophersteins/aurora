@@ -138,13 +138,13 @@ export default function HomePage() {
               Finde deine perfekte
               <span className="block gradient-text mt-2">Begleitung</span>
             </h1>
-            <p className="text-xl text-muted">
+            <p className="text-xl text-muted max-w-2xl mx-auto">
               Entdecke Premium-Escorts in deiner Nähe. Diskret, sicher und professionell.
             </p>
           </div>
 
           {/* Search Box */}
-          <div>
+          <div className="max-w-3xl mx-auto">
             <form onSubmit={handleSearchSubmit} className="relative">
               <div className="flex gap-3">
                 {/* Location Search Field */}
