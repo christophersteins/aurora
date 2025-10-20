@@ -6,6 +6,7 @@ import { escortProfileService } from '@/services/escortProfileService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
+import { ChevronRight, ArrowLeft } from 'lucide-react';
 import {
   NATIONALITIES,
   LANGUAGES,
@@ -54,6 +55,9 @@ export default function EscortProfileForm() {
     user?.profilePicture ? profilePictureService.getProfilePictureUrl(user.profilePicture) : null
   );
   const [uploadingPicture, setUploadingPicture] = useState(false);
+
+  // Mobile navigation state - null means menu is shown, string means section is shown
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
     if (formData.birthDate) {
@@ -148,10 +152,50 @@ export default function EscortProfileForm() {
     }
   };
 
+  const sections = [
+    { id: 'profilbild', label: 'Profilbild' },
+    { id: 'persoenliche-daten', label: 'Persönliche Daten' },
+    { id: 'koerpermerkmale', label: 'Körpermerkmale' },
+    { id: 'aussehen', label: 'Aussehen' },
+    { id: 'eigenschaften', label: 'Eigenschaften' },
+    { id: 'beschreibung', label: 'Beschreibung' },
+  ];
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      {/* Sidebar Navigation - Desktop only */}
-      <aside className="hidden lg:block lg:col-span-1">
+    <div>
+      {/* Mobile Navigation - Tablets and Smartphones only */}
+      <div className="lg:hidden mb-6">
+        {/* Menu - shown when no section is active */}
+        {activeSection === null && (
+          <div className="grid grid-cols-1 gap-2 p-4 rounded-lg bg-page-secondary animate-slide-in-left">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className="flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border-depth bg-page-secondary text-body hover:bg-page-primary hover:text-heading"
+              >
+                <span className="text-left">{section.label}</span>
+                <ChevronRight className="w-5 h-5 flex-shrink-0" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Back Button - shown when a section is active */}
+        {activeSection !== null && (
+          <button
+            onClick={() => setActiveSection(null)}
+            className="flex items-center gap-2 mb-4 px-4 py-2 rounded-lg text-sm font-medium transition-all border-depth bg-page-secondary text-body hover:bg-page-primary hover:text-heading"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Zurück zum Menü</span>
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar Navigation - Desktop only */}
+        <aside className="hidden lg:block lg:col-span-1">
         <div className="sticky top-24 p-6 rounded-lg border border-default bg-page-secondary">
           <h3 className="text-lg font-semibold mb-4 text-heading">Navigation</h3>
           <nav className="space-y-2">
@@ -196,14 +240,19 @@ export default function EscortProfileForm() {
       </aside>
 
       {/* Main Content */}
-      <div className="lg:col-span-3">
+      <div className={`lg:col-span-3 ${activeSection === null ? 'hidden lg:block' : 'block'}`}>
         <div className="p-8 rounded-lg border-depth bg-page-primary">
-          <h2 className="text-3xl font-bold mb-6 text-heading">
+          <h2 className="text-3xl font-bold mb-6 text-heading hidden lg:block">
             Escort-Profil bearbeiten
           </h2>
 
           {/* Profile Picture Section */}
-          <div id="profilbild" className="mb-8 p-6 rounded-lg border border-default scroll-mt-8">
+          <div
+            id="profilbild"
+            className={`mb-8 p-6 rounded-lg border border-default scroll-mt-8 ${
+              activeSection === 'profilbild' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+            }`}
+          >
             <h3 className="text-xl font-semibold mb-4 text-heading">Profilbild</h3>
 
         <div className="flex flex-col md:flex-row items-start gap-6">
@@ -240,7 +289,7 @@ export default function EscortProfileForm() {
             </button>
           </div>
         </div>
-      </div>
+          </div>
 
           {/* Success/Error Messages */}
           {error && (
@@ -258,7 +307,12 @@ export default function EscortProfileForm() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Data Section */}
-            <div id="persoenliche-daten" className="scroll-mt-8">
+            <div
+              id="persoenliche-daten"
+              className={`scroll-mt-8 ${
+                activeSection === 'persoenliche-daten' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+              }`}
+            >
               <h3 className="text-xl font-semibold mb-4 text-heading border-b border-default pb-2">
                 Persönliche Daten
               </h3>
@@ -304,7 +358,12 @@ export default function EscortProfileForm() {
             </div>
 
             {/* Body Features Section */}
-            <div id="koerpermerkmale" className="scroll-mt-8">
+            <div
+              id="koerpermerkmale"
+              className={`scroll-mt-8 ${
+                activeSection === 'koerpermerkmale' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+              }`}
+            >
               <h3 className="text-xl font-semibold mb-4 text-heading border-b border-default pb-2">
                 Körpermerkmale
               </h3>
@@ -381,7 +440,12 @@ export default function EscortProfileForm() {
             </div>
 
             {/* Appearance Section */}
-            <div id="aussehen" className="scroll-mt-8">
+            <div
+              id="aussehen"
+              className={`scroll-mt-8 ${
+                activeSection === 'aussehen' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+              }`}
+            >
               <h3 className="text-xl font-semibold mb-4 text-heading border-b border-default pb-2">
                 Aussehen
               </h3>
@@ -439,7 +503,12 @@ export default function EscortProfileForm() {
             </div>
 
             {/* Characteristics Section */}
-            <div id="eigenschaften" className="scroll-mt-8">
+            <div
+              id="eigenschaften"
+              className={`scroll-mt-8 ${
+                activeSection === 'eigenschaften' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+              }`}
+            >
               <h3 className="text-xl font-semibold mb-4 text-heading border-b border-default pb-2">
                 Eigenschaften
               </h3>
@@ -476,7 +545,12 @@ export default function EscortProfileForm() {
             </div>
 
             {/* Description Section */}
-            <div id="beschreibung" className="scroll-mt-8">
+            <div
+              id="beschreibung"
+              className={`scroll-mt-8 ${
+                activeSection === 'beschreibung' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
+              }`}
+            >
               <h3 className="text-xl font-semibold mb-4 text-heading border-b border-default pb-2">
                 Beschreibung
               </h3>
@@ -505,6 +579,7 @@ export default function EscortProfileForm() {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 }
