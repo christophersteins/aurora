@@ -133,7 +133,7 @@ export default function EscortProfileForm() {
 
   if (user?.role !== 'escort') {
     return (
-      <div className="p-6 rounded-lg border-depth bg-page-secondary">
+      <div className="p-6 rounded-lg border-depth bg-page-primary">
         <p className="text-action-primary">
           Nur Benutzer mit der Rolle &quot;Escort&quot; können dieses Profil bearbeiten.
         </p>
@@ -142,15 +142,15 @@ export default function EscortProfileForm() {
   }
 
   return (
-    <div className="p-8 rounded-lg border-depth max-w-4xl mx-auto bg-page-secondary">
+    <div className="p-8 rounded-lg border-depth max-w-4xl mx-auto bg-page-primary">
       <h2 className="text-3xl font-bold mb-6 text-heading">
         Escort-Profil bearbeiten
       </h2>
 
       {/* Profile Picture Section */}
-      <div className="mb-8 p-6 rounded-lg border-depth bg-page-primary">
+      <div className="mb-8 p-6 rounded-lg border border-default">
         <h3 className="text-xl font-semibold mb-4 text-heading">Profilbild</h3>
-        
+
         <div className="flex flex-col md:flex-row items-start gap-6">
           <div className="flex-shrink-0">
             {profilePicturePreview ? (
@@ -160,7 +160,7 @@ export default function EscortProfileForm() {
                 className="w-32 h-32 object-cover rounded-full"
               />
             ) : (
-              <div className="w-32 h-32 bg-page-secondary rounded-full flex items-center justify-center">
+              <div className="w-32 h-32 border border-default rounded-full flex items-center justify-center">
                 <span className="text-heading font-bold text-2xl">
                   {user?.firstName?.[0] || user?.username?.[0] || '?'}
                 </span>
@@ -369,8 +369,6 @@ export default function EscortProfileForm() {
               type="checkbox"
               checked={formData.hasTattoos}
               onChange={(e) => setFormData({ ...formData, hasTattoos: e.target.checked })}
-              className="w-5 h-5 rounded"
-              style={{ accentColor: 'var(--color-primary)' }}
             />
             <span className="text-body">Hat Tattoos</span>
           </label>
@@ -380,8 +378,6 @@ export default function EscortProfileForm() {
               type="checkbox"
               checked={formData.hasPiercings}
               onChange={(e) => setFormData({ ...formData, hasPiercings: e.target.checked })}
-              className="w-5 h-5 rounded"
-              style={{ accentColor: 'var(--color-primary)' }}
             />
             <span className="text-body">Hat Piercings</span>
           </label>
@@ -391,8 +387,6 @@ export default function EscortProfileForm() {
               type="checkbox"
               checked={formData.isSmoker}
               onChange={(e) => setFormData({ ...formData, isSmoker: e.target.checked })}
-              className="w-5 h-5 rounded"
-              style={{ accentColor: 'var(--color-primary)' }}
             />
             <span className="text-body">Raucher/in</span>
           </label>

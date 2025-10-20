@@ -92,7 +92,7 @@ export default function MultiSelectDropdown({
         </div>
 
         {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-page-secondary border border-default rounded shadow-lg">
+          <div className="absolute z-10 w-full mt-1 bg-page-primary border border-default rounded shadow-lg">
             <div className="p-2 border-b border-default">
               <input
                 ref={searchInputRef}
@@ -110,14 +110,13 @@ export default function MultiSelectDropdown({
                 filteredOptions.map((option) => (
                   <label
                     key={option}
-                    className="flex items-center px-4 py-2 hover:bg-page-primary cursor-pointer text-body"
+                    className="flex items-center px-4 py-2 hover:bg-page-primary cursor-pointer text-body border-b border-default last:border-b-0"
                   >
                     <input
                       type="checkbox"
                       checked={selectedValues.includes(option)}
                       onChange={() => toggleOption(option)}
                       className="mr-2"
-                      style={{ accentColor: 'var(--color-primary)' }}
                     />
                     <span>{option}</span>
                   </label>
