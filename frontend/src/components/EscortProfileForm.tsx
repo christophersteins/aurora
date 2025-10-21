@@ -288,26 +288,23 @@ export default function EscortProfileForm() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Navigation - Desktop only */}
         <aside className="hidden lg:block lg:col-span-1">
-        <div className="sticky top-24 p-6 rounded-lg border border-default bg-page-primary">
-          <h3 className="text-lg font-semibold mb-4 text-heading">Navigation</h3>
           <nav className="space-y-2">
             {sections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border-depth bg-page-primary text-body hover:bg-page-secondary hover:text-heading"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all bg-page-primary text-body hover:bg-page-secondary hover:text-heading"
               >
                 <span className="text-left">{section.label}</span>
                 <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
               </button>
             ))}
           </nav>
-        </div>
-      </aside>
+        </aside>
 
       {/* Main Content */}
       <div className={`lg:col-span-3 ${activeSection === null ? 'hidden lg:block' : 'block'}`}>
-        <div className="p-8 rounded-lg border-depth bg-page-primary">
+        <div className="p-8 rounded-lg bg-page-primary">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-heading hidden lg:block">
               Escort-Profil bearbeiten

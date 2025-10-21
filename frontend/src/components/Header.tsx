@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState } from 'react';
-import { AlignJustify, X, User, Settings, LogOut } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -130,7 +130,30 @@ export default function Header() {
                   </button>
                 </>
               ) : (
-                <UserMenu />
+                <>
+                  {/* Notifications Icon */}
+                  <button
+                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] hover:bg-[#2f3336] rounded-lg transition relative"
+                    aria-label="Benachrichtigungen"
+                  >
+                    <Bell size={20} />
+                    {/* Badge für ungelesene Benachrichtigungen (optional später) */}
+                    {/* <span className="absolute top-1 right-1 w-2 h-2 bg-[#8b5cf6] rounded-full"></span> */}
+                  </button>
+
+                  {/* Messages Icon */}
+                  <Link
+                    href="/chat"
+                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] hover:bg-[#2f3336] rounded-lg transition relative"
+                    aria-label="Nachrichten"
+                  >
+                    <MessageCircle size={20} />
+                    {/* Badge für ungelesene Nachrichten (optional später) */}
+                    {/* <span className="absolute top-1 right-1 w-2 h-2 bg-[#8b5cf6] rounded-full"></span> */}
+                  </Link>
+
+                  <UserMenu />
+                </>
               )}
             </div>
 
@@ -251,6 +274,25 @@ export default function Header() {
                 </div>
               ) : (
                 <>
+                  {/* Notifications Link */}
+                  <button
+                    onClick={closeMobileMenu}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                  >
+                    <Bell size={18} className="text-[#71767b]" />
+                    <span>Benachrichtigungen</span>
+                  </button>
+
+                  {/* Messages Link */}
+                  <Link
+                    href="/chat"
+                    onClick={closeMobileMenu}
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                  >
+                    <MessageCircle size={18} className="text-[#71767b]" />
+                    <span>Nachrichten</span>
+                  </Link>
+
                   <Link
                     href="/escort-profile"
                     onClick={closeMobileMenu}
