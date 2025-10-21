@@ -75,6 +75,7 @@ const initialFilters: Filters = {
 };
 
 const FILTER_STORAGE_KEY = 'aurora_member_filters';
+const LOCATION_SEARCH_KEY = 'aurora_location_search';
 
 type GridView = 'compact' | 'comfortable';
 
@@ -86,12 +87,40 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterSidebarOpen, setFilterSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState<Filters>(initialFilters);
+
+  // Initialize filters with lazy initialization from localStorage
+  const [filters, setFilters] = useState<Filters>(() => {
+    // Check if we have URL parameters (they take precedence)
+    if (typeof window !== 'undefined') {
+      try {
+        const savedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
+        if (savedFilters) {
+          const parsedFilters = JSON.parse(savedFilters);
+          return { ...initialFilters, ...parsedFilters };
+        }
+      } catch (error) {
+        console.error('Error loading filters during initialization:', error);
+      }
+    }
+    return initialFilters;
+  });
+
   const [sortBy, setSortBy] = useState<'distance'>('distance');
   const [gridView, setGridView] = useState<GridView>('comfortable');
 
-  // Location search states
-  const [locationSearch, setLocationSearch] = useState('');
+  // Location search states - also initialize from localStorage
+  const [locationSearch, setLocationSearch] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedLocationSearch = localStorage.getItem(LOCATION_SEARCH_KEY);
+        return savedLocationSearch || '';
+      } catch (error) {
+        console.error('Error loading location search during initialization:', error);
+      }
+    }
+    return '';
+  });
+
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
@@ -100,6 +129,9 @@ export default function MembersPage() {
 
   // Mobile sort dropdown state
   const [showMobileSortDropdown, setShowMobileSortDropdown] = useState(false);
+
+  // Track initial mount to prevent saving on first render
+  const isInitialMount = useRef(true);
 
   // Process URL parameters from home page search
   useEffect(() => {
@@ -145,31 +177,32 @@ export default function MembersPage() {
     }
   }, [searchParams]);
 
-  // Load filters from LocalStorage on mount
+  // Save filters to LocalStorage on changes (skip initial mount)
   useEffect(() => {
-    // Don't load from localStorage if we have URL parameters
-    const lat = searchParams.get('lat');
-    if (lat) return;
-
-    try {
-      const savedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
-      if (savedFilters) {
-        const parsed = JSON.parse(savedFilters);
-        setFilters({ ...initialFilters, ...parsed });
-      }
-    } catch (error) {
-      console.error('Error loading filters from LocalStorage:', error);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  }, [searchParams]);
 
-  // Save filters to LocalStorage on changes
-  useEffect(() => {
     try {
       localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
     } catch (error) {
       console.error('Error saving filters to LocalStorage:', error);
     }
   }, [filters]);
+
+  // Save location search to LocalStorage on changes
+  useEffect(() => {
+    try {
+      if (locationSearch) {
+        localStorage.setItem(LOCATION_SEARCH_KEY, locationSearch);
+      } else {
+        localStorage.removeItem(LOCATION_SEARCH_KEY);
+      }
+    } catch (error) {
+      console.error('Error saving location search to LocalStorage:', error);
+    }
+  }, [locationSearch]);
 
   // Load all escorts on mount
   useEffect(() => {
@@ -533,18 +566,21 @@ export default function MembersPage() {
 
   // Reset filters (keep location search and radius)
   const handleResetFilters = () => {
-    setFilters({
+    const resetFilters = {
       ...initialFilters,
       useRadius: filters.useRadius,
       radiusKm: filters.radiusKm,
       userLatitude: filters.userLatitude,
       userLongitude: filters.userLongitude,
-    });
-    // Don't reset locationSearch
+    };
+
+    setFilters(resetFilters);
+
+    // Save the reset state with preserved location/radius to localStorage
     try {
-      localStorage.removeItem(FILTER_STORAGE_KEY);
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(resetFilters));
     } catch (error) {
-      console.error('Error removing filters from LocalStorage:', error);
+      console.error('Error saving reset filters to LocalStorage:', error);
     }
   };
 
