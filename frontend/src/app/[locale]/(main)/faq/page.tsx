@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 interface FAQItem {
   question: string;
@@ -102,12 +103,12 @@ export default function FAQPage() {
           <p className="text-muted mb-6">
             {t('contactText')}
           </p>
-          <a
+          <Link
             href="/contact"
             className="btn-base btn-primary inline-block"
           >
             {t('contactButton')}
-          </a>
+          </Link>
         </div>
       </div>
     </main>

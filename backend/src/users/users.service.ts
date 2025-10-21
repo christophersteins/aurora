@@ -167,8 +167,11 @@ export class UsersService {
       description?: string;
     },
   ): Promise<User> {
+    console.log('updateEscortProfile called for user:', userId);
+    console.log('Update data:', JSON.stringify(updateData, null, 2));
+
     const user = await this.findById(userId);
-    
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -179,7 +182,7 @@ export class UsersService {
     }
 
     // Convert birthDate from string to Date if present
-    if (updateData.birthDate) {
+    if (updateData.birthDate !== undefined) {
       user.birthDate = new Date(updateData.birthDate);
     }
 
@@ -200,7 +203,35 @@ export class UsersService {
     if (updateData.isSmoker !== undefined) user.isSmoker = updateData.isSmoker;
     if (updateData.description !== undefined) user.description = updateData.description;
 
-    return this.usersRepository.save(user);
+    console.log('User data after update (before save):', {
+      id: user.id,
+      birthDate: user.birthDate,
+      height: user.height,
+      weight: user.weight,
+      bodyType: user.bodyType,
+      cupSize: user.cupSize,
+    });
+
+    // Save and reload to ensure we get the latest data
+    await this.usersRepository.save(user);
+
+    // Reload the user from database to ensure we have the latest data
+    const reloadedUser = await this.findById(userId);
+
+    if (!reloadedUser) {
+      throw new NotFoundException('User not found after save');
+    }
+
+    console.log('User reloaded from database:', {
+      id: reloadedUser.id,
+      birthDate: reloadedUser.birthDate,
+      height: reloadedUser.height,
+      weight: reloadedUser.weight,
+      bodyType: reloadedUser.bodyType,
+      cupSize: reloadedUser.cupSize,
+    });
+
+    return reloadedUser;
   }
 
   async findUsersWithinRadius(

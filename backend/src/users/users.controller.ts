@@ -88,12 +88,16 @@ export class UsersController {
   async updateEscortProfile(
     @Request() req,
     @Body() updateEscortProfileDto: UpdateEscortProfileDto,
-  ): Promise<User> {
+  ): Promise<Omit<User, 'password'>> {
     const userId = req.user.id;
-    return this.usersService.updateEscortProfile(
+    const updatedUser = await this.usersService.updateEscortProfile(
       userId,
       updateEscortProfileDto,
     );
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
   }
 
   @Post('upload-profile-picture')

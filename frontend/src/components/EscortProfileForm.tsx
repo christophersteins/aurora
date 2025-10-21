@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { escortProfileService } from '@/services/escortProfileService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
-import { ChevronRight, ArrowLeft } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Check } from 'lucide-react';
 import {
   NATIONALITIES,
   LANGUAGES,
@@ -21,9 +21,10 @@ import {
 
 export default function EscortProfileForm() {
   const { user, setUser } = useAuthStore();
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const formatDateForInput = (dateString?: string) => {
     if (!dateString) return '';
@@ -74,26 +75,75 @@ export default function EscortProfileForm() {
     }
   }, [formData.birthDate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Auto-save function with debouncing - accepts the data to save
+  const autoSave = useCallback(async (dataToSave: UpdateEscortProfileDto) => {
+    setIsSaving(true);
     setError(null);
-    setSuccess(false);
 
     try {
-      const updatedUser = await escortProfileService.updateProfile(formData);
+      // Filter out empty strings and undefined values
+      const cleanedData: Partial<UpdateEscortProfileDto> = {};
+
+      Object.entries(dataToSave).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          // For arrays, only include if not empty
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              cleanedData[key as keyof UpdateEscortProfileDto] = value as any;
+            }
+          } else {
+            cleanedData[key as keyof UpdateEscortProfileDto] = value as any;
+          }
+        }
+      });
+
+      console.log('Sending data:', cleanedData);
+      const updatedUser = await escortProfileService.updateProfile(cleanedData as UpdateEscortProfileDto);
+      console.log('Received updated user:', updatedUser);
+
+      // Update the local form data with the response to ensure consistency
+      setFormData({
+        birthDate: formatDateForInput(updatedUser.birthDate),
+        nationalities: updatedUser.nationalities || [],
+        languages: updatedUser.languages || [],
+        height: updatedUser.height || undefined,
+        weight: updatedUser.weight || undefined,
+        bodyType: updatedUser.bodyType || '',
+        cupSize: updatedUser.cupSize || '',
+        hairColor: updatedUser.hairColor || '',
+        hairLength: updatedUser.hairLength || '',
+        eyeColor: updatedUser.eyeColor || '',
+        hasTattoos: updatedUser.hasTattoos || false,
+        hasPiercings: updatedUser.hasPiercings || false,
+        isSmoker: updatedUser.isSmoker || false,
+        description: updatedUser.description || '',
+      });
+
       setUser(updatedUser);
+      console.log('User updated in store');
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
+      console.error('Save error:', err);
+      const errorMessage = err instanceof Error
+        ? err.message
         : (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Fehler beim Speichern des Profils';
       setError(errorMessage);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
-  };
+  }, [setUser]);
+
+  // Debounced save - triggers 1 second after user stops typing
+  const debouncedSave = useCallback((newData: UpdateEscortProfileDto) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      autoSave(newData);
+    }, 1000);
+  }, [autoSave]);
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,7 +203,6 @@ export default function EscortProfileForm() {
   };
 
   const sections = [
-    { id: 'profilbild', label: 'Profilbild' },
     { id: 'persoenliche-daten', label: 'Persönliche Daten' },
     { id: 'koerpermerkmale', label: 'Körpermerkmale' },
     { id: 'aussehen', label: 'Aussehen' },
@@ -163,19 +212,62 @@ export default function EscortProfileForm() {
 
   return (
     <div>
+      {/* Profile Picture Section - Mobile/Tablet only, shown when menu is visible */}
+      {activeSection === null && (
+        <div className="mb-6 lg:hidden">
+        <div className="p-6 rounded-lg border-depth bg-page-primary">
+          <h3 className="text-xl font-semibold mb-4 text-heading">Profilbild</h3>
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="flex-shrink-0">
+              {profilePicturePreview ? (
+                <img
+                  src={profilePicturePreview}
+                  alt="Profilbild Vorschau"
+                  className="w-32 h-32 object-cover rounded-full"
+                />
+              ) : (
+                <div className="w-32 h-32 border border-default rounded-full flex items-center justify-center">
+                  <span className="text-heading font-bold text-2xl">
+                    {user?.firstName?.[0] || user?.username?.[0] || '?'}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 w-full">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="mb-3 block w-full text-sm text-body file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-action-primary hover:file:bg-action-primary-hover hover:file:text-white file:transition-all file:cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={handleUploadProfilePicture}
+                disabled={!profilePicture || uploadingPicture}
+                className="btn-base btn-primary"
+              >
+                {uploadingPicture ? 'Lädt hoch...' : 'Profilbild hochladen'}
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+      )}
+
       {/* Mobile Navigation - Tablets and Smartphones only */}
       <div className="lg:hidden mb-6">
         {/* Menu - shown when no section is active */}
         {activeSection === null && (
-          <div className="grid grid-cols-1 gap-2 p-4 rounded-lg bg-page-secondary animate-slide-in-left">
+          <div className="grid grid-cols-1 gap-2 p-4 rounded-lg bg-page-primary animate-slide-in-left">
             {sections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className="flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border-depth bg-page-secondary text-body hover:bg-page-primary hover:text-heading"
+                className="flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border-depth bg-page-primary text-body hover:bg-page-secondary hover:text-heading"
               >
                 <span className="text-left">{section.label}</span>
-                <ChevronRight className="w-5 h-5 flex-shrink-0" />
+                <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
               </button>
             ))}
           </div>
@@ -185,9 +277,9 @@ export default function EscortProfileForm() {
         {activeSection !== null && (
           <button
             onClick={() => setActiveSection(null)}
-            className="flex items-center gap-2 mb-4 px-4 py-2 rounded-lg text-sm font-medium transition-all border-depth bg-page-secondary text-body hover:bg-page-primary hover:text-heading"
+            className="flex items-center gap-2 mb-4 px-4 py-2 rounded-lg text-sm font-medium transition-all border-depth bg-page-primary text-body hover:bg-page-secondary hover:text-heading"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-muted" />
             <span>Zurück zum Menü</span>
           </button>
         )}
@@ -196,45 +288,19 @@ export default function EscortProfileForm() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Navigation - Desktop only */}
         <aside className="hidden lg:block lg:col-span-1">
-        <div className="sticky top-24 p-6 rounded-lg border border-default bg-page-secondary">
+        <div className="sticky top-24 p-6 rounded-lg border border-default bg-page-primary">
           <h3 className="text-lg font-semibold mb-4 text-heading">Navigation</h3>
           <nav className="space-y-2">
-            <button
-              onClick={() => scrollToSection('profilbild')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Profilbild
-            </button>
-            <button
-              onClick={() => scrollToSection('persoenliche-daten')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Persönliche Daten
-            </button>
-            <button
-              onClick={() => scrollToSection('koerpermerkmale')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Körpermerkmale
-            </button>
-            <button
-              onClick={() => scrollToSection('aussehen')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Aussehen
-            </button>
-            <button
-              onClick={() => scrollToSection('eigenschaften')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Eigenschaften
-            </button>
-            <button
-              onClick={() => scrollToSection('beschreibung')}
-              className="w-full text-left px-3 py-2 rounded-lg text-body hover:bg-page-primary hover:text-heading transition"
-            >
-              Beschreibung
-            </button>
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => scrollToSection(section.id)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all border-depth bg-page-primary text-body hover:bg-page-secondary hover:text-heading"
+              >
+                <span className="text-left">{section.label}</span>
+                <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
+              </button>
+            ))}
           </nav>
         </div>
       </aside>
@@ -242,16 +308,32 @@ export default function EscortProfileForm() {
       {/* Main Content */}
       <div className={`lg:col-span-3 ${activeSection === null ? 'hidden lg:block' : 'block'}`}>
         <div className="p-8 rounded-lg border-depth bg-page-primary">
-          <h2 className="text-3xl font-bold mb-6 text-heading hidden lg:block">
-            Escort-Profil bearbeiten
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-heading hidden lg:block">
+              Escort-Profil bearbeiten
+            </h2>
 
-          {/* Profile Picture Section */}
+            {/* Auto-save Indicator */}
+            <div className="flex items-center gap-2 text-sm">
+              {isSaving && (
+                <span className="flex items-center gap-2 text-muted">
+                  <span className="w-4 h-4 border-2 border-muted border-t-transparent rounded-full animate-spin"></span>
+                  Speichert...
+                </span>
+              )}
+              {success && !isSaving && (
+                <span className="flex items-center gap-2 text-success">
+                  <Check className="w-4 h-4" />
+                  Gespeichert
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Profile Picture Section - Desktop only */}
           <div
             id="profilbild"
-            className={`mb-8 p-6 rounded-lg border border-default scroll-mt-8 ${
-              activeSection === 'profilbild' ? 'block lg:block animate-slide-in-right' : 'hidden lg:block'
-            }`}
+            className="mb-8 p-6 rounded-lg border border-default scroll-mt-8 hidden lg:block"
           >
             <h3 className="text-xl font-semibold mb-4 text-heading">Profilbild</h3>
 
@@ -305,7 +387,7 @@ export default function EscortProfileForm() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-8">
             {/* Personal Data Section */}
             <div
               id="persoenliche-daten"
@@ -326,6 +408,7 @@ export default function EscortProfileForm() {
                   type="date"
                   value={formData.birthDate || ''}
                   onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                  onBlur={debouncedSave}
                   className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                 />
               </div>
@@ -338,7 +421,11 @@ export default function EscortProfileForm() {
                 <MultiSelectDropdown
                   options={NATIONALITIES}
                   selectedValues={formData.nationalities || []}
-                  onChange={(values) => setFormData({ ...formData, nationalities: values })}
+                  onChange={(values) => {
+                    const newData = { ...formData, nationalities: values };
+                    setFormData(newData);
+                    debouncedSave(newData);
+                  }}
                   placeholder="Wähle Nationalitäten"
                 />
               </div>
@@ -351,7 +438,11 @@ export default function EscortProfileForm() {
                 <MultiSelectDropdown
                   options={LANGUAGES}
                   selectedValues={formData.languages || []}
-                  onChange={(values) => setFormData({ ...formData, languages: values })}
+                  onChange={(values) => {
+                    const newData = { ...formData, languages: values };
+                    setFormData(newData);
+                    debouncedSave(newData);
+                  }}
                   placeholder="Wähle Sprachen"
                 />
               </div>
@@ -376,7 +467,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.height || ''}
-                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : undefined })}
+                    onChange={(e) => {
+                      const newData = { ...formData, height: e.target.value ? Number(e.target.value) : undefined };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -392,7 +487,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.weight || ''}
-                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : undefined })}
+                    onChange={(e) => {
+                      const newData = { ...formData, weight: e.target.value ? Number(e.target.value) : undefined };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -411,7 +510,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.bodyType || ''}
-                    onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
+                    onChange={(e) => {
+                      const newData = { ...formData, bodyType: e.target.value };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -427,7 +530,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.cupSize || ''}
-                    onChange={(e) => setFormData({ ...formData, cupSize: e.target.value })}
+                    onChange={(e) => {
+                      const newData = { ...formData, cupSize: e.target.value };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -458,7 +565,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.hairColor || ''}
-                    onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
+                    onChange={(e) => {
+                      const newData = { ...formData, hairColor: e.target.value };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -474,7 +585,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.hairLength || ''}
-                    onChange={(e) => setFormData({ ...formData, hairLength: e.target.value })}
+                    onChange={(e) => {
+                      const newData = { ...formData, hairLength: e.target.value };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -490,7 +605,11 @@ export default function EscortProfileForm() {
                   </label>
                   <select
                     value={formData.eyeColor || ''}
-                    onChange={(e) => setFormData({ ...formData, eyeColor: e.target.value })}
+                    onChange={(e) => {
+                      const newData = { ...formData, eyeColor: e.target.value };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                     className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   >
                     <option value="">Bitte wählen</option>
@@ -519,7 +638,11 @@ export default function EscortProfileForm() {
                   <input
                     type="checkbox"
                     checked={formData.hasTattoos}
-                    onChange={(e) => setFormData({ ...formData, hasTattoos: e.target.checked })}
+                    onChange={(e) => {
+                      const newData = { ...formData, hasTattoos: e.target.checked };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                   />
                   <span className="text-body">Hat Tattoos</span>
                 </label>
@@ -528,7 +651,11 @@ export default function EscortProfileForm() {
                   <input
                     type="checkbox"
                     checked={formData.hasPiercings}
-                    onChange={(e) => setFormData({ ...formData, hasPiercings: e.target.checked })}
+                    onChange={(e) => {
+                      const newData = { ...formData, hasPiercings: e.target.checked };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                   />
                   <span className="text-body">Hat Piercings</span>
                 </label>
@@ -537,7 +664,11 @@ export default function EscortProfileForm() {
                   <input
                     type="checkbox"
                     checked={formData.isSmoker}
-                    onChange={(e) => setFormData({ ...formData, isSmoker: e.target.checked })}
+                    onChange={(e) => {
+                      const newData = { ...formData, isSmoker: e.target.checked };
+                      setFormData(newData);
+                      debouncedSave(newData);
+                    }}
                   />
                   <span className="text-body">Raucher/in</span>
                 </label>
@@ -561,22 +692,14 @@ export default function EscortProfileForm() {
                 <textarea
                   value={formData.description || ''}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onBlur={debouncedSave}
                   rows={6}
                   className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   placeholder="Beschreibe dich selbst..."
                 />
               </div>
             </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-base btn-primary font-semibold text-lg"
-            >
-              {loading ? 'Speichert...' : 'Profil speichern'}
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </div>
