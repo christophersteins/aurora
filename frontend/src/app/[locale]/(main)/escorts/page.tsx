@@ -529,10 +529,16 @@ export default function MembersPage() {
     }
   };
 
-  // Reset filters
+  // Reset filters (keep location search and radius)
   const handleResetFilters = () => {
-    setFilters(initialFilters);
-    setLocationSearch('');
+    setFilters({
+      ...initialFilters,
+      useRadius: filters.useRadius,
+      radiusKm: filters.radiusKm,
+      userLatitude: filters.userLatitude,
+      userLongitude: filters.userLongitude,
+    });
+    // Don't reset locationSearch
     try {
       localStorage.removeItem(FILTER_STORAGE_KEY);
     } catch (error) {
@@ -540,7 +546,7 @@ export default function MembersPage() {
     }
   };
 
-  // Check if filters are active
+  // Check if filters are active (excluding location search and radius)
   const hasActiveFilters = () => {
     return (
       filters.searchQuery.trim() !== '' ||
@@ -561,8 +567,7 @@ export default function MembersPage() {
       filters.intimateHair.length > 0 ||
       filters.hasTattoos !== 'all' ||
       filters.hasPiercings !== 'all' ||
-      filters.isSmoker !== 'all' ||
-      filters.useRadius
+      filters.isSmoker !== 'all'
     );
   };
 
@@ -678,7 +683,7 @@ export default function MembersPage() {
               </div>
 
               {/* Radius Field */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 relative group">
                 <input
                   type="number"
                   value={filters.radiusKm || ''}
@@ -693,10 +698,16 @@ export default function MembersPage() {
                   min="5"
                   max="500"
                   step="5"
-                  className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                  disabled={!locationSearch}
+                  className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                   placeholder="km"
                 />
+                {!locationSearch && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    <span className="text-sm text-body">Bitte zuerst Stadt oder PLZ eingeben</span>
+                  </div>
+                )}
                 <span className="text-muted text-sm whitespace-nowrap">km</span>
               </div>
             </div>
@@ -859,7 +870,7 @@ export default function MembersPage() {
             </div>
 
             {/* Radius Field */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 relative group">
               <input
                 type="number"
                 value={filters.radiusKm || ''}
@@ -874,10 +885,16 @@ export default function MembersPage() {
                 min="5"
                 max="500"
                 step="5"
-                className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
+                disabled={!locationSearch}
+                className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ colorScheme: 'dark', accentColor: '#71767b' }}
                 placeholder="km"
               />
+              {!locationSearch && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  <span className="text-sm text-body">Bitte zuerst Stadt oder PLZ eingeben</span>
+                </div>
+              )}
               <span className="text-muted text-sm whitespace-nowrap">km</span>
             </div>
 
