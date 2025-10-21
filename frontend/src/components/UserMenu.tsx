@@ -6,12 +6,14 @@ import { useAuthStore } from '@/store/authStore';
 import { useState, useRef, useEffect } from 'react';
 import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import LogoutModal from './LogoutModal';
 
 export default function UserMenu() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('nav');
 
@@ -37,10 +39,9 @@ export default function UserMenu() {
     };
   }, [isOpen]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogoutClick = () => {
     setIsOpen(false);
-    router.push('/login');
+    setLogoutModalOpen(true);
   };
 
   // Don't render until mounted to avoid hydration errors
@@ -130,7 +131,7 @@ export default function UserMenu() {
             </Link>
 
             <button
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
             >
               <LogOut size={18} className="text-[#71767b]" />
@@ -139,6 +140,12 @@ export default function UserMenu() {
           </div>
         </div>
       )}
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+      />
     </div>
   );
 }

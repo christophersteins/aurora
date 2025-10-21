@@ -11,20 +11,21 @@ import UserMenu from './UserMenu';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
+import LogoutModal from './LogoutModal';
 
 export default function Header() {
   const router = useRouter();
-  const { isAuthenticated, logout, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const t = useTranslations('nav');
 
-  const handleLogout = () => {
-    logout();
+  const handleLogoutClick = () => {
     setMobileMenuOpen(false);
-    router.push('/login');
+    setLogoutModalOpen(true);
   };
 
   const closeMobileMenu = () => {
@@ -153,8 +154,6 @@ export default function Header() {
                   </Link>
 
                   <UserMenu />
-
-                  <LanguageSwitcher />
                 </>
               )}
             </div>
@@ -252,10 +251,12 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Language Switcher */}
-            <div className="mt-6 pt-6 border-t border-[#2f3336]">
-              <LanguageSwitcher />
-            </div>
+            {/* Language Switcher - Only for logged out users */}
+            {!isAuthenticated && (
+              <div className="mt-6 pt-6 border-t border-[#2f3336]">
+                <LanguageSwitcher />
+              </div>
+            )}
 
             {/* Auth Buttons / User Menu */}
             <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-1">
@@ -312,7 +313,7 @@ export default function Header() {
                     <span>{t('settings')}</span>
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <LogOut size={18} className="text-[#71767b]" />
@@ -345,6 +346,12 @@ export default function Header() {
         isOpen={forgotPasswordModalOpen}
         onClose={closeModals}
         onBackToLogin={handleBackToLoginFromForgotPassword}
+      />
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
       />
     </>
   );
