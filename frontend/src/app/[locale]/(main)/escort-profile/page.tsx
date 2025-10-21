@@ -39,15 +39,8 @@ export default function EscortProfilePage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-heading">Mein Escort-Profil</h1>
-          <p className="text-muted mt-2">
-            Bearbeite deine Profilinformationen
-          </p>
-        </div>
-
+    <div className="min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         <EscortProfileForm />
       </div>
     </div>

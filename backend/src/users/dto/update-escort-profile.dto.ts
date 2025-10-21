@@ -2,6 +2,14 @@ import { IsOptional, IsDateString, IsArray, IsInt, IsString, IsBoolean, Min, Max
 
 export class UpdateEscortProfileDto {
   @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  showNameInProfile?: boolean;
+
+  @IsOptional()
   @IsDateString()
   birthDate?: string;
 

@@ -12,6 +12,8 @@ export interface User {
     coordinates: [number, number];
   };
   // Escort-spezifische Felder
+  name?: string;
+  showNameInProfile?: boolean;
   birthDate?: string;
   nationalities?: string[];
   languages?: string[];
@@ -57,6 +59,8 @@ export interface AuthResponse {
 }
 
 export interface UpdateEscortProfileDto {
+  name?: string;
+  showNameInProfile?: boolean;
   birthDate?: string;
   nationalities?: string[];
   languages?: string[];

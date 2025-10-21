@@ -62,7 +62,13 @@ export class User {
   location: any;
 
   // === ESCORT-SPEZIFISCHE FELDER ===
-  
+
+  @Column({ nullable: true })
+  name: string;
+
+  @Column({ type: 'boolean', default: false })
+  showNameInProfile: boolean;
+
   @Column({ type: 'date', nullable: true })
   birthDate: Date;
 

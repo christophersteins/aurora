@@ -149,6 +149,8 @@ export class UsersService {
   async updateEscortProfile(
     userId: string,
     updateData: {
+      name?: string;
+      showNameInProfile?: boolean;
       birthDate?: string;
       nationalities?: string[];
       languages?: string[];
@@ -180,6 +182,10 @@ export class UsersService {
     if (user.role !== UserRole.ESCORT) {
       throw new Error('Only users with ESCORT role can update escort profile');
     }
+
+    // Update name and toggle
+    if (updateData.name !== undefined) user.name = updateData.name;
+    if (updateData.showNameInProfile !== undefined) user.showNameInProfile = updateData.showNameInProfile;
 
     // Convert birthDate from string to Date if present
     if (updateData.birthDate !== undefined) {
