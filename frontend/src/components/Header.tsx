@@ -115,6 +115,7 @@ export default function Header() {
             <div className="hidden md:flex items-center space-x-3">
               {!isAuthenticated ? (
                 <>
+                  <LanguageSwitcher />
                   <button
                     onClick={openLoginModal}
                     className="btn-base btn-secondary !py-2 !px-4 text-sm"
@@ -127,7 +128,6 @@ export default function Header() {
                   >
                     {t('register')}
                   </button>
-                  <LanguageSwitcher />
                 </>
               ) : (
                 <>
@@ -153,6 +153,8 @@ export default function Header() {
                   </Link>
 
                   <UserMenu />
+
+                  <LanguageSwitcher />
                 </>
               )}
             </div>
