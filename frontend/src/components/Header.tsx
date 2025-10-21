@@ -113,7 +113,6 @@ export default function Header() {
 
             {/* Desktop Buttons - Rechts */}
             <div className="hidden md:flex items-center space-x-3">
-              <LanguageSwitcher />
               {!isAuthenticated ? (
                 <>
                   <button
@@ -128,12 +127,13 @@ export default function Header() {
                   >
                     {t('register')}
                   </button>
+                  <LanguageSwitcher />
                 </>
               ) : (
                 <>
                   {/* Notifications Icon */}
                   <button
-                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] hover:bg-[#2f3336] rounded-lg transition relative"
+                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative"
                     aria-label="Benachrichtigungen"
                   >
                     <Bell size={20} />
@@ -144,7 +144,7 @@ export default function Header() {
                   {/* Messages Icon */}
                   <Link
                     href="/chat"
-                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] hover:bg-[#2f3336] rounded-lg transition relative"
+                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative"
                     aria-label="Nachrichten"
                   >
                     <MessageCircle size={20} />
@@ -216,35 +216,35 @@ export default function Header() {
               <Link
                 href="/members"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('members')}
               </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('clubsAndCo')}
               </Link>
               <Link
                 href="/videos"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('videos')}
               </Link>
               <Link
                 href="/premium"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('premium')}
               </Link>
               <Link
                 href="/faq"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
                 {t('faq')}
               </Link>
@@ -277,7 +277,7 @@ export default function Header() {
                   {/* Notifications Link */}
                   <button
                     onClick={closeMobileMenu}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <Bell size={18} className="text-[#71767b]" />
                     <span>Benachrichtigungen</span>
@@ -287,7 +287,7 @@ export default function Header() {
                   <Link
                     href="/chat"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <MessageCircle size={18} className="text-[#71767b]" />
                     <span>Nachrichten</span>
@@ -296,7 +296,7 @@ export default function Header() {
                   <Link
                     href="/escort-profile"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <User size={18} className="text-[#71767b]" />
                     <span>{t('myProfile')}</span>
@@ -304,14 +304,14 @@ export default function Header() {
                   <Link
                     href="/settings"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <Settings size={18} className="text-[#71767b]" />
                     <span>{t('settings')}</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
                     <LogOut size={18} className="text-[#71767b]" />
                     <span>{t('logout')}</span>

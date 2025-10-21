@@ -76,7 +76,7 @@ export default function UserMenu() {
       {/* User Menu Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-[#2f3336] transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 rounded-full hover:text-[#8b5cf6] transition-colors"
         aria-label="User menu"
       >
         {/* Profile Picture or Initial */}
@@ -95,7 +95,7 @@ export default function UserMenu() {
         )}
 
         {/* Username */}
-        <span className="text-[#e7e9ea] font-medium hidden sm:block max-w-[100px] truncate">
+        <span className="text-[#e7e9ea] font-medium hidden sm:block max-w-[100px] truncate hover:text-[#8b5cf6] transition-colors">
           {displayName}
         </span>
 
@@ -109,12 +109,6 @@ export default function UserMenu() {
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 bg-[#15202b] border border-[#2f3336] rounded-lg shadow-lg py-2 z-50">
-          {/* User Info */}
-          <div className="px-4 py-3 border-b border-[#2f3336]">
-            <p className="text-[#e7e9ea] font-medium truncate">{displayName}</p>
-            <p className="text-[#71767b] text-sm truncate">{user.email}</p>
-          </div>
-
           {/* Menu Items */}
           <div className="py-1">
             <Link
