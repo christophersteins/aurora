@@ -85,8 +85,8 @@ export default function HomePage() {
         (position) => {
           const { latitude, longitude } = position.coords;
 
-          // Redirect to members page with coordinates
-          router.push(`/members?lat=${latitude}&lon=${longitude}&radius=20`);
+          // Redirect to escorts page with coordinates
+          router.push(`/escorts?lat=${latitude}&lon=${longitude}&radius=20`);
 
           setIsLoadingLocation(false);
         },
@@ -107,8 +107,8 @@ export default function HomePage() {
     const latitude = parseFloat(suggestion.lat);
     const longitude = parseFloat(suggestion.lon);
 
-    // Redirect to members page with coordinates
-    router.push(`/members?lat=${latitude}&lon=${longitude}&radius=20`);
+    // Redirect to escorts page with coordinates
+    router.push(`/escorts?lat=${latitude}&lon=${longitude}&radius=20`);
   };
 
   // Handle search submit

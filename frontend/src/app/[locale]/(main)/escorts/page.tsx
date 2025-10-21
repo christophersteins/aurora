@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown } from 'lucide-react';
+import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star } from 'lucide-react';
 
 // Filter-Interface
 interface Filters {
@@ -615,6 +615,7 @@ export default function MembersPage() {
             <div className="flex gap-3">
               {/* Location Search Field */}
               <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -625,7 +626,7 @@ export default function MembersPage() {
                   }}
                   onFocus={() => setShowSuggestions(true)}
                   placeholder="Stadt oder PLZ..."
-                  className="w-full pl-4 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
+                  className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                 />
                 
                 {/* Clear or Location Icon */}
@@ -725,7 +726,7 @@ export default function MembersPage() {
                     className="p-2 rounded-lg border border-default bg-page-secondary text-body hover:border-primary transition"
                     title="Sortierung"
                   >
-                    <ArrowUpDown className="w-5 h-5" />
+                    <ArrowUpDown className="w-5 h-5 text-muted" />
                   </button>
 
                   {showMobileSortDropdown && (
@@ -795,6 +796,7 @@ export default function MembersPage() {
 
             {/* Location Search Field */}
             <div className="flex-1 max-w-md relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -805,7 +807,7 @@ export default function MembersPage() {
                 }}
                 onFocus={() => setShowSuggestions(true)}
                 placeholder="Stadt oder PLZ suchen..."
-                className="w-full pl-4 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
+                className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
               />
               
               {/* Clear or Location Icon */}
@@ -983,10 +985,10 @@ export default function MembersPage() {
                     )}
 
                     {/* Premium Badge */}
-                    <div className="absolute top-3 right-3 flex items-center justify-center w-7 h-7 rounded-full backdrop-blur-sm"
+                    <div className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full backdrop-blur-sm"
                          style={{
-                           background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%)',
-                           boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
+                           background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(124, 58, 237, 0.85) 100%)',
+                           boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
                          }}>
                       <Crown className="w-3.5 h-3.5" style={{ color: '#fbbf24', fill: '#fbbf24' }} />
                     </div>
@@ -1003,15 +1005,15 @@ export default function MembersPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm text-muted">
+                    <div className="flex items-center justify-between text-sm text-muted">
                       {/* Show distance */}
-                      {filters.useRadius && filters.userLatitude && filters.userLongitude && escort.location && (
+                      {filters.userLatitude && filters.userLongitude && escort.location ? (
                         <span className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
                           {(() => {
                             const coords = escort.location.coordinates;
                             if (!coords || coords.length !== 2) return 'N/A';
-                            
+
                             const [escortLon, escortLat] = coords;
                             const distance = calculateDistance(
                               filters.userLatitude,
@@ -1019,14 +1021,22 @@ export default function MembersPage() {
                               escortLat,
                               escortLon
                             );
-                            
-                            return `${Math.round(distance)}km`;
+
+                            return `${Math.round(distance)} km`;
                           })()}
                         </span>
+                      ) : (
+                        <span></span>
                       )}
 
-                      {/* Age */}
-                      {age && <span>{age} Jahre</span>}
+                      {/* Star Rating (2.5 for testing) */}
+                      <div className="flex items-center gap-1">
+                        <Star
+                          className="w-3.5 h-3.5"
+                          style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }}
+                        />
+                        <span className="text-sm text-body font-normal">2.5</span>
+                      </div>
                     </div>
                   </div>
                 </div>

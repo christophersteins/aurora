@@ -122,7 +122,7 @@ export default function ProfilePage() {
           <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-primary)', borderColor: 'var(--color-primary)' }}>
             <p style={{ color: 'var(--color-primary)' }}>{error || 'Profile not found'}</p>
           </div>
-          <button onClick={() => router.push('/members')} className="btn-base btn-primary">
+          <button onClick={() => router.push('/escorts')} className="btn-base btn-primary">
             Zurück zur Übersicht
           </button>
         </div>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
     <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Back Button */}
-        <button onClick={() => router.push('/members')} className="mb-6 btn-base btn-secondary">
+        <button onClick={() => router.push('/escorts')} className="mb-6 btn-base btn-secondary">
           ← Zurück
         </button>
 

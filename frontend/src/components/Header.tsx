@@ -80,7 +80,7 @@ export default function Header() {
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
-                  href="/members"
+                  href="/escorts"
                   className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
                 >
                   {t('members')}
@@ -215,7 +215,7 @@ export default function Header() {
             {/* Navigation Links */}
             <nav className="space-y-1">
               <Link
-                href="/members"
+                href="/escorts"
                 onClick={closeMobileMenu}
                 className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
               >
