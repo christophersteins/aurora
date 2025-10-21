@@ -6,6 +6,7 @@ import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
 import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 // Filter-Interface
 interface Filters {
@@ -80,6 +81,7 @@ type GridView = 'compact' | 'comfortable';
 export default function MembersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('members');
   const [escorts, setEscorts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -583,7 +585,7 @@ export default function MembersPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-muted">Lädt...</p>
+        <p className="text-xl text-muted">{t('loading')}</p>
       </div>
     );
   }
@@ -597,7 +599,7 @@ export default function MembersPage() {
             onClick={() => window.location.reload()}
             className="btn-base btn-primary"
           >
-            Erneut versuchen
+            {t('retry')}
           </button>
         </div>
       </div>
@@ -609,7 +611,7 @@ export default function MembersPage() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl text-heading">Escorts</h1>
+          <h1 className="text-4xl text-heading">{t('title')}</h1>
         </div>
 
         {/* Toolbar */}
@@ -630,7 +632,7 @@ export default function MembersPage() {
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
-                  placeholder="Stadt oder PLZ..."
+                  placeholder={t('searchPlaceholder')}
                   className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                 />
                 
@@ -639,7 +641,7 @@ export default function MembersPage() {
                   onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
                   disabled={isLoadingLocation}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition"
-                  title={locationSearch ? 'Suche löschen' : 'Aktuellen Standort verwenden'}
+                  title={locationSearch ? t('clearSearch') : t('useCurrentLocation')}
                 >
                   {isLoadingLocation ? (
                     <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -705,10 +707,10 @@ export default function MembersPage() {
                 />
                 {!locationSearch && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    <span className="text-sm text-body">Bitte zuerst Stadt oder PLZ eingeben</span>
+                    <span className="text-sm text-body">{t('radiusTooltip')}</span>
                   </div>
                 )}
-                <span className="text-muted text-sm whitespace-nowrap">km</span>
+                <span className="text-muted text-sm whitespace-nowrap">{t('km')}</span>
               </div>
             </div>
 
@@ -720,10 +722,10 @@ export default function MembersPage() {
                 className="btn-base btn-primary flex items-center justify-center gap-2"
               >
                 <ListFilter className="w-5 h-5" />
-                Filter
+                {t('filter')}
                 {hasActiveFilters() && (
                   <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: '#eff3f4', color: '#8b5cf6' }}>
-                    Aktiv
+                    {t('active')}
                   </span>
                 )}
               </button>
@@ -735,7 +737,7 @@ export default function MembersPage() {
                   <button
                     onClick={() => setShowMobileSortDropdown(!showMobileSortDropdown)}
                     className="p-2 rounded-lg border border-default bg-page-secondary text-body hover:border-primary transition"
-                    title="Sortierung"
+                    title={t('sorting')}
                   >
                     <ArrowUpDown className="w-5 h-5 text-muted" />
                   </button>
@@ -750,7 +752,7 @@ export default function MembersPage() {
                         className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-body">Entfernung aufsteigend</span>
+                          <span className="text-body">{t('sortDistanceAsc')}</span>
                           {sortBy === 'distance' && (
                             <div className="w-2 h-2 bg-primary rounded-full"></div>
                           )}
@@ -769,7 +771,7 @@ export default function MembersPage() {
                         ? 'bg-action-primary text-button-primary border-primary'
                         : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                     }`}
-                    title="Kompakte Ansicht"
+                    title={t('compactView')}
                   >
                     <LayoutGrid className="w-5 h-5" />
                   </button>
@@ -780,7 +782,7 @@ export default function MembersPage() {
                         ? 'bg-action-primary text-button-primary border-primary'
                         : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                     }`}
-                    title="Komfortable Ansicht"
+                    title={t('comfortableView')}
                   >
                     <Grid3x3 className="w-5 h-5" />
                   </button>
@@ -797,10 +799,10 @@ export default function MembersPage() {
               className="btn-base btn-primary flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <ListFilter className="w-5 h-5" />
-              Filter
+              {t('filter')}
               {hasActiveFilters() && (
                 <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: '#eff3f4', color: '#8b5cf6' }}>
-                  Aktiv
+                  {t('active')}
                 </span>
               )}
             </button>
@@ -817,7 +819,7 @@ export default function MembersPage() {
                   setShowSuggestions(true);
                 }}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Stadt oder PLZ suchen..."
+                placeholder={t('desktopSearchPlaceholder')}
                 className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
               />
               
@@ -826,7 +828,7 @@ export default function MembersPage() {
                 onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
                 disabled={isLoadingLocation}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition"
-                title={locationSearch ? 'Suche löschen' : 'Aktuellen Standort verwenden'}
+                title={locationSearch ? t('clearSearch') : t('useCurrentLocation')}
               >
                 {isLoadingLocation ? (
                   <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -892,7 +894,7 @@ export default function MembersPage() {
               />
               {!locationSearch && (
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  <span className="text-sm text-body">Bitte zuerst Stadt oder PLZ eingeben</span>
+                  <span className="text-sm text-body">{t('radiusTooltip')}</span>
                 </div>
               )}
               <span className="text-muted text-sm whitespace-nowrap">km</span>
@@ -909,7 +911,7 @@ export default function MembersPage() {
                 onChange={(e) => setSortBy(e.target.value as 'distance')}
                 className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-muted appearance-none cursor-pointer"
               >
-                <option value="distance">Entfernung aufsteigend</option>
+                <option value="distance">{t('sortDistanceAsc')}</option>
               </select>
             </div>
 
@@ -922,7 +924,7 @@ export default function MembersPage() {
                     ? 'bg-action-primary text-button-primary border-primary'
                     : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                 }`}
-                title="Kompakte Ansicht"
+                title={t('compactView')}
               >
                 <LayoutGrid className="w-5 h-5" />
               </button>
@@ -933,40 +935,40 @@ export default function MembersPage() {
                     ? 'bg-action-primary text-button-primary border-primary'
                     : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
                 }`}
-                title="Komfortable Ansicht"
+                title={t('comfortableView')}
               >
                 <Grid3x3 className="w-5 h-5" />
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Reset filters (if active) */}
-        {hasActiveFilters() && (
-          <div className="mb-6">
-            <button
-              onClick={handleResetFilters}
-              className="text-sm link-primary"
-            >
-              Alle Filter zurücksetzen
-            </button>
-          </div>
-        )}
+          {/* Reset filters (if active) */}
+          {hasActiveFilters() && (
+            <div className="mt-3">
+              <button
+                onClick={handleResetFilters}
+                className="text-sm link-primary hover:underline"
+              >
+                {t('resetAllFilters')}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Escorts Grid */}
         {sortedEscorts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted text-lg mb-4">
               {hasActiveFilters()
-                ? 'Keine Escorts mit den ausgewählten Filtern gefunden'
-                : 'Keine Escorts gefunden'}
+                ? t('noResultsWithFilters')
+                : t('noResults')}
             </p>
             {hasActiveFilters() && (
               <button
                 onClick={handleResetFilters}
                 className="btn-base btn-primary"
               >
-                Filter zurücksetzen
+                {t('resetFilters')}
               </button>
             )}
           </div>
@@ -1015,7 +1017,7 @@ export default function MembersPage() {
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <h3 className="text-base font-normal text-body">
-                        {escort.username || 'Unbekannt'}
+                        {escort.username || t('unknown')}
                       </h3>
                       <div className="flex items-center justify-center w-4 h-4 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
                         <Check className="w-2.5 h-2.5" style={{ color: 'var(--text-button)', strokeWidth: 3 }} />
