@@ -1,7 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
 import { locales } from './i18n';
+import { defineRouting } from 'next-intl/routing';
 
-export default createMiddleware({
+export const routing = defineRouting({
   // A list of all locales that are supported
   locales,
 
@@ -17,8 +18,31 @@ export default createMiddleware({
   // The locale prefix strategy
   // 'always': always show locale in URL (/en/page, /de/page)
   // 'as-needed': only show locale if not default (/page for en, /de/page for de)
-  localePrefix: 'always'
+  localePrefix: 'always',
+
+  // Localized pathnames
+  pathnames: {
+    '/': '/',
+    '/login': {
+      en: '/login',
+      de: '/anmelden'
+    },
+    '/signup': {
+      en: '/signup',
+      de: '/registrieren'
+    },
+    '/forgot-password': {
+      en: '/forgot-password',
+      de: '/passwort-vergessen'
+    },
+    '/verify-email': {
+      en: '/verify-email',
+      de: '/email-verifizieren'
+    }
+  }
 });
+
+export default createMiddleware(routing);
 
 export const config = {
   // Match only internationalized pathnames

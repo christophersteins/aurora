@@ -2,11 +2,13 @@ import apiClient from '@/lib/api-client';
 
 export interface RegisterData {
   email: string;
+}
+
+export interface VerifyEmailData {
+  token: string;
   username: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
-  role?: 'customer' | 'escort' | 'business';
+  role: 'customer' | 'escort' | 'business';
 }
 
 export interface LoginData {
@@ -27,8 +29,13 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async register(data: RegisterData): Promise<AuthResponse> {
+  async register(data: RegisterData): Promise<{ message: string; user: { id: string; email: string; emailVerified: boolean } }> {
     const response = await apiClient.post('/auth/register', data);
+    return response.data;
+  },
+
+  async verifyEmail(data: VerifyEmailData): Promise<AuthResponse> {
+    const response = await apiClient.post('/auth/verify-email', data);
     return response.data;
   },
 

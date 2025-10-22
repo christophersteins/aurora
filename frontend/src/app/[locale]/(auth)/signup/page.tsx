@@ -14,23 +14,36 @@ export default function RegisterPage() {
   const tCommon = useTranslations('common');
 
   const [email, setEmail] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [termsError, setTermsError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setTermsError('');
+    setSuccess(false);
+
+    // Check if terms are agreed
+    if (!agreedToTerms) {
+      setTermsError(t('mustAgreeToTerms'));
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // TODO: Later implement email verification flow
-      // For now, just show a placeholder message
-      console.log('Email submitted for registration:', email);
-      setError(t('emailVerificationLater'));
-    } catch (err) {
-      const errorMessage = err instanceof Error
-        ? err.message
-        : t('registrationFailed');
+      const response = await authService.register({
+        email,
+      });
+
+      // Registration successful - show success message
+      setSuccess(true);
+      setEmail('');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || t('registrationFailed');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -47,7 +60,7 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-heading mb-2">Aurora</h1>
-          <p className="text-muted">Create your account</p>
+          <p className="text-muted">{t('registerTitle')}</p>
         </div>
 
         {/* Register Card */}
@@ -59,6 +72,14 @@ export default function RegisterPage() {
           {error && (
             <div className="mb-6 p-4 bg-error-light border border-error rounded-lg">
               <p className="text-error text-sm">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-4 bg-green-500/10 border border-green-500/50 rounded-lg">
+              <p className="text-green-400 text-sm">
+                {t('registrationSuccess')}
+              </p>
             </div>
           )}
 
@@ -128,11 +149,49 @@ export default function RegisterPage() {
               />
             </div>
 
+            {/* Terms Checkbox */}
+            <div>
+              <div className="flex items-start gap-3 pt-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded border-gray-600 text-[#8b5cf6] focus:ring-[#8b5cf6] focus:ring-1"
+                />
+                <label htmlFor="terms" className="text-sm text-muted leading-relaxed font-normal">
+                  {t('agreeToTermsPart1')}{' '}
+                  <Link href="/privacy" className="link-default">
+                    {t('privacyPolicy')}
+                  </Link>
+                  {t('agreeToTermsPart2')}
+                </label>
+              </div>
+              {termsError && (
+                <div className="mt-2 flex items-start gap-2">
+                  <svg
+                    className="w-4 h-4 text-error flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 10l7-7m0 0l7 7m-7-7v18"
+                    />
+                  </svg>
+                  <p className="text-error text-sm">{termsError}</p>
+                </div>
+              )}
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-base btn-primary mt-6"
+              className="w-full btn-base btn-primary mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t('loading') : tCommon('continue')}
             </button>

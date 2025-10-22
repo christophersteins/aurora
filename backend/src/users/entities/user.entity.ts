@@ -26,6 +26,15 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   lastUsernameChange: Date;
 
+  @Column({ type: 'boolean', default: false })
+  emailVerified: boolean;
+
+  @Column({ nullable: true })
+  emailVerificationToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  emailVerificationExpires: Date;
+
   @Column({ nullable: true })
   firstName: string;
 

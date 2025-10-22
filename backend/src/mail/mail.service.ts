@@ -89,7 +89,7 @@ export class MailService {
 
   async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
     const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
-    
+
     await this.sendMail({
       to: email,
       subject: 'Reset Your Password',
@@ -104,6 +104,27 @@ export class MailService {
         <p>Best regards,<br>The Aurora Team</p>
       `,
       text: `Password Reset Request. Click this link to reset your password: ${resetUrl}. This link will expire in 1 hour.`,
+    });
+  }
+
+  async sendVerificationEmail(email: string, verificationToken: string): Promise<void> {
+    const verificationUrl = `http://localhost:3000/verify-email?token=${verificationToken}`;
+
+    await this.sendMail({
+      to: email,
+      subject: 'Verify Your Email Address',
+      html: `
+        <h1>Welcome to Aurora!</h1>
+        <p>Thank you for registering. Please verify your email address to complete your registration.</p>
+        <p>Click the button below to verify your email:</p>
+        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #8b5cf6; color: white; text-decoration: none; border-radius: 5px; margin: 15px 0;">Verify Email Address</a>
+        <p>Or copy this link: ${verificationUrl}</p>
+        <p>This link will expire in 24 hours.</p>
+        <p>If you didn't create an account, please ignore this email.</p>
+        <br>
+        <p>Best regards,<br>The Aurora Team</p>
+      `,
+      text: `Welcome to Aurora! Please verify your email address by clicking this link: ${verificationUrl}. This link will expire in 24 hours.`,
     });
   }
 }

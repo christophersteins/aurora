@@ -65,7 +65,7 @@ export default function LandingPage() {
                 {tNav('login')}
               </Link>
               <Link
-                href="/register"
+                href="/signup"
                 className="px-6 py-2 bg-white text-purple-600 rounded-full font-medium hover:bg-purple-50 transition-colors"
               >
                 {tNav('register')}

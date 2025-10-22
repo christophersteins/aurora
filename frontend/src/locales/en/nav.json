@@ -1,8 +1,8 @@
 {
   "welcome": "Welcome",
   "myProfile": "My Profile",
-  "login": "Login",
-  "register": "Register",
+  "login": "Log in",
+  "register": "Sign up",
   "logout": "Logout",
   "adminPanel": "Admin Panel",
   "close": "Close",

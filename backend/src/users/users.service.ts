@@ -19,11 +19,14 @@ export class UsersService {
     firstName?: string;
     lastName?: string;
     role?: UserRole;
+    emailVerificationToken?: string;
+    emailVerificationExpires?: Date;
+    emailVerified?: boolean;
   }): Promise<User> {
     // Hash the password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    // Create user with all data including role
+    // Create user with all data including role and email verification fields
     const user = this.usersRepository.create({
       email: userData.email,
       username: userData.username,
@@ -31,6 +34,9 @@ export class UsersService {
       firstName: userData.firstName,
       lastName: userData.lastName,
       role: userData.role || UserRole.CUSTOMER, // Default: CUSTOMER
+      emailVerificationToken: userData.emailVerificationToken,
+      emailVerificationExpires: userData.emailVerificationExpires,
+      emailVerified: userData.emailVerified ?? false,
     });
 
     return this.usersRepository.save(user);
@@ -380,5 +386,68 @@ export class UsersService {
     }
 
     return { canChange: true };
+  }
+
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { emailVerificationToken: token }
+    });
+  }
+
+  async verifyEmail(userId: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.emailVerified = true;
+    user.emailVerificationToken = null as any;
+    user.emailVerificationExpires = null as any;
+
+    return this.usersRepository.save(user);
+  }
+
+  async updateVerificationToken(
+    userId: string,
+    token: string,
+    expires: Date
+  ): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.emailVerificationToken = token;
+    user.emailVerificationExpires = expires;
+
+    return this.usersRepository.save(user);
+  }
+
+  async completeRegistration(
+    userId: string,
+    username: string,
+    password: string,
+    role: string
+  ): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update user with new data and mark as verified
+    user.username = username.toLowerCase();
+    user.password = hashedPassword;
+    user.role = role as UserRole;
+    user.emailVerified = true;
+    user.emailVerificationToken = null as any;
+    user.emailVerificationExpires = null as any;
+
+    return this.usersRepository.save(user);
   }
 }

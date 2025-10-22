@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { SocketProvider } from '@/contexts/SocketContext';
 import LocaleDetector from '@/components/LocaleDetector';
 import { locales } from '@/i18n';
+import Script from 'next/script';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -29,15 +30,20 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className="flex flex-col min-h-screen">
-        <NextIntlClientProvider messages={messages}>
-          <LocaleDetector />
-          <SocketProvider>
-            {children}
-          </SocketProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <>
+      <Script
+        id="set-locale"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang = "${locale}";`,
+        }}
+      />
+      <NextIntlClientProvider messages={messages}>
+        <LocaleDetector />
+        <SocketProvider>
+          {children}
+        </SocketProvider>
+      </NextIntlClientProvider>
+    </>
   );
 }
