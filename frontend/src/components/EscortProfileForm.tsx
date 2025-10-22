@@ -250,7 +250,7 @@ export default function EscortProfileForm() {
               </p>
               <button
                 onClick={() => setShowProfilePictureModal(true)}
-                className="text-sm text-action-primary hover:text-action-primary-hover transition-colors mt-1"
+                className="text-sm text-action-primary hover:text-action-primary-hover transition-colors mt-1 cursor-pointer"
               >
                 Profilbild ändern
               </button>
@@ -270,7 +270,7 @@ export default function EscortProfileForm() {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary ${
+                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
                     style={{ borderRadius: 0 }}
@@ -290,7 +290,7 @@ export default function EscortProfileForm() {
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setActiveSection(null)}
-            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover"
+            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Zurück</span>
@@ -310,7 +310,7 @@ export default function EscortProfileForm() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSidebarSection(section.id)}
-                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary ${
+                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary cursor-pointer ${
                     activeSidebarSection === section.id
                       ? 'bg-page-secondary'
                       : 'bg-page-primary'
@@ -372,7 +372,7 @@ export default function EscortProfileForm() {
                 </p>
                 <button
                   onClick={() => setShowProfilePictureModal(true)}
-                  className="text-sm text-action-primary hover:text-action-primary-hover transition-colors"
+                  className="text-sm text-action-primary hover:text-action-primary-hover transition-colors cursor-pointer"
                 >
                   Profilbild ändern
                 </button>
@@ -1094,7 +1094,7 @@ export default function EscortProfileForm() {
             </div>
             <button
               onClick={() => setError(null)}
-              className="flex-shrink-0 text-muted hover:text-heading transition-colors"
+              className="flex-shrink-0 text-muted hover:text-heading transition-colors cursor-pointer"
             >
               ✕
             </button>
@@ -1113,7 +1113,7 @@ export default function EscortProfileForm() {
                   setShowProfilePictureModal(false);
                   setProfilePicture(null);
                 }}
-                className="text-muted hover:text-heading transition-colors"
+                className="text-muted hover:text-heading transition-colors cursor-pointer"
               >
                 ✕
               </button>
@@ -1163,7 +1163,7 @@ export default function EscortProfileForm() {
                   setShowProfilePictureModal(false);
                   setProfilePicture(null);
                 }}
-                className="flex-1 px-4 py-2 rounded-lg border border-[#2f3336] text-body hover-bg-page-secondary transition-all"
+                className="flex-1 px-4 py-2 rounded-lg border border-[#2f3336] text-body hover-bg-page-secondary transition-all cursor-pointer"
               >
                 Abbrechen
               </button>
@@ -1171,7 +1171,7 @@ export default function EscortProfileForm() {
                 type="button"
                 onClick={handleUploadProfilePicture}
                 disabled={!profilePicture || uploadingPicture}
-                className="flex-1 btn-base btn-primary"
+                className="flex-1 btn-base btn-primary cursor-pointer"
               >
                 {uploadingPicture ? 'Lädt hoch...' : 'Hochladen'}
               </button>

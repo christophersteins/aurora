@@ -170,7 +170,7 @@ export default function HomePage() {
                     type="button"
                     onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
                     disabled={isLoadingLocation}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 hover:bg-page-primary rounded transition"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 hover:bg-page-primary rounded transition cursor-pointer"
                     title={locationSearch ? 'Suche löschen' : 'Aktuellen Standort verwenden'}
                   >
                     {isLoadingLocation ? (
@@ -202,7 +202,7 @@ export default function HomePage() {
                             key={index}
                             type="button"
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="w-full text-left px-6 py-4 hover:bg-page-primary border-b border-default last:border-b-0 transition"
+                            className="w-full text-left px-6 py-4 hover:bg-page-primary border-b border-default last:border-b-0 transition cursor-pointer"
                           >
                             <div className="text-body font-medium">{cityName}</div>
                             {postcode && (

@@ -223,7 +223,7 @@ export default function SettingsPage() {
                       setActiveSection(section.id);
                       localStorage.setItem('settings-active-section', section.id);
                     }}
-                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary ${
+                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
                     style={{ borderRadius: 0 }}
@@ -243,7 +243,7 @@ export default function SettingsPage() {
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setActiveSection(null)}
-            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover"
+            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>{t('back')}</span>
@@ -263,7 +263,7 @@ export default function SettingsPage() {
                     setActiveSidebarSection(section.id);
                     localStorage.setItem('settings-active-section', section.id);
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary ${
+                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary cursor-pointer ${
                     activeSidebarSection === section.id
                       ? 'bg-page-secondary'
                       : 'bg-page-primary'
@@ -313,7 +313,7 @@ export default function SettingsPage() {
                             disabled={!canChangeUsername}
                             className={`text-sm font-medium ${
                               canChangeUsername
-                                ? 'text-action-primary hover:underline'
+                                ? 'text-action-primary hover:underline cursor-pointer'
                                 : 'text-muted cursor-not-allowed'
                             }`}
                           >
@@ -347,7 +347,7 @@ export default function SettingsPage() {
                           <button
                             onClick={handleUsernameUpdate}
                             disabled={isLoading}
-                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             {t('account.username.save')}
                           </button>
@@ -358,7 +358,7 @@ export default function SettingsPage() {
                               setUsernameError('');
                             }}
                             disabled={isLoading}
-                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors cursor-pointer"
                           >
                             {t('account.username.cancel')}
                           </button>
@@ -385,7 +385,7 @@ export default function SettingsPage() {
                             setIsEditingEmail(true);
                             setNewEmail(user?.email || '');
                           }}
-                          className="text-sm font-medium text-action-primary hover:underline"
+                          className="text-sm font-medium text-action-primary hover:underline cursor-pointer"
                         >
                           {t('account.email.change')}
                         </button>
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                           <button
                             onClick={handleEmailUpdate}
                             disabled={isLoading}
-                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             {t('account.email.save')}
                           </button>
@@ -417,7 +417,7 @@ export default function SettingsPage() {
                               setEmailError('');
                             }}
                             disabled={isLoading}
-                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors cursor-pointer"
                           >
                             {t('account.email.cancel')}
                           </button>
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                         <p className="text-body">••••••••</p>
                         <button
                           onClick={() => setIsEditingPassword(true)}
-                          className="text-sm font-medium text-action-primary hover:underline"
+                          className="text-sm font-medium text-action-primary hover:underline cursor-pointer"
                         >
                           {t('account.password.change')}
                         </button>
@@ -469,7 +469,7 @@ export default function SettingsPage() {
                           <button
                             onClick={handlePasswordUpdate}
                             disabled={isLoading}
-                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
                           >
                             {t('account.password.save')}
                           </button>
@@ -481,7 +481,7 @@ export default function SettingsPage() {
                               setPasswordError('');
                             }}
                             disabled={isLoading}
-                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors cursor-pointer"
                           >
                             {t('account.password.cancel')}
                           </button>

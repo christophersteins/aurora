@@ -77,7 +77,7 @@ export default function UserMenu() {
       {/* User Menu Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-full hover:text-[#8b5cf6] transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 rounded-full hover:text-[#8b5cf6] transition-colors cursor-pointer"
         aria-label="User menu"
       >
         {/* Profile Picture or Initial */}
@@ -132,7 +132,7 @@ export default function UserMenu() {
 
             <button
               onClick={handleLogoutClick}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
+              className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors cursor-pointer"
             >
               <LogOut size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('logout')}</span>

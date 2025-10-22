@@ -134,7 +134,7 @@ export default function Header() {
                 <>
                   {/* Notifications Icon */}
                   <button
-                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative"
+                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative cursor-pointer"
                     aria-label="Benachrichtigungen"
                   >
                     <Bell size={20} />
@@ -161,7 +161,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition"
+              className="md:hidden p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer"
               aria-label="Menu"
             >
               {mobileMenuOpen ? <X size={24} /> : <AlignJustify size={24} />}
@@ -186,7 +186,7 @@ export default function Header() {
             <div className="flex justify-end mb-6">
               <button
                 onClick={closeMobileMenu}
-                className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition"
+                className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer"
                 aria-label={t('close')}
               >
                 <X size={24} />
@@ -280,7 +280,7 @@ export default function Header() {
                   {/* Notifications Link */}
                   <button
                     onClick={closeMobileMenu}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium cursor-pointer"
                   >
                     <Bell size={18} className="text-[#71767b]" />
                     <span>Benachrichtigungen</span>

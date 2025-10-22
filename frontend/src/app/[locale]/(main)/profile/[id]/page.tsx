@@ -136,7 +136,7 @@ export default function ProfilePage() {
     <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Back Button */}
-        <button onClick={() => router.push('/escorts')} className="mb-6 btn-base btn-secondary">
+        <button onClick={() => router.push('/escorts')} className="mb-6 btn-base btn-secondary cursor-pointer">
           ← Zurück
         </button>
 
@@ -172,8 +172,8 @@ export default function ProfilePage() {
                       <>
                         <button
                           onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                          style={{ 
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                          style={{
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
                             border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -183,8 +183,8 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                          style={{ 
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                          style={{
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
                             border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -220,10 +220,10 @@ export default function ProfilePage() {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all"
+                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer"
                       style={{
-                        border: selectedImageIndex === index 
-                          ? '2px solid var(--color-primary)' 
+                        border: selectedImageIndex === index
+                          ? '2px solid var(--color-primary)'
                           : '2px solid transparent',
                         opacity: selectedImageIndex === index ? 1 : 0.6
                       }}
@@ -297,13 +297,13 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <button
                   onClick={handleMessageClick}
-                  className="w-full btn-base btn-primary"
+                  className="w-full btn-base btn-primary cursor-pointer"
                 >
                   💬 Nachricht schreiben
                 </button>
                 <button
                   onClick={handleDateClick}
-                  className="w-full btn-base btn-secondary"
+                  className="w-full btn-base btn-secondary cursor-pointer"
                 >
                   📅 Date vereinbaren
                 </button>
@@ -365,8 +365,8 @@ export default function ProfilePage() {
             {/* Close Button */}
             <button
               onClick={() => setIsFullscreen(false)}
-              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110"
-              style={{ 
+              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110 cursor-pointer"
+              style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-button)',
                 border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -389,8 +389,8 @@ export default function ProfilePage() {
                 <>
                   <button
                     onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110"
-                    style={{ 
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                    style={{
                       background: 'rgba(0, 0, 0, 0.7)',
                       color: 'var(--text-button)',
                       border: '1px solid rgba(255, 255, 255, 0.3)'
@@ -400,8 +400,8 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110"
-                    style={{ 
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                    style={{
                       background: 'rgba(0, 0, 0, 0.7)',
                       color: 'var(--text-button)',
                       border: '1px solid rgba(255, 255, 255, 0.3)'

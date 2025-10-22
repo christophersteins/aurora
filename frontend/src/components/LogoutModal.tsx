@@ -27,7 +27,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 z-50 animate-fade-in"
+        className="fixed inset-0 bg-black/60 z-50 animate-fade-in cursor-pointer"
         onClick={onClose}
       />
 
@@ -44,7 +44,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-page-secondary rounded-lg transition-colors"
+              className="p-2 hover:bg-page-secondary rounded-lg transition-colors cursor-pointer"
               aria-label="Close"
             >
               <X size={20} className="text-muted" />
@@ -61,13 +61,13 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="flex-1 btn-base btn-secondary"
+                className="flex-1 btn-base btn-secondary cursor-pointer"
               >
                 Abbrechen
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 btn-base btn-primary"
+                className="flex-1 btn-base btn-primary cursor-pointer"
               >
                 Abmelden
               </button>

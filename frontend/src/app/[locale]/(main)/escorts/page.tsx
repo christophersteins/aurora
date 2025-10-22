@@ -691,7 +691,7 @@ export default function MembersPage() {
           <p className="text-xl text-error mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="btn-base btn-primary"
+            className="btn-base btn-primary cursor-pointer"
           >
             {t('retry')}
           </button>
@@ -734,7 +734,7 @@ export default function MembersPage() {
                 <button
                   onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
                   disabled={isLoadingLocation}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer"
                   title={locationSearch ? t('clearSearch') : t('useCurrentLocation')}
                 >
                   {isLoadingLocation ? (
@@ -765,7 +765,7 @@ export default function MembersPage() {
                         <button
                           key={index}
                           onClick={() => handleSuggestionClick(suggestion)}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary border-b border-default last:border-b-0 transition"
+                          className="w-full text-left px-4 py-3 hover:bg-page-primary border-b border-default last:border-b-0 transition cursor-pointer"
                         >
                           <div className="text-body">{cityName}</div>
                           {postcode && (
@@ -813,7 +813,7 @@ export default function MembersPage() {
               {/* Left Side: Filter Button */}
               <button
                 onClick={() => setFilterSidebarOpen(true)}
-                className="btn-base btn-primary flex items-center justify-center gap-2"
+                className="btn-base btn-primary flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ListFilter className="w-5 h-5" />
                 {t('filter')}
@@ -830,7 +830,7 @@ export default function MembersPage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowMobileSortDropdown(!showMobileSortDropdown)}
-                    className="p-2 rounded-lg border border-default bg-page-secondary text-body hover:border-primary transition"
+                    className="p-2 rounded-lg border border-default bg-page-secondary text-body hover:border-primary transition cursor-pointer"
                     title={t('sorting')}
                   >
                     <ArrowUpDown className="w-5 h-5 text-muted" />
@@ -843,7 +843,7 @@ export default function MembersPage() {
                           setSortBy('distance');
                           setShowMobileSortDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default"
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-body">{t('sortDistanceAsc')}</span>
@@ -860,7 +860,7 @@ export default function MembersPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setGridView('compact')}
-                    className={`p-2 rounded-lg border transition ${
+                    className={`p-2 rounded-lg border transition cursor-pointer ${
                       gridView === 'compact'
                         ? 'bg-action-primary text-button-primary border-primary'
                         : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
@@ -871,7 +871,7 @@ export default function MembersPage() {
                   </button>
                   <button
                     onClick={() => setGridView('comfortable')}
-                    className={`p-2 rounded-lg border transition ${
+                    className={`p-2 rounded-lg border transition cursor-pointer ${
                       gridView === 'comfortable'
                         ? 'bg-action-primary text-button-primary border-primary'
                         : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
@@ -890,7 +890,7 @@ export default function MembersPage() {
             {/* Filter Button (ganz links) */}
             <button
               onClick={() => setFilterSidebarOpen(true)}
-              className="btn-base btn-primary flex items-center justify-center gap-2 whitespace-nowrap"
+              className="btn-base btn-primary flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
             >
               <ListFilter className="w-5 h-5" />
               {t('filter')}
@@ -921,7 +921,7 @@ export default function MembersPage() {
               <button
                 onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
                 disabled={isLoadingLocation}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer"
                 title={locationSearch ? t('clearSearch') : t('useCurrentLocation')}
               >
                 {isLoadingLocation ? (
@@ -952,7 +952,7 @@ export default function MembersPage() {
                       <button
                         key={index}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="w-full text-left px-4 py-3 hover:bg-page-primary border-b border-default last:border-b-0 transition"
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary border-b border-default last:border-b-0 transition cursor-pointer"
                       >
                         <div className="text-body">{cityName}</div>
                         {postcode && (
@@ -1013,7 +1013,7 @@ export default function MembersPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setGridView('compact')}
-                className={`p-2 rounded-lg border transition ${
+                className={`p-2 rounded-lg border transition cursor-pointer ${
                   gridView === 'compact'
                     ? 'bg-action-primary text-button-primary border-primary'
                     : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
@@ -1024,7 +1024,7 @@ export default function MembersPage() {
               </button>
               <button
                 onClick={() => setGridView('comfortable')}
-                className={`p-2 rounded-lg border transition ${
+                className={`p-2 rounded-lg border transition cursor-pointer ${
                   gridView === 'comfortable'
                     ? 'bg-action-primary text-button-primary border-primary'
                     : 'bg-page-secondary text-muted border-default hover:border-primary hover:text-action-primary'
@@ -1041,7 +1041,7 @@ export default function MembersPage() {
             <div className="mt-3">
               <button
                 onClick={handleResetFilters}
-                className="text-sm link-primary hover:underline"
+                className="text-sm link-primary hover:underline cursor-pointer"
               >
                 {t('resetAllFilters')}
               </button>
@@ -1060,7 +1060,7 @@ export default function MembersPage() {
             {hasActiveFilters() && (
               <button
                 onClick={handleResetFilters}
-                className="btn-base btn-primary"
+                className="btn-base btn-primary cursor-pointer"
               >
                 {t('resetFilters')}
               </button>

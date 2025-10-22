@@ -39,7 +39,7 @@ export default function LanguageSwitcher() {
       {/* Language Switcher Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         aria-label="Switch language"
         disabled={isPending}
       >
@@ -54,7 +54,7 @@ export default function LanguageSwitcher() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-10 cursor-pointer"
             onClick={() => setIsOpen(false)}
           />
 
@@ -64,7 +64,7 @@ export default function LanguageSwitcher() {
               <button
                 key={language.code}
                 onClick={() => switchLanguage(language.code)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer ${
                   language.code === locale ? 'bg-gray-50 dark:bg-gray-800' : ''
                 }`}
                 disabled={isPending}

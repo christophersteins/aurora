@@ -85,7 +85,7 @@ export default function MemberFilterSidebar({
           <div className="flex items-center gap-2">
             <button
               onClick={onResetFilters}
-              className="p-2 hover:bg-page-primary rounded-full transition"
+              className="p-2 hover:bg-page-primary rounded-full transition cursor-pointer"
               aria-label="Reset filters"
               title="Reset all filters"
             >
@@ -93,7 +93,7 @@ export default function MemberFilterSidebar({
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-page-primary rounded-full transition"
+              className="p-2 hover:bg-page-primary rounded-full transition cursor-pointer"
               aria-label="Close"
             >
               <X className="w-5 h-5 text-body" />
@@ -320,7 +320,7 @@ export default function MemberFilterSidebar({
                 <button
                   key={size}
                   onClick={() => toggleArrayItem('cupSizes', size)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition ${
+                  className={`px-3 py-2 text-sm rounded-lg border transition cursor-pointer ${
                     filters.cupSizes.includes(size)
                       ? 'bg-action-primary text-button-primary border-primary'
                       : 'bg-page-primary text-body border-default hover:border-primary'
@@ -426,7 +426,7 @@ export default function MemberFilterSidebar({
                 <button
                   key={option}
                   onClick={() => updateFilter('hasTattoos', option)}
-                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
+                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition cursor-pointer ${
                     filters.hasTattoos === option
                       ? 'bg-action-primary text-button-primary border-primary'
                       : 'bg-page-primary text-body border-default hover:border-primary'
@@ -448,7 +448,7 @@ export default function MemberFilterSidebar({
                 <button
                   key={option}
                   onClick={() => updateFilter('hasPiercings', option)}
-                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
+                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition cursor-pointer ${
                     filters.hasPiercings === option
                       ? 'bg-action-primary text-button-primary border-primary'
                       : 'bg-page-primary text-body border-default hover:border-primary'
@@ -470,7 +470,7 @@ export default function MemberFilterSidebar({
                 <button
                   key={option}
                   onClick={() => updateFilter('isSmoker', option)}
-                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition ${
+                  className={`flex-1 px-4 py-2 text-sm rounded-lg border transition cursor-pointer ${
                     filters.isSmoker === option
                       ? 'bg-action-primary text-button-primary border-primary'
                       : 'bg-page-primary text-body border-default hover:border-primary'
