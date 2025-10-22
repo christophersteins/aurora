@@ -133,6 +133,58 @@ export default function MembersPage() {
   // Track initial mount to prevent saving on first render
   const isInitialMount = useRef(true);
 
+  // Get location from IP address
+  const getLocationFromIP = async (updateSearchField: boolean = false) => {
+    const fallbackCoords = { latitude: 51.1657, longitude: 10.4515 }; // Center of Germany
+
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+
+      const latitude = data.latitude || fallbackCoords.latitude;
+      const longitude = data.longitude || fallbackCoords.longitude;
+
+      // Update search field if requested (manual GPS button click)
+      if (updateSearchField) {
+        if (data.latitude && data.longitude) {
+          const cityName = data.city || 'Ungefährer Standort';
+          const postcode = data.postal || '';
+          const displayName = postcode ? `${postcode} ${cityName}` : cityName;
+          setLocationSearch(displayName);
+        } else {
+          setLocationSearch('Deutschland');
+        }
+      }
+
+      // Update coordinates for distance calculation
+      setFilters((prev) => ({
+        ...prev,
+        useRadius: updateSearchField, // Only enable radius filter if user manually requested
+        userLatitude: latitude,
+        userLongitude: longitude,
+      }));
+    } catch (error) {
+      console.error('Error getting location from IP:', error);
+
+      // Fallback to center of Germany
+      if (updateSearchField) {
+        setLocationSearch('Deutschland');
+      }
+
+      setFilters((prev) => ({
+        ...prev,
+        useRadius: updateSearchField,
+        userLatitude: fallbackCoords.latitude,
+        userLongitude: fallbackCoords.longitude,
+      }));
+    } finally {
+      if (updateSearchField) {
+        setIsLoadingLocation(false);
+        setShowSuggestions(false);
+      }
+    }
+  };
+
   // Process URL parameters from home page search
   useEffect(() => {
     const lat = searchParams.get('lat');
@@ -174,6 +226,11 @@ export default function MembersPage() {
         userLongitude: longitude,
         radiusKm: radiusKm,
       }));
+    } else {
+      // No URL parameters - get approximate location silently if we don't have coordinates yet
+      if (!filters.userLatitude && !filters.userLongitude) {
+        getLocationFromIP(false); // Silent mode: don't update search field
+      }
     }
   }, [searchParams]);
 
@@ -273,32 +330,32 @@ export default function MembersPage() {
     return () => clearTimeout(timer);
   }, [locationSearch]);
 
-  // Get user's current location
+  // Get user's current location (manual click on location button)
   const handleUseCurrentLocation = () => {
     setIsLoadingLocation(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          
+
           // Reverse geocoding to get location name
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
             const data = await response.json();
-            
-            const cityName = 
-              data.address?.city || 
-              data.address?.town || 
-              data.address?.village || 
+
+            const cityName =
+              data.address?.city ||
+              data.address?.town ||
+              data.address?.village ||
               'Aktueller Standort';
-            
+
             const postcode = data.address?.postcode || '';
-            
+
             // Display with postcode if available
             const displayName = postcode ? `${postcode} ${cityName}` : cityName;
-            
+
             setLocationSearch(displayName);
             setFilters({
               ...filters,
@@ -317,18 +374,19 @@ export default function MembersPage() {
             });
             setLocationSearch('Aktueller Standort');
           }
-          
+
           setIsLoadingLocation(false);
         },
         (error) => {
-          console.error('Error getting location:', error);
-          alert('Standortzugriff verweigert oder nicht verfügbar');
-          setIsLoadingLocation(false);
+          console.error('GPS location denied, using IP-based fallback:', error);
+          // Fallback to IP-based location WITH display
+          getLocationFromIP(true); // Manual mode: update search field
         }
       );
     } else {
-      alert('Geolocation wird von diesem Browser nicht unterstützt');
-      setIsLoadingLocation(false);
+      // Browser doesn't support geolocation, use IP-based fallback
+      console.log('Geolocation not supported, using IP-based fallback');
+      getLocationFromIP(true); // Manual mode: update search field
     }
   };
 

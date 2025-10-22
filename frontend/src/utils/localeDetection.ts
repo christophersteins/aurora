@@ -5,45 +5,26 @@
  */
 export async function detectLocaleFromGeolocation(): Promise<'en' | 'de'> {
   try {
-    // Check if geolocation is supported
-    if (!navigator.geolocation) {
-      return 'en'; // Default to English if geolocation not supported
-    }
+    // Try IP-based geolocation first (non-intrusive)
+    try {
+      const ipResponse = await fetch('https://ipapi.co/json/');
+      const ipData = await ipResponse.json();
 
-    // Get user's coordinates
-    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        timeout: 5000,
-        maximumAge: 60000, // Cache for 1 minute
-      });
-    });
-
-    const { latitude, longitude } = position.coords;
-
-    // Use Nominatim (OpenStreetMap) reverse geocoding to get country
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`,
-      {
-        headers: {
-          'User-Agent': 'Aurora App'
+      if (ipData.country_code) {
+        const countryCode = ipData.country_code.toUpperCase();
+        // Return 'de' for Germany, Austria, and Switzerland
+        if (countryCode === 'DE' || countryCode === 'AT' || countryCode === 'CH') {
+          return 'de';
         }
+        return 'en';
       }
-    );
-
-    if (!response.ok) {
-      return 'en';
+    } catch (ipError) {
+      // IP geolocation failed, continue to browser locale detection
+      console.log('IP-based locale detection failed, using browser locale');
     }
 
-    const data = await response.json();
-    const countryCode = data.address?.country_code?.toUpperCase();
-
-    // Return 'de' for Germany, Austria, and Switzerland
-    // Return 'en' for all other countries
-    if (countryCode === 'DE' || countryCode === 'AT' || countryCode === 'CH') {
-      return 'de';
-    }
-
-    return 'en';
+    // Fallback to browser language detection
+    return detectLocaleFromBrowser();
   } catch (error) {
     console.error('Error detecting locale from geolocation:', error);
     return 'en'; // Default to English on error

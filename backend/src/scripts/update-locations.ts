@@ -6,6 +6,7 @@ import { GalleryPhoto } from '../users/entities/gallery-photo.entity';
 dotenv.config();
 
 const locations: { [key: string]: { latitude: number; longitude: number } } = {
+  // Old escorts
   'anna_berlin': { latitude: 52.5200, longitude: 13.4050 },
   'maria_munich': { latitude: 48.1351, longitude: 11.5820 },
   'sophie_hamburg': { latitude: 53.5511, longitude: 9.9937 },
@@ -26,6 +27,31 @@ const locations: { [key: string]: { latitude: number; longitude: number } } = {
   'laura_wiesbaden': { latitude: 50.0782, longitude: 8.2398 },
   'diana_bonn': { latitude: 50.7374, longitude: 7.0982 },
   'amira_duisburg': { latitude: 51.4344, longitude: 6.7623 },
+
+  // New escorts
+  'sofia_berlin': { latitude: 52.5200, longitude: 13.4050 },
+  'emma_munich': { latitude: 48.1351, longitude: 11.5820 },
+  'anna_frankfurt': { latitude: 50.1109, longitude: 8.6821 },
+  'elena_koeln': { latitude: 50.9375, longitude: 6.9603 },
+  'escort_lisa': { latitude: 48.7758, longitude: 9.1829 },
+  'julia_hamburg': { latitude: 53.5511, longitude: 9.9937 },
+  'kim_duesseldorf': { latitude: 51.2277, longitude: 6.7735 },
+  'lara_dortmund': { latitude: 51.5136, longitude: 7.4653 },
+  'lena_leipzig': { latitude: 51.3397, longitude: 12.3731 },
+  'lisa_hannover': { latitude: 52.3759, longitude: 9.7320 },
+  'maria_muenchen': { latitude: 48.1351, longitude: 11.5820 },
+  'mia_dresden': { latitude: 51.0504, longitude: 13.7373 },
+  'nina_bremen': { latitude: 53.0793, longitude: 8.8017 },
+  'sarah_nuernberg': { latitude: 49.4521, longitude: 11.0767 },
+  'sophie_essen': { latitude: 51.4556, longitude: 7.0116 },
+  'valentina_freiburg': { latitude: 47.9990, longitude: 7.8421 },
+
+  // Additional escorts found
+  'escort1': { latitude: 52.5200, longitude: 13.4050 }, // Berlin
+  'sarah_duesseldorf': { latitude: 51.2277, longitude: 6.7735 }, // Düsseldorf
+  'lisa_bonn': { latitude: 50.7374, longitude: 7.0982 }, // Bonn
+  'maria_berlin': { latitude: 52.5200, longitude: 13.4050 }, // Berlin
+  'nina_frechen': { latitude: 50.9138, longitude: 6.8091 }, // Frechen (near Cologne)
 };
 
 async function updateLocations() {
