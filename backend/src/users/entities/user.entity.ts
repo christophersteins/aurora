@@ -23,6 +23,9 @@ export class User {
   @Column({ nullable: true })
   username: string;
 
+  @Column({ type: 'timestamp', nullable: true })
+  lastUsernameChange: Date;
+
   @Column({ nullable: true })
   firstName: string;
 

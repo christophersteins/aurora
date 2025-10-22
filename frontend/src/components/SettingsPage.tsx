@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { ArrowLeft, ChevronRight, Check, AlertCircle } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import axios from 'axios';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇬🇧', nativeName: 'English' },
@@ -11,6 +13,9 @@ const languages = [
 ];
 
 export default function SettingsPage() {
+  const t = useTranslations('settings');
+  const { user, updateUser } = useAuthStore();
+
   // Mobile navigation state - null means menu is shown, string means section is shown
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -19,6 +24,29 @@ export default function SettingsPage() {
 
   // Track if component is mounting (to disable animations on initial load)
   const [isMounting, setIsMounting] = useState(true);
+
+  // Account settings state
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+
+  const [newUsername, setNewUsername] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
+  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const [usernameSuccess, setUsernameSuccess] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  const [canChangeUsername, setCanChangeUsername] = useState(true);
+  const [daysUntilUsernameChange, setDaysUntilUsernameChange] = useState<number | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load saved section from localStorage on mount
   useEffect(() => {
@@ -30,11 +58,121 @@ export default function SettingsPage() {
     // After initial load, set isMounting to false
     setIsMounting(false);
 
+    // Check username change availability only if user is authenticated
+    if (user && typeof window !== 'undefined') {
+      checkUsernameAvailability();
+    }
+
     // Cleanup: Remove saved section when component unmounts (user leaves settings page)
     return () => {
       localStorage.removeItem('settings-active-section');
     };
-  }, []);
+  }, [user]);
+
+  const checkUsernameAvailability = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await axios.get('http://localhost:4000/users/username-check/availability', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setCanChangeUsername(response.data.canChange);
+      if (response.data.daysRemaining !== undefined) {
+        setDaysUntilUsernameChange(response.data.daysRemaining);
+      }
+    } catch (error) {
+      console.error('Error checking username availability:', error);
+    }
+  };
+
+  const handleUsernameUpdate = async () => {
+    if (!newUsername.trim()) return;
+
+    setIsLoading(true);
+    setUsernameError('');
+    setUsernameSuccess(false);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.patch(
+        'http://localhost:4000/users/account/username',
+        { username: newUsername },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      updateUser(response.data);
+      setUsernameSuccess(true);
+      setIsEditingUsername(false);
+      setNewUsername('');
+      await checkUsernameAvailability();
+
+      setTimeout(() => setUsernameSuccess(false), 3000);
+    } catch (error: any) {
+      setUsernameError(error.response?.data?.message || t('account.username.error'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailUpdate = async () => {
+    if (!newEmail.trim()) return;
+
+    setIsLoading(true);
+    setEmailError('');
+    setEmailSuccess(false);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.patch(
+        'http://localhost:4000/users/account/email',
+        { email: newEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      updateUser(response.data);
+      setEmailSuccess(true);
+      setIsEditingEmail(false);
+      setNewEmail('');
+
+      setTimeout(() => setEmailSuccess(false), 3000);
+    } catch (error: any) {
+      setEmailError(error.response?.data?.message || t('account.email.error'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!currentPassword.trim() || !newPassword.trim()) return;
+
+    setIsLoading(true);
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        'http://localhost:4000/users/account/password',
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPasswordSuccess(true);
+      setIsEditingPassword(false);
+      setCurrentPassword('');
+      setNewPassword('');
+
+      setTimeout(() => setPasswordSuccess(false), 3000);
+    } catch (error: any) {
+      setPasswordError(error.response?.data?.message || t('account.password.error'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Language switching
   const locale = useLocale();
@@ -57,17 +195,20 @@ export default function SettingsPage() {
   };
 
   const sections = [
-    { id: 'konto', label: 'Konto' },
-    { id: 'sicherheit', label: 'Sicherheit' },
-    { id: 'datenschutz', label: 'Datenschutz' },
-    { id: 'mitteilungen', label: 'Mitteilungen' },
-    { id: 'premium', label: 'Premium' },
-    { id: 'barrierefreiheit', label: 'Barrierefreiheit' },
-    { id: 'sprache', label: 'Sprache' },
+    { id: 'konto', label: t('sections.account') },
+    { id: 'sicherheit', label: t('sections.security') },
+    { id: 'datenschutz', label: t('sections.privacy') },
+    { id: 'mitteilungen', label: t('sections.notifications') },
+    { id: 'premium', label: t('sections.premium') },
+    { id: 'barrierefreiheit', label: t('sections.accessibility') },
+    { id: 'sprache', label: t('sections.language') },
   ];
 
   return (
     <div>
+      {/* Überschrift - immer sichtbar */}
+      <h1 className="text-3xl font-bold text-heading mb-6">{t('title')}</h1>
+
       {/* Mobile/Tablet Navigation - shown only when no section is active */}
       {activeSection === null && (
         <div className={`lg:hidden mb-6 ${!isMounting ? 'animate-slide-in-left' : ''}`}>
@@ -102,16 +243,13 @@ export default function SettingsPage() {
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setActiveSection(null)}
-            className="flex items-center gap-2 text-sm font-medium transition-all text-muted hover:text-body"
+            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Zurück</span>
+            <span>{t('back')}</span>
           </button>
         </div>
       )}
-
-      {/* Überschrift - Desktop only */}
-      <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">Einstellungen</h1>
 
       <div className="flex gap-0">
         {/* Sidebar Navigation - Desktop only */}
@@ -152,8 +290,210 @@ export default function SettingsPage() {
                 activeSection === 'konto' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'konto' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Konto</h2>
-              <p className="text-muted">Kontoeinstellungen werden hier angezeigt.</p>
+              <h2 className="text-xl font-semibold text-heading mb-6 lg:hidden">{t('account.title')}</h2>
+
+              <div className="space-y-6">
+                {/* Username Field */}
+                <div className="lg:flex lg:items-start lg:gap-6">
+                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                    {t('account.username.label')}
+                  </label>
+                  <div className="lg:flex-1">
+                    {!isEditingUsername ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-body">{user?.username}</p>
+                          <button
+                            onClick={() => {
+                              if (canChangeUsername) {
+                                setIsEditingUsername(true);
+                                setNewUsername(user?.username || '');
+                              }
+                            }}
+                            disabled={!canChangeUsername}
+                            className={`text-sm font-medium ${
+                              canChangeUsername
+                                ? 'text-action-primary hover:underline'
+                                : 'text-muted cursor-not-allowed'
+                            }`}
+                          >
+                            {t('account.username.change')}
+                          </button>
+                        </div>
+                        {!canChangeUsername && daysUntilUsernameChange !== null && (
+                          <div className="flex items-start gap-2 text-sm text-muted">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            <p>{t('account.username.availableIn', { days: daysUntilUsernameChange })}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={newUsername}
+                          onChange={(e) => setNewUsername(e.target.value)}
+                          placeholder={t('account.username.placeholder')}
+                          className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                        />
+                        <div className="flex items-center gap-2 text-sm text-muted">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                          <p>{t('account.username.restriction')}</p>
+                        </div>
+                        {usernameError && (
+                          <p className="text-sm text-red-500">{usernameError}</p>
+                        )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleUsernameUpdate}
+                            disabled={isLoading}
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                          >
+                            {t('account.username.save')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEditingUsername(false);
+                              setNewUsername('');
+                              setUsernameError('');
+                            }}
+                            disabled={isLoading}
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                          >
+                            {t('account.username.cancel')}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {usernameSuccess && (
+                      <p className="mt-2 text-sm text-green-500">{t('account.username.success')}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email Field */}
+                <div className="lg:flex lg:items-start lg:gap-6">
+                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                    {t('account.email.label')}
+                  </label>
+                  <div className="lg:flex-1">
+                    {!isEditingEmail ? (
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-body">{user?.email}</p>
+                        <button
+                          onClick={() => {
+                            setIsEditingEmail(true);
+                            setNewEmail(user?.email || '');
+                          }}
+                          className="text-sm font-medium text-action-primary hover:underline"
+                        >
+                          {t('account.email.change')}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <input
+                          type="email"
+                          value={newEmail}
+                          onChange={(e) => setNewEmail(e.target.value)}
+                          placeholder={t('account.email.placeholder')}
+                          className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                        />
+                        {emailError && (
+                          <p className="text-sm text-red-500">{emailError}</p>
+                        )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleEmailUpdate}
+                            disabled={isLoading}
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                          >
+                            {t('account.email.save')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEditingEmail(false);
+                              setNewEmail('');
+                              setEmailError('');
+                            }}
+                            disabled={isLoading}
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                          >
+                            {t('account.email.cancel')}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {emailSuccess && (
+                      <p className="mt-2 text-sm text-green-500">{t('account.email.success')}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div className="lg:flex lg:items-start lg:gap-6">
+                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                    {t('account.password.label')}
+                  </label>
+                  <div className="lg:flex-1">
+                    {!isEditingPassword ? (
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-body">••••••••</p>
+                        <button
+                          onClick={() => setIsEditingPassword(true)}
+                          className="text-sm font-medium text-action-primary hover:underline"
+                        >
+                          {t('account.password.change')}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <input
+                          type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder={t('account.password.current')}
+                          className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                        />
+                        <input
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder={t('account.password.new')}
+                          className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                        />
+                        {passwordError && (
+                          <p className="text-sm text-red-500">{passwordError}</p>
+                        )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handlePasswordUpdate}
+                            disabled={isLoading}
+                            className="px-4 py-2 bg-action-primary text-white rounded-lg hover:bg-action-primary-hover transition-colors disabled:opacity-50"
+                          >
+                            {t('account.password.save')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsEditingPassword(false);
+                              setCurrentPassword('');
+                              setNewPassword('');
+                              setPasswordError('');
+                            }}
+                            disabled={isLoading}
+                            className="px-4 py-2 border border-default rounded-lg text-body hover:bg-page-secondary transition-colors"
+                          >
+                            {t('account.password.cancel')}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {passwordSuccess && (
+                      <p className="mt-2 text-sm text-green-500">{t('account.password.success')}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Sicherheit Section */}
@@ -218,8 +558,8 @@ export default function SettingsPage() {
                 activeSection === 'sprache' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'sprache' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Sprache</h2>
-              <p className="text-muted mb-6">Wähle deine bevorzugte Sprache für die Anwendung.</p>
+              <h2 className="text-xl font-semibold text-heading mb-4">{t('language.title')}</h2>
+              <p className="text-muted mb-6">{t('language.description')}</p>
 
               <div className="space-y-3">
                 {languages.map((language) => (
@@ -255,7 +595,7 @@ export default function SettingsPage() {
               {isPending && (
                 <div className="mt-4 text-sm text-muted flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-action-primary border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sprache wird gewechselt...</span>
+                  <span>{t('language.switching')}</span>
                 </div>
               )}
             </div>

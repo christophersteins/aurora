@@ -290,7 +290,7 @@ export default function EscortProfileForm() {
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setActiveSection(null)}
-            className="flex items-center gap-2 text-sm font-medium transition-all text-muted hover:text-body"
+            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Zurück</span>

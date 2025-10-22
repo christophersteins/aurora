@@ -20,6 +20,9 @@ import { GalleryPhotosService } from './gallery-photos.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { UpdateEscortProfileDto } from './dto/update-escort-profile.dto';
+import { UpdateUsernameDto } from './dto/update-username.dto';
+import { UpdateEmailDto } from './dto/update-email.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
 import { GalleryPhoto } from './entities/gallery-photo.entity';
 import { multerConfig, galleryMulterConfig } from '../config/multer.config';
@@ -190,16 +193,71 @@ export class UsersController {
     return { message: 'Photos reordered successfully' };
   }
 
+  @Get('username-check/availability')
+  @UseGuards(JwtAuthGuard)
+  async checkUsernameAvailability(@Request() req) {
+    const userId = req.user.id;
+    return this.usersService.canChangeUsername(userId);
+  }
+
+  @Patch('account/username')
+  @UseGuards(JwtAuthGuard)
+  async updateUsername(
+    @Request() req,
+    @Body() updateUsernameDto: UpdateUsernameDto,
+  ): Promise<Omit<User, 'password'>> {
+    const userId = req.user.id;
+    const updatedUser = await this.usersService.updateUsername(
+      userId,
+      updateUsernameDto.username,
+    );
+
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  }
+
+  @Patch('account/email')
+  @UseGuards(JwtAuthGuard)
+  async updateEmail(
+    @Request() req,
+    @Body() updateEmailDto: UpdateEmailDto,
+  ): Promise<Omit<User, 'password'>> {
+    const userId = req.user.id;
+    const updatedUser = await this.usersService.updateEmail(
+      userId,
+      updateEmailDto.email,
+    );
+
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  }
+
+  @Patch('account/password')
+  @UseGuards(JwtAuthGuard)
+  async updatePassword(
+    @Request() req,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    const userId = req.user.id;
+    await this.usersService.updatePassword(
+      userId,
+      updatePasswordDto.currentPassword,
+      updatePasswordDto.newPassword,
+    );
+
+    return { message: 'Password updated successfully' };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Partial<User>> {
     const user = await this.usersService.findById(id);
-    
+
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    
+
     const { password, ...userWithoutPassword } = user;
-    
+
     return userWithoutPassword;
   }
 }

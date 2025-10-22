@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -273,12 +273,112 @@ export class UsersService {
 
   async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
     const user = await this.findById(userId);
-    
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     Object.assign(user, updateData);
     return this.usersRepository.save(user);
+  }
+
+  async updateUsername(userId: string, newUsername: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if username change is allowed (90 days restriction)
+    if (user.lastUsernameChange) {
+      const daysSinceLastChange = Math.floor(
+        (Date.now() - new Date(user.lastUsernameChange).getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (daysSinceLastChange < 90) {
+        const daysRemaining = 90 - daysSinceLastChange;
+        throw new BadRequestException(
+          `Username can only be changed once every 90 days. You can change it again in ${daysRemaining} days.`
+        );
+      }
+    }
+
+    // Check if username is already taken
+    const existingUser = await this.findByUsername(newUsername);
+    if (existingUser && existingUser.id !== userId) {
+      throw new BadRequestException('Username is already taken');
+    }
+
+    user.username = newUsername.toLowerCase();
+    user.lastUsernameChange = new Date();
+
+    return this.usersRepository.save(user);
+  }
+
+  async updateEmail(userId: string, newEmail: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if email is already taken
+    const existingUser = await this.findByEmail(newEmail);
+    if (existingUser && existingUser.id !== userId) {
+      throw new BadRequestException('Email is already taken');
+    }
+
+    user.email = newEmail;
+
+    return this.usersRepository.save(user);
+  }
+
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify current password
+    const isPasswordValid = await this.validatePassword(currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    return this.usersRepository.save(user);
+  }
+
+  async canChangeUsername(userId: string): Promise<{ canChange: boolean; daysRemaining?: number }> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.lastUsernameChange) {
+      return { canChange: true };
+    }
+
+    const daysSinceLastChange = Math.floor(
+      (Date.now() - new Date(user.lastUsernameChange).getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysSinceLastChange < 90) {
+      return {
+        canChange: false,
+        daysRemaining: 90 - daysSinceLastChange
+      };
+    }
+
+    return { canChange: true };
   }
 }

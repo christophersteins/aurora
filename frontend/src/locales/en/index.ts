@@ -13,6 +13,7 @@ import privacy from './privacy.json';
 import faq from './faq.json';
 import videos from './videos.json';
 import premium from './premium.json';
+import settings from './settings.json';
 
 const messages = {
   common,
@@ -29,7 +30,8 @@ const messages = {
   privacy,
   faq,
   videos,
-  premium
+  premium,
+  settings
 };
 
 export default messages;

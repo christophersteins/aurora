@@ -25,6 +25,16 @@ services:
     networks:
       - aurora_network
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: aurora_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP Server
+      - "8025:8025"  # Web UI
+    networks:
+      - aurora_network
+
 volumes:
   postgres_data:
   redis_data:

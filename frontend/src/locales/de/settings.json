@@ -1,0 +1,54 @@
+{
+  "title": "Einstellungen",
+  "sections": {
+    "account": "Konto",
+    "security": "Sicherheit",
+    "privacy": "Datenschutz",
+    "notifications": "Mitteilungen",
+    "premium": "Premium",
+    "accessibility": "Barrierefreiheit",
+    "language": "Sprache"
+  },
+  "account": {
+    "title": "Kontoeinstellungen",
+    "username": {
+      "label": "Benutzername",
+      "placeholder": "Dein Benutzername",
+      "change": "Benutzername ändern",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "success": "Benutzername erfolgreich geändert",
+      "error": "Fehler beim Ändern des Benutzernamens",
+      "restriction": "Du kannst deinen Benutzernamen nur alle 90 Tage ändern.",
+      "availableIn": "Du kannst deinen Benutzernamen in {days} Tagen ändern.",
+      "taken": "Dieser Benutzername ist bereits vergeben"
+    },
+    "email": {
+      "label": "E-Mail-Adresse",
+      "placeholder": "deine@email.de",
+      "change": "E-Mail ändern",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "success": "E-Mail-Adresse erfolgreich geändert",
+      "error": "Fehler beim Ändern der E-Mail-Adresse",
+      "taken": "Diese E-Mail-Adresse wird bereits verwendet"
+    },
+    "password": {
+      "label": "Passwort",
+      "current": "Aktuelles Passwort",
+      "new": "Neues Passwort",
+      "change": "Passwort ändern",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "success": "Passwort erfolgreich geändert",
+      "error": "Fehler beim Ändern des Passworts",
+      "incorrect": "Aktuelles Passwort ist falsch"
+    }
+  },
+  "language": {
+    "title": "Sprache",
+    "description": "Wähle deine bevorzugte Sprache für die Anwendung.",
+    "switching": "Sprache wird gewechselt..."
+  },
+  "back": "Zurück"
+}

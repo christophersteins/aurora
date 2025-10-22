@@ -1,0 +1,54 @@
+{
+  "title": "Settings",
+  "sections": {
+    "account": "Account",
+    "security": "Security",
+    "privacy": "Privacy",
+    "notifications": "Notifications",
+    "premium": "Premium",
+    "accessibility": "Accessibility",
+    "language": "Language"
+  },
+  "account": {
+    "title": "Account Settings",
+    "username": {
+      "label": "Username",
+      "placeholder": "Your username",
+      "change": "Change Username",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Username changed successfully",
+      "error": "Error changing username",
+      "restriction": "You can only change your username once every 90 days.",
+      "availableIn": "You can change your username in {days} days.",
+      "taken": "This username is already taken"
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "your@email.com",
+      "change": "Change Email",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Email address changed successfully",
+      "error": "Error changing email address",
+      "taken": "This email address is already in use"
+    },
+    "password": {
+      "label": "Password",
+      "current": "Current Password",
+      "new": "New Password",
+      "change": "Change Password",
+      "save": "Save",
+      "cancel": "Cancel",
+      "success": "Password changed successfully",
+      "error": "Error changing password",
+      "incorrect": "Current password is incorrect"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "description": "Choose your preferred language for the application.",
+    "switching": "Switching language..."
+  },
+  "back": "Back"
+}
