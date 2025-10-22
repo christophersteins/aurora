@@ -20,6 +20,7 @@ export interface User {
   type?: string;
   height?: number;
   weight?: number;
+  clothingSize?: string;
   bodyType?: string;
   cupSize?: string;
   hairColor?: string;
@@ -30,6 +31,16 @@ export interface User {
   hasPiercings?: boolean;
   isSmoker?: boolean;
   description?: string;
+  // Preise
+  price30Min?: number;
+  price1Hour?: number;
+  price2Hours?: number;
+  price3Hours?: number;
+  price6Hours?: number;
+  price12Hours?: number;
+  price24Hours?: number;
+  priceOvernight?: number;
+  priceWeekend?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -67,6 +78,7 @@ export interface UpdateEscortProfileDto {
   type?: string;
   height?: number;
   weight?: number;
+  clothingSize?: string;
   bodyType?: string;
   cupSize?: string;
   hairColor?: string;
@@ -77,4 +89,14 @@ export interface UpdateEscortProfileDto {
   hasPiercings?: boolean;
   isSmoker?: boolean;
   description?: string;
+  // Preise
+  price30Min?: number;
+  price1Hour?: number;
+  price2Hours?: number;
+  price3Hours?: number;
+  price6Hours?: number;
+  price12Hours?: number;
+  price24Hours?: number;
+  priceOvernight?: number;
+  priceWeekend?: number;
 }

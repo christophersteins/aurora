@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { ArrowLeft, ChevronRight, User, Lock, Shield, Bell, Star, Accessibility, Globe, Check } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -57,13 +57,13 @@ export default function SettingsPage() {
   };
 
   const sections = [
-    { id: 'konto', label: 'Konto', icon: User },
-    { id: 'sicherheit', label: 'Sicherheit', icon: Lock },
-    { id: 'datenschutz', label: 'Datenschutz', icon: Shield },
-    { id: 'mitteilungen', label: 'Mitteilungen', icon: Bell },
-    { id: 'premium', label: 'Premium', icon: Star },
-    { id: 'barrierefreiheit', label: 'Barrierefreiheit', icon: Accessibility },
-    { id: 'sprache', label: 'Sprache', icon: Globe },
+    { id: 'konto', label: 'Konto' },
+    { id: 'sicherheit', label: 'Sicherheit' },
+    { id: 'datenschutz', label: 'Datenschutz' },
+    { id: 'mitteilungen', label: 'Mitteilungen' },
+    { id: 'premium', label: 'Premium' },
+    { id: 'barrierefreiheit', label: 'Barrierefreiheit' },
+    { id: 'sprache', label: 'Sprache' },
   ];
 
   return (
@@ -74,7 +74,6 @@ export default function SettingsPage() {
           <div className="border border-[#2f3336] shadow-md bg-page-primary rounded-lg overflow-hidden">
             <nav>
               {sections.map((section, index) => {
-                const Icon = section.icon;
                 const isLast = index === sections.length - 1;
                 return (
                   <button
@@ -88,10 +87,7 @@ export default function SettingsPage() {
                     }`}
                     style={{ borderRadius: 0 }}
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-5 h-5 flex-shrink-0 text-muted" />
-                      <span className="text-left">{section.label}</span>
-                    </div>
+                    <span className="text-left">{section.label}</span>
                     <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
                   </button>
                 );
@@ -122,7 +118,6 @@ export default function SettingsPage() {
         <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start lg:border lg:border-[#2f3336] lg:shadow-md lg:bg-page-primary lg:rounded-l-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
           <nav>
             {sections.map((section) => {
-              const Icon = section.icon;
               return (
                 <button
                   key={section.id}
@@ -137,10 +132,7 @@ export default function SettingsPage() {
                   }`}
                   style={{ borderRadius: 0 }}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-5 h-5 flex-shrink-0 text-muted" />
-                    <span className="text-left">{section.label}</span>
-                  </div>
+                  <span className="text-left">{section.label}</span>
                   <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
                 </button>
               );

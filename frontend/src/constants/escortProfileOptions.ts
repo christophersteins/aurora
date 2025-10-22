@@ -42,8 +42,8 @@ export const LANGUAGES = [
   'Thailändisch',
 ];
 
-// Height in cm (140-220)
-export const HEIGHTS = Array.from({ length: 81 }, (_, i) => 140 + i);
+// Height in cm (140-200)
+export const HEIGHTS = Array.from({ length: 61 }, (_, i) => 140 + i);
 
 // Gewicht in kg (40-200)
 export const WEIGHTS = Array.from({ length: 161 }, (_, i) => 40 + i);
@@ -65,6 +65,17 @@ export const BODY_TYPES = [
   'Mittel',
   'Mollig',
   'Sehr mollig',
+];
+
+export const CLOTHING_SIZES = [
+  'XXS',
+  'XS',
+  'S',
+  'M',
+  'L',
+  'XL',
+  'XXL',
+  'XXXL',
 ];
 
 export const CUP_SIZES = [

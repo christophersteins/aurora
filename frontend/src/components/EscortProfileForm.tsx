@@ -7,7 +7,8 @@ import { profilePictureService } from '@/services/profilePictureService';
 import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
-import { ArrowLeft, ChevronRight, Check, User, Activity, Eye, Star, FileText, Briefcase, Clock, ShieldCheck } from 'lucide-react';
+import ToggleSwitch from './ToggleSwitch';
+import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
   NATIONALITIES,
@@ -15,6 +16,7 @@ import {
   HEIGHTS,
   WEIGHTS,
   BODY_TYPES,
+  CLOTHING_SIZES,
   CUP_SIZES,
   HAIR_COLORS,
   HAIR_LENGTHS,
@@ -44,6 +46,7 @@ export default function EscortProfileForm() {
     languages: user?.languages || [],
     height: user?.height || undefined,
     weight: user?.weight || undefined,
+    clothingSize: user?.clothingSize || '',
     bodyType: user?.bodyType || '',
     cupSize: user?.cupSize || '',
     hairColor: user?.hairColor || '',
@@ -53,6 +56,15 @@ export default function EscortProfileForm() {
     hasPiercings: user?.hasPiercings || false,
     isSmoker: user?.isSmoker || false,
     description: user?.description || '',
+    price30Min: user?.price30Min || undefined,
+    price1Hour: user?.price1Hour || undefined,
+    price2Hours: user?.price2Hours || undefined,
+    price3Hours: user?.price3Hours || undefined,
+    price6Hours: user?.price6Hours || undefined,
+    price12Hours: user?.price12Hours || undefined,
+    price24Hours: user?.price24Hours || undefined,
+    priceOvernight: user?.priceOvernight || undefined,
+    priceWeekend: user?.priceWeekend || undefined,
   });
 
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -101,6 +113,7 @@ export default function EscortProfileForm() {
         languages: updatedUser.languages || [],
         height: updatedUser.height || undefined,
         weight: updatedUser.weight || undefined,
+        clothingSize: updatedUser.clothingSize || '',
         bodyType: updatedUser.bodyType || '',
         cupSize: updatedUser.cupSize || '',
         hairColor: updatedUser.hairColor || '',
@@ -198,14 +211,13 @@ export default function EscortProfileForm() {
   };
 
   const sections = [
-    { id: 'persoenliche-daten', label: 'Persönliche Daten', icon: User },
-    { id: 'koerpermerkmale', label: 'Körpermerkmale', icon: Activity },
-    { id: 'aussehen', label: 'Aussehen', icon: Eye },
-    { id: 'eigenschaften', label: 'Eigenschaften', icon: Star },
-    { id: 'service', label: 'Service', icon: Briefcase },
-    { id: 'arbeitszeiten', label: 'Arbeitszeiten', icon: Clock },
-    { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
-    { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
+    { id: 'persoenliche-daten', label: 'Persönliche Daten' },
+    { id: 'erscheinungsbild', label: 'Erscheinungsbild' },
+    { id: 'service', label: 'Service' },
+    { id: 'verfuegbarkeit', label: 'Verfügbarkeit' },
+    { id: 'preise', label: 'Preise' },
+    { id: 'beschreibung', label: 'Beschreibung' },
+    { id: 'verifizierung', label: 'Verifizierung' },
   ];
 
   return (
@@ -253,7 +265,6 @@ export default function EscortProfileForm() {
           <div className="border border-[#2f3336] shadow-md bg-page-primary rounded-lg overflow-hidden">
             <nav>
               {sections.map((section, index) => {
-                const Icon = section.icon;
                 const isLast = index === sections.length - 1;
                 return (
                   <button
@@ -264,10 +275,7 @@ export default function EscortProfileForm() {
                     }`}
                     style={{ borderRadius: 0 }}
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-5 h-5 flex-shrink-0 text-muted" />
-                      <span className="text-left">{section.label}</span>
-                    </div>
+                    <span className="text-left">{section.label}</span>
                     <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
                   </button>
                 );
@@ -298,7 +306,6 @@ export default function EscortProfileForm() {
         <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start lg:border lg:border-[#2f3336] lg:shadow-md lg:bg-page-primary lg:rounded-l-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
           <nav>
             {sections.map((section) => {
-              const Icon = section.icon;
               return (
                 <button
                   key={section.id}
@@ -310,10 +317,7 @@ export default function EscortProfileForm() {
                   }`}
                   style={{ borderRadius: 0 }}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className="w-5 h-5 flex-shrink-0 text-muted" />
-                    <span className="text-left">{section.label}</span>
-                  </div>
+                  <span className="text-left">{section.label}</span>
                   <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
                 </button>
               );
@@ -478,17 +482,17 @@ export default function EscortProfileForm() {
               </div>
             </div>
 
-            {/* Body Features Section */}
+            {/* Erscheinungsbild Section (combined: Körpermerkmale + Aussehen + Eigenschaften) */}
             <div
-              id="koerpermerkmale"
+              id="erscheinungsbild"
               className={`scroll-mt-8 ${
-                activeSection === 'koerpermerkmale' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'koerpermerkmale' ? 'lg:block' : 'lg:hidden'}`}
+                activeSection === 'erscheinungsbild' ? 'block animate-slide-in-right' : 'hidden'
+              } ${activeSidebarSection === 'erscheinungsbild' ? 'lg:block' : 'lg:hidden'}`}
             >
-              {/* Height */}
+              {/* Größe */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Größe (cm)
+                  Größe
                 </label>
                 <select
                   value={formData.height || ''}
@@ -506,10 +510,10 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Weight */}
+              {/* Gewicht */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Gewicht (kg)
+                  Gewicht
                 </label>
                 <select
                   value={formData.weight || ''}
@@ -527,7 +531,28 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Body Type */}
+              {/* Konfektionsgröße */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  Konfektionsgröße
+                </label>
+                <select
+                  value={formData.clothingSize || ''}
+                  onChange={(e) => {
+                    const newData = { ...formData, clothingSize: e.target.value };
+                    setFormData(newData);
+                    debouncedSave(newData);
+                  }}
+                  className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  {CLOTHING_SIZES.map((size) => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Körpertyp */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Körpertyp
@@ -548,10 +573,10 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Cup Size */}
-              <div className="lg:flex lg:items-center lg:gap-6">
+              {/* Oberweite */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Körbchengröße
+                  Oberweite
                 </label>
                 <select
                   value={formData.cupSize || ''}
@@ -568,16 +593,8 @@ export default function EscortProfileForm() {
                   ))}
                 </select>
               </div>
-            </div>
 
-            {/* Appearance Section */}
-            <div
-              id="aussehen"
-              className={`scroll-mt-8 ${
-                activeSection === 'aussehen' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'aussehen' ? 'lg:block' : 'lg:hidden'}`}
-            >
-              {/* Hair Color */}
+              {/* Haarfarbe */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Haarfarbe
@@ -598,7 +615,7 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Hair Length */}
+              {/* Haarlänge */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Haarlänge
@@ -619,8 +636,8 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Eye Color */}
-              <div className="lg:flex lg:items-center lg:gap-6">
+              {/* Augenfarbe */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Augenfarbe
                 </label>
@@ -639,73 +656,116 @@ export default function EscortProfileForm() {
                   ))}
                 </select>
               </div>
-            </div>
 
-            {/* Characteristics Section */}
-            <div
-              id="eigenschaften"
-              className={`scroll-mt-8 ${
-                activeSection === 'eigenschaften' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'eigenschaften' ? 'lg:block' : 'lg:hidden'}`}
-            >
-              {/* Tattoos */}
+              {/* Tattoos - Checkboxes */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Tattoos
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer lg:flex-1">
-                  <input
-                    type="checkbox"
-                    checked={formData.hasTattoos}
-                    onChange={(e) => {
-                      const newData = { ...formData, hasTattoos: e.target.checked };
-                      setFormData(newData);
-                      debouncedSave(newData);
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-body">Hat Tattoos</span>
-                </label>
+                <div className="lg:flex-1 flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasTattoos}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, hasTattoos: true };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Ja</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!formData.hasTattoos}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, hasTattoos: false };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Nein</span>
+                  </label>
+                </div>
               </div>
 
-              {/* Piercings */}
+              {/* Piercings - Checkboxes */}
               <div className="mb-4 lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Piercings
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer lg:flex-1">
-                  <input
-                    type="checkbox"
-                    checked={formData.hasPiercings}
-                    onChange={(e) => {
-                      const newData = { ...formData, hasPiercings: e.target.checked };
-                      setFormData(newData);
-                      debouncedSave(newData);
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-body">Hat Piercings</span>
-                </label>
+                <div className="lg:flex-1 flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasPiercings}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, hasPiercings: true };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Ja</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!formData.hasPiercings}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, hasPiercings: false };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Nein</span>
+                  </label>
+                </div>
               </div>
 
-              {/* Smoker */}
+              {/* Raucher - Checkboxes */}
               <div className="lg:flex lg:items-center lg:gap-6">
                 <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Raucher
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer lg:flex-1">
-                  <input
-                    type="checkbox"
-                    checked={formData.isSmoker}
-                    onChange={(e) => {
-                      const newData = { ...formData, isSmoker: e.target.checked };
-                      setFormData(newData);
-                      debouncedSave(newData);
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-body">Raucher/in</span>
-                </label>
+                <div className="lg:flex-1 flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isSmoker}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, isSmoker: true };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Ja</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!formData.isSmoker}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newData = { ...formData, isSmoker: false };
+                          setFormData(newData);
+                          debouncedSave(newData);
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-body">Nein</span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -719,24 +779,256 @@ export default function EscortProfileForm() {
               <p className="text-muted text-sm">Service-Felder werden hier hinzugefügt.</p>
             </div>
 
-            {/* Arbeitszeiten Section */}
+            {/* Verfügbarkeit Section (Arbeitszeiten + Arbeitsort) */}
             <div
-              id="arbeitszeiten"
+              id="verfuegbarkeit"
               className={`scroll-mt-8 ${
-                activeSection === 'arbeitszeiten' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'arbeitszeiten' ? 'lg:block' : 'lg:hidden'}`}
+                activeSection === 'verfuegbarkeit' ? 'block animate-slide-in-right' : 'hidden'
+              } ${activeSidebarSection === 'verfuegbarkeit' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <p className="text-muted text-sm">Arbeitszeiten-Felder werden hier hinzugefügt.</p>
+              <p className="text-muted text-sm">Verfügbarkeits-Felder (Arbeitszeiten & Arbeitsort) werden hier hinzugefügt.</p>
             </div>
 
-            {/* Verifizierung Section */}
+            {/* Preise Section */}
             <div
-              id="verifizierung"
+              id="preise"
               className={`scroll-mt-8 ${
-                activeSection === 'verifizierung' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'verifizierung' ? 'lg:block' : 'lg:hidden'}`}
+                activeSection === 'preise' ? 'block animate-slide-in-right' : 'hidden'
+              } ${activeSidebarSection === 'preise' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <p className="text-muted text-sm">Verifizierungs-Felder werden hier hinzugefügt.</p>
+              {/* 30 Minuten */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  30 Minuten
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price30Min || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price30Min: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 150"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1 Stunde */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  1 Stunde
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price1Hour || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price1Hour: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 250"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2 Stunden */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  2 Stunden
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price2Hours || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price2Hours: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 450"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 Stunden */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  3 Stunden
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price3Hours || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price3Hours: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 600"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 6 Stunden */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  6 Stunden
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price6Hours || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price6Hours: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 1000"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 12 Stunden */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  12 Stunden
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price12Hours || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price12Hours: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 1800"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 24 Stunden */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  24 Stunden
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.price24Hours || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, price24Hours: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 3000"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Übernachtung */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  Übernachtung
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.priceOvernight || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, priceOvernight: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 2500"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Wochenende */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  Wochenende
+                </label>
+                <div className="lg:flex-1">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={formData.priceWeekend || ''}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                        const newData = { ...formData, priceWeekend: value };
+                        setFormData(newData);
+                        debouncedSave(newData);
+                      }}
+                      className="w-full px-4 py-2 pr-10 rounded-lg border-depth bg-input text-body focus:outline-none focus:ring-2 focus:ring-action-primary"
+                      placeholder="z.B. 5000"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">€</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Description Section */}
@@ -759,6 +1051,16 @@ export default function EscortProfileForm() {
                   placeholder="Beschreibe dich selbst..."
                 />
               </div>
+            </div>
+
+            {/* Verifizierung Section */}
+            <div
+              id="verifizierung"
+              className={`scroll-mt-8 ${
+                activeSection === 'verifizierung' ? 'block animate-slide-in-right' : 'hidden'
+              } ${activeSidebarSection === 'verifizierung' ? 'lg:block' : 'lg:hidden'}`}
+            >
+              <p className="text-muted text-sm">Verifizierungs-Felder werden hier hinzugefügt.</p>
             </div>
           </div>
         </div>

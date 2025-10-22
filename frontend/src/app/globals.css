@@ -591,17 +591,16 @@ input[type="checkbox"]:checked {
   border-color: var(--color-secondary);
 }
 
-input[type="checkbox"]:checked::before {
-  content: '';
+input[type="checkbox"]:checked::after {
+  content: '✓';
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 0.35rem;
-  height: 0.7rem;
-  border: solid var(--text-button);
-  border-width: 0 2px 2px 0;
-  transform: translate(-50%, -60%) rotate(45deg);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: bold;
+  line-height: 1;
 }
 
 input[type="checkbox"]:focus {

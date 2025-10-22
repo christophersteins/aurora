@@ -1,4 +1,4 @@
-import { IsOptional, IsDateString, IsArray, IsInt, IsString, IsBoolean, Min, Max } from 'class-validator';
+import { IsOptional, IsDateString, IsArray, IsInt, IsString, IsBoolean, IsNumber, Min, Max } from 'class-validator';
 
 export class UpdateEscortProfileDto {
   @IsOptional()
@@ -30,7 +30,7 @@ export class UpdateEscortProfileDto {
   @IsOptional()
   @IsInt()
   @Min(140)
-  @Max(220)
+  @Max(200)
   height?: number; // in cm
 
   @IsOptional()
@@ -38,6 +38,10 @@ export class UpdateEscortProfileDto {
   @Min(40)
   @Max(200)
   weight?: number; // in kg
+
+  @IsOptional()
+  @IsString()
+  clothingSize?: string; // Konfektionsgröße
 
   @IsOptional()
   @IsString()
@@ -78,4 +82,51 @@ export class UpdateEscortProfileDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  // === PREISE ===
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price30Min?: number; // 30 Minuten
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price1Hour?: number; // 1 Stunde
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price2Hours?: number; // 2 Stunden
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price3Hours?: number; // 3 Stunden
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price6Hours?: number; // 6 Stunden
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price12Hours?: number; // 12 Stunden
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price24Hours?: number; // 24 Stunden
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  priceOvernight?: number; // Übernachtung
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  priceWeekend?: number; // Wochenende
 }

@@ -82,13 +82,15 @@ export default function ChatPage() {
   return (
     <>
       <div className="flex h-screen">
-        <ConversationList
-          conversations={conversations}
-          selectedId={selectedConversationId}
-          onSelectConversation={setSelectedConversationId}
-          onNewConversation={() => setIsModalOpen(true)}
-        />
-        <ChatWindow conversationId={selectedConversationId} currentUserId="test-user-123" />
+        <div className="flex w-full mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
+          <ConversationList
+            conversations={conversations}
+            selectedId={selectedConversationId}
+            onSelectConversation={setSelectedConversationId}
+            onNewConversation={() => setIsModalOpen(true)}
+          />
+          <ChatWindow conversationId={selectedConversationId} currentUserId="test-user-123" />
+        </div>
       </div>
 
       <NewConversationModal

@@ -71,21 +71,26 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex items-center gap-3 px-4 py-3 border-b bg-white md:hidden">
+      {/* Back button for mobile */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b md:hidden" style={{ background: 'var(--background-primary)', borderColor: 'var(--border)' }}>
         <button
           onClick={() => router.back()}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 rounded-full transition-colors"
+          style={{ background: 'var(--background-secondary)' }}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-body)' }} />
         </button>
-        <h1 className="text-lg font-semibold">Zurück</h1>
+        <h1 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Zurück</h1>
       </div>
 
+      {/* Chat container with max width */}
       <div className="flex-1 overflow-hidden">
-        <ChatWindow
-          conversationId={conversationId}
-          currentUserId={currentUserId}
-        />
+        <div className="mx-auto h-full" style={{ maxWidth: 'var(--max-content-width)' }}>
+          <ChatWindow
+            conversationId={conversationId}
+            currentUserId={currentUserId}
+          />
+        </div>
       </div>
     </div>
   );

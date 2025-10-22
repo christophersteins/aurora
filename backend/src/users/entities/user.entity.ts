@@ -88,6 +88,9 @@ export class User {
   weight: number; // in kg
 
   @Column({ nullable: true })
+  clothingSize: string; // Konfektionsgröße
+
+  @Column({ nullable: true })
   bodyType: string; // Figur
 
   @Column({ nullable: true })
@@ -116,6 +119,35 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  // === PREISE ===
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price30Min: number; // 30 Minuten
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price1Hour: number; // 1 Stunde
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price2Hours: number; // 2 Stunden
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price3Hours: number; // 3 Stunden
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price6Hours: number; // 6 Stunden
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price12Hours: number; // 12 Stunden
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price24Hours: number; // 24 Stunden
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  priceOvernight: number; // Übernachtung
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  priceWeekend: number; // Wochenende
 
   // === RELATIONS ===
   
