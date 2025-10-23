@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
 import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star, Gem } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { scrollPositionUtil } from '@/utils/scrollPosition';
 
 // Filter-Interface
 interface Filters {
@@ -69,7 +70,7 @@ const initialFilters: Filters = {
   hasPiercings: 'all',
   isSmoker: 'all',
   useRadius: false,
-  radiusKm: 50,
+  radiusKm: 100,
   userLatitude: null,
   userLongitude: null,
 };
@@ -82,6 +83,7 @@ type GridView = 'compact' | 'comfortable';
 export default function MembersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const t = useTranslations('members');
   const [escorts, setEscorts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +98,10 @@ export default function MembersPage() {
         const savedFilters = localStorage.getItem(FILTER_STORAGE_KEY);
         if (savedFilters) {
           const parsedFilters = JSON.parse(savedFilters);
+          // Migrate old radius value: if saved radius is 50, update to new default of 100
+          if (parsedFilters.radiusKm === 50) {
+            parsedFilters.radiusKm = 100;
+          }
           return { ...initialFilters, ...parsedFilters };
         }
       } catch (error) {
@@ -194,7 +200,7 @@ export default function MembersPage() {
     if (lat && lon) {
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
-      const radiusKm = radius ? parseInt(radius) : 50;
+      const radiusKm = radius ? parseInt(radius) : 100;
 
       // Reverse geocoding to get location name
       fetch(
@@ -247,6 +253,39 @@ export default function MembersPage() {
       console.error('Error saving filters to LocalStorage:', error);
     }
   }, [filters]);
+
+  // Restore scroll position on mount
+  useEffect(() => {
+    scrollPositionUtil.restoreScrollPosition(pathname);
+  }, [pathname]);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      scrollPositionUtil.saveScrollPosition(pathname);
+    };
+
+    // Save on window unload
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Save on route change (when clicking on profile cards)
+    const handleRouteChange = () => {
+      scrollPositionUtil.saveScrollPosition(pathname);
+    };
+
+    // Listen for link clicks
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+      if (link && link.href.includes('/profile/')) {
+        handleRouteChange();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pathname]);
 
   // Save location search to LocalStorage on changes
   useEffect(() => {

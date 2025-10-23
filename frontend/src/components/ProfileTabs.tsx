@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Briefcase, Euro, Clock, FileText, Star } from 'lucide-react';
+import { Clock, Star } from 'lucide-react';
 
 interface ProfileTabsProps {
   escort?: {
@@ -12,10 +12,17 @@ interface ProfileTabsProps {
     priceOvernight?: number;
     description?: string;
   };
+  initialTab?: 'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen';
+  onTabChange?: (tab: 'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen') => void;
 }
 
-export default function ProfileTabs({ escort }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>('service');
+export default function ProfileTabs({ escort, initialTab = 'service', onTabChange }: ProfileTabsProps) {
+  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>(initialTab);
+
+  // Update active tab when initialTab changes
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
   const [isSticky, setIsSticky] = useState(false);
   const [showHeader, setShowHeader] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -107,11 +114,11 @@ export default function ProfileTabs({ escort }: ProfileTabsProps) {
   }, [isSticky, showHeader]);
 
   const tabs = [
-    { id: 'service' as const, label: 'Service', icon: Briefcase },
-    { id: 'preise' as const, label: 'Preise', icon: Euro },
-    { id: 'zeiten' as const, label: 'Zeiten', icon: Clock },
-    { id: 'ueber-mich' as const, label: 'Über mich', icon: FileText },
-    { id: 'bewertungen' as const, label: 'Bewertungen', icon: Star },
+    { id: 'service' as const, label: 'Service' },
+    { id: 'preise' as const, label: 'Preise' },
+    { id: 'zeiten' as const, label: 'Zeiten' },
+    { id: 'ueber-mich' as const, label: 'Über mich' },
+    { id: 'bewertungen' as const, label: 'Bewertungen' },
   ];
 
   return (
@@ -122,41 +129,61 @@ export default function ProfileTabs({ escort }: ProfileTabsProps) {
       {/* Tab Navigation */}
       <div
         ref={tabsRef}
-        className="flex border-b transition-all duration-300 lg:static sticky z-30 rounded-t-lg"
+        className="relative transition-all duration-300 lg:static sticky z-30 rounded-t-lg overflow-hidden"
         style={{
-          borderColor: 'var(--border)',
           background: 'var(--background-primary)',
           boxShadow: isSticky ? '0 2px 8px rgba(0, 0, 0, 0.3)' : 'none',
           top: showHeader ? '64px' : '0',
         }}
       >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+        {/* Scrollable Tab Container */}
+        <div
+          className="flex overflow-x-auto scrollbar-hide lg:overflow-x-visible"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
 
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="flex-1 px-4 py-4 flex items-center justify-center gap-2 text-sm font-medium transition-all cursor-pointer relative"
-              style={{
-                color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                background: isActive ? 'rgba(139, 92, 246, 0.05)' : 'transparent',
-              }}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (onTabChange) onTabChange(tab.id);
+                }}
+                className="flex-1 lg:flex-1 flex-shrink-0 px-4 py-4 flex items-center justify-center text-sm font-medium transition-all cursor-pointer relative whitespace-nowrap"
+                style={{
+                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                  background: 'transparent',
+                  borderBottom: isActive ? '2px solid var(--color-primary)' : '2px solid var(--border)',
+                  minWidth: '120px',
+                }}
+              >
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-              {/* Active Indicator */}
-              {isActive && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-0.5"
-                  style={{ background: 'var(--color-primary)' }}
-                />
-              )}
-            </button>
-          );
-        })}
+        {/* Left Gradient Fade Indicator */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-8 pointer-events-none lg:hidden"
+          style={{
+            background: 'linear-gradient(to right, var(--background-primary), transparent)',
+          }}
+        />
+
+        {/* Right Gradient Fade Indicator */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none lg:hidden"
+          style={{
+            background: 'linear-gradient(to left, var(--background-primary), transparent)',
+          }}
+        />
       </div>
 
       {/* Tab Content */}
