@@ -234,6 +234,138 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* iPhone Mockup Section */}
+      <div className="py-20 bg-page-primary">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-heading mb-4">
+              Entdecke Premium-Escorts
+            </h2>
+            <p className="text-xl text-muted">
+              Erlebe die App in Aktion
+            </p>
+          </div>
+
+          {/* iPhone Container */}
+          <div className="max-w-md mx-auto">
+            {/* iPhone Frame */}
+            <div className="relative mx-auto" style={{ width: '340px', height: '700px' }}>
+              {/* Device Border */}
+              <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-b from-gray-800 to-gray-900 p-3 shadow-2xl">
+                {/* Screen Container */}
+                <div className="relative w-full h-full rounded-[2.5rem] bg-black overflow-hidden">
+                  {/* Notch */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-20"></div>
+
+                  {/* Status Bar */}
+                  <div className="absolute top-0 left-0 right-0 h-12 bg-page-secondary z-10 px-6 flex items-end pb-2">
+                    <div className="flex justify-between w-full text-xs text-muted">
+                      <span>9:41</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-4 h-3 border border-muted rounded-sm"></div>
+                        <div className="w-3 h-3 border border-muted rounded-sm"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Screen Content - Scrollable Area */}
+                  <div className="absolute inset-0 pt-12 overflow-hidden">
+                    <div className="h-full overflow-y-auto scrollbar-hide" style={{
+                      animation: 'scroll 20s linear infinite',
+                      WebkitOverflowScrolling: 'touch'
+                    }}>
+                      {/* Header */}
+                      <div className="px-4 py-6 bg-page-secondary">
+                        <h1 className="text-2xl text-heading mb-4">Escorts</h1>
+
+                        {/* Search Bar */}
+                        <div className="relative mb-4">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+                          <input
+                            type="text"
+                            placeholder="Stadt oder PLZ..."
+                            className="w-full pl-10 pr-4 py-2 border border-default rounded-lg bg-page-primary text-body text-sm"
+                            disabled
+                          />
+                        </div>
+                      </div>
+
+                      {/* Escort Cards Grid */}
+                      <div className="px-4 py-4 bg-page-primary">
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Sample Escort Cards */}
+                          {Array.from({ length: 12 }).map((_, index) => (
+                            <div
+                              key={index}
+                              className="bg-page-secondary border border-default rounded-lg overflow-hidden"
+                            >
+                              {/* Profile Picture Placeholder */}
+                              <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                <div className="w-16 h-16 rounded-full bg-primary/30 flex items-center justify-center">
+                                  <span className="text-2xl text-primary font-semibold">
+                                    {String.fromCharCode(65 + (index % 26))}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Card Info */}
+                              <div className="p-3">
+                                <div className="flex items-center gap-1 mb-2">
+                                  <h3 className="text-sm font-normal text-body">
+                                    Model {index + 1}
+                                  </h3>
+                                  <div className="flex items-center justify-center w-3 h-3 rounded-full bg-secondary">
+                                    <svg className="w-2 h-2 text-button-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs text-muted">
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" />
+                                    {5 + index} km
+                                  </span>
+                                  <span>⭐ 4.{8 - (index % 4)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Home Indicator */}
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* CSS Animation */}
+        <style jsx>{`
+          @keyframes scroll {
+            0% {
+              transform: translateY(0);
+            }
+            100% {
+              transform: translateY(-50%);
+            }
+          }
+
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+      </div>
+
       {/* Features Section */}
       <div className="py-20 bg-page-secondary">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>

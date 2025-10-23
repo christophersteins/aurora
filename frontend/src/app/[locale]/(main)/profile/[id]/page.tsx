@@ -125,9 +125,12 @@ export default function ProfilePage() {
     return allPhotos;
   })();
 
-  // Keyboard navigation for fullscreen gallery
+  // Keyboard navigation for fullscreen gallery and prevent body scroll
   useEffect(() => {
     if (!isFullscreen) return;
+
+    // Prevent body scroll when fullscreen is open
+    document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -140,7 +143,12 @@ export default function ProfilePage() {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      // Restore body scroll when fullscreen is closed
+      document.body.style.overflow = 'unset';
+    };
   }, [isFullscreen, selectedImageIndex, photos.length]);
 
   const calculateAge = (birthDate: string | undefined): number | null => {
@@ -171,6 +179,40 @@ export default function ProfilePage() {
   const handleDateClick = () => {
     // TODO: Open date booking modal
     console.log('Open date booking');
+  };
+
+  const handleShareClick = async () => {
+    const shareData = {
+      title: escort?.firstName && escort?.lastName
+        ? `${escort.firstName} ${escort.lastName} - Aurora`
+        : `${escort?.username} - Aurora`,
+      text: `Schau dir ${escort?.firstName && escort?.lastName ? `${escort.firstName} ${escort.lastName}` : escort?.username} auf Aurora an!`,
+      url: window.location.href,
+    };
+
+    try {
+      // Check if Web Share API is supported
+      if (navigator.share) {
+        await navigator.share(shareData);
+        console.log('Profile shared successfully');
+      } else {
+        // Fallback: Copy link to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link wurde in die Zwischenablage kopiert!');
+      }
+    } catch (error) {
+      // User cancelled or error occurred
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Error sharing:', error);
+        // Fallback: Try to copy to clipboard
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          alert('Link wurde in die Zwischenablage kopiert!');
+        } catch (clipboardError) {
+          console.error('Clipboard error:', clipboardError);
+        }
+      }
+    }
   };
 
   if (loading) {
@@ -538,7 +580,10 @@ export default function ProfilePage() {
                 </span>
               </button>
 
-              <button className="flex flex-col items-center gap-2 cursor-pointer group">
+              <button
+                className="flex flex-col items-center gap-2 cursor-pointer group"
+                onClick={handleShareClick}
+              >
                 <svg
                   className="w-5 h-5 transition-colors"
                   viewBox="0 0 24 24"
@@ -599,30 +644,36 @@ export default function ProfilePage() {
 
         {/* Fullscreen Gallery Modal */}
         {isFullscreen && (
-          <div 
-            className="fixed inset-0 z-50 flex items-center justify-center mobile-menu-backdrop"
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center mobile-menu-backdrop overflow-hidden"
             style={{ background: 'rgba(0, 0, 0, 0.95)' }}
             onClick={() => setIsFullscreen(false)}
           >
             {/* Close Button */}
             <button
               onClick={() => setIsFullscreen(false)}
-              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110 cursor-pointer"
+              className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110"
               style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-button)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
+                cursor: 'pointer'
               }}
             >
               ✕
             </button>
 
             {/* Image */}
-            <div className="relative max-w-7xl max-h-[90vh] w-full mx-4">
+            <div className="relative w-full h-full flex items-center justify-center mx-4">
               <img
                 src={photos[selectedImageIndex]}
                 alt={`Foto ${selectedImageIndex + 1}`}
-                className="w-full h-full object-contain"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  width: 'auto',
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
                 onClick={(e) => e.stopPropagation()}
               />
 
