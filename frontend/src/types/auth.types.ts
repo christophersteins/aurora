@@ -31,6 +31,7 @@ export interface User {
   hasTattoos?: boolean;
   hasPiercings?: boolean;
   isSmoker?: boolean;
+  services?: string[];
   description?: string;
   isOnline?: boolean;
   lastSeen?: string;
@@ -92,6 +93,7 @@ export interface UpdateEscortProfileDto {
   hasTattoos?: boolean;
   hasPiercings?: boolean;
   isSmoker?: boolean;
+  services?: string[];
   description?: string;
   // Preise
   price30Min?: number;

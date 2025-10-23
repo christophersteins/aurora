@@ -132,6 +132,9 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isSmoker: boolean;
 
+  @Column('text', { array: true, nullable: true })
+  services: string[];
+
   @Column({ type: 'text', nullable: true })
   description: string;
 

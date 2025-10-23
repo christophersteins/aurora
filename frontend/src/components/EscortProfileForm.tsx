@@ -56,6 +56,7 @@ export default function EscortProfileForm() {
     hasTattoos: user?.hasTattoos || false,
     hasPiercings: user?.hasPiercings || false,
     isSmoker: user?.isSmoker || false,
+    services: user?.services || [],
     description: user?.description || '',
     price30Min: user?.price30Min || undefined,
     price1Hour: user?.price1Hour || undefined,
@@ -126,6 +127,7 @@ export default function EscortProfileForm() {
         hasTattoos: updatedUser.hasTattoos || false,
         hasPiercings: updatedUser.hasPiercings || false,
         isSmoker: updatedUser.isSmoker || false,
+        services: updatedUser.services || [],
         description: updatedUser.description || '',
         price30Min: updatedUser.price30Min || undefined,
         price1Hour: updatedUser.price1Hour || undefined,
@@ -404,11 +406,11 @@ export default function EscortProfileForm() {
               } ${activeSidebarSection === 'persoenliche-daten' ? 'lg:block' : 'lg:hidden'}`}
             >
               {/* Name */}
-              <div className="mb-4 lg:flex lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
                   Name
                 </label>
-                <div className="lg:flex-1">
+                <div className="lg:flex-1 flex items-center gap-4">
                   <input
                     type="text"
                     value={formData.name || ''}
@@ -417,12 +419,12 @@ export default function EscortProfileForm() {
                       setFormData(newData);
                       debouncedSave(newData);
                     }}
-                    className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                    className="flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                     placeholder="Dein Name"
                   />
 
                   {/* Show Name in Profile Checkbox */}
-                  <label className="flex items-center gap-2 cursor-pointer mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={formData.showNameInProfile}
@@ -433,7 +435,7 @@ export default function EscortProfileForm() {
                       }}
                       className="w-3 h-3 rounded border-gray-600 text-[#8b5cf6] focus:ring-[#8b5cf6] focus:ring-1"
                     />
-                    <span className="text-xs text-muted">Name im Profil anzeigen</span>
+                    <span className="text-xs text-muted">Im Profil anzeigen</span>
                   </label>
                 </div>
               </div>
@@ -764,42 +766,6 @@ export default function EscortProfileForm() {
                 </div>
               </div>
 
-              {/* Raucher - Checkboxes */}
-              <div className="lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Raucher
-                </label>
-                <div className="lg:flex-1 flex items-center gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.isSmoker}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          const newData = { ...formData, isSmoker: true };
-                          setFormData(newData);
-                          debouncedSave(newData);
-                        }
-                      }}
-                    />
-                    <span className="text-sm text-body">Ja</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!formData.isSmoker}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          const newData = { ...formData, isSmoker: false };
-                          setFormData(newData);
-                          debouncedSave(newData);
-                        }
-                      }}
-                    />
-                    <span className="text-sm text-body">Nein</span>
-                  </label>
-                </div>
-              </div>
             </div>
 
             {/* Service Section */}
@@ -809,7 +775,63 @@ export default function EscortProfileForm() {
                 activeSection === 'service' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'service' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <p className="text-muted text-sm">Service-Felder werden hier hinzugefügt.</p>
+              {/* Services */}
+              <div className="mb-4 lg:flex lg:gap-6">
+                <label className="block text-sm mb-3 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3 lg:text-right text-muted">
+                  Angebotene Services
+                </label>
+                <div className="lg:flex-1">
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      'Girlfriend Experience',
+                      'Boyfriend Experience',
+                      'Massage',
+                      'Erotische Massage',
+                      'Tantra Massage',
+                      'Outcall',
+                      'Incall',
+                      'Dinner Date',
+                      'Travel Companion',
+                      'Overnight',
+                      'Couples',
+                      'Role Play',
+                      'BDSM',
+                      'Fetish',
+                    ].map((service) => {
+                      const isSelected = formData.services?.includes(service) || false;
+                      return (
+                        <button
+                          key={service}
+                          type="button"
+                          onClick={() => {
+                            const currentServices = formData.services || [];
+                            const newServices = isSelected
+                              ? currentServices.filter((s) => s !== service)
+                              : [...currentServices, service];
+                            const newData = { ...formData, services: newServices };
+                            setFormData(newData);
+                            debouncedSave(newData);
+                          }}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                            isSelected
+                              ? 'text-button-primary border-2'
+                              : 'text-muted border-2 border-default hover:border-primary'
+                          }`}
+                          style={{
+                            backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',
+                            borderColor: isSelected ? 'var(--color-primary)' : undefined,
+                          }}
+                        >
+                          {service}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-muted mt-3">
+                    Wähle alle zutreffenden Services aus. Du kannst mehrere auswählen.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Verfügbarkeit Section (Arbeitszeiten + Arbeitsort) */}

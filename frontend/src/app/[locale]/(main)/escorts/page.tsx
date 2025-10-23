@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star } from 'lucide-react';
+import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star, Gem } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 // Filter-Interface
@@ -1100,10 +1100,10 @@ export default function MembersPage() {
                     {/* Premium Badge */}
                     <div className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full backdrop-blur-sm"
                          style={{
-                           background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.85) 0%, rgba(124, 58, 237, 0.85) 100%)',
-                           boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                           backgroundColor: 'var(--color-primary)',
+                           opacity: 0.85
                          }}>
-                      <Crown className="w-3.5 h-3.5" style={{ color: '#fbbf24', fill: '#fbbf24' }} />
+                      <Gem className="w-3.5 h-3.5" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
                     </div>
                   </div>
 

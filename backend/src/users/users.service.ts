@@ -174,6 +174,7 @@ export class UsersService {
       hasTattoos?: boolean;
       hasPiercings?: boolean;
       isSmoker?: boolean;
+      services?: string[];
       description?: string;
     },
   ): Promise<User> {
@@ -218,6 +219,7 @@ export class UsersService {
     if (updateData.hasTattoos !== undefined) user.hasTattoos = updateData.hasTattoos;
     if (updateData.hasPiercings !== undefined) user.hasPiercings = updateData.hasPiercings;
     if (updateData.isSmoker !== undefined) user.isSmoker = updateData.isSmoker;
+    if (updateData.services !== undefined) user.services = updateData.services;
     if (updateData.description !== undefined) user.description = updateData.description;
 
     console.log('User data after update (before save):', {

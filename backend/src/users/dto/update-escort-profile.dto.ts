@@ -84,6 +84,11 @@ export class UpdateEscortProfileDto {
   isSmoker?: boolean;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  services?: string[];
+
+  @IsOptional()
   @IsString()
   description?: string;
 
