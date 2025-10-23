@@ -26,6 +26,18 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>('service');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [isCurrentImagePortrait, setIsCurrentImagePortrait] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect if mobile on client side
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Mock data for reviews (replace with real data later)
   const reviewCount = 24;
@@ -379,28 +391,46 @@ export default function ProfilePage() {
         </div>
 
         {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-start">
           {/* Photo Gallery - 2/3 width */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-primary)' }}>
-              {/* Main Image - flexible height, no cropping */}
+              {/* Main Image - fixed height on desktop, no cropping */}
               <div
-                className="relative w-full flex items-center justify-center"
+                className="relative w-full flex items-center justify-center overflow-hidden"
                 style={{
-                  minHeight: '500px',
-                  maxHeight: '700px',
+                  height: '600px',
                   background: 'var(--background-secondary)'
                 }}
               >
                 {photos.length > 0 ? (
                   <>
+                    {/* Background: Blurred version of current image (only show on desktop OR on mobile for landscape images) */}
+                    {(!isCurrentImagePortrait || !isMobile) && (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${photos[selectedImageIndex]})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          filter: 'blur(20px)',
+                          transform: 'scale(1.1)',
+                          opacity: 0.8
+                        }}
+                      />
+                    )}
+
+                    {/* Foreground: Sharp image */}
                     <img
                       src={photos[selectedImageIndex]}
                       alt={`Foto ${selectedImageIndex + 1}`}
-                      className="w-full h-full cursor-pointer"
-                      style={{ 
-                        objectFit: 'contain',
-                        maxHeight: '700px'
+                      className="relative w-full h-full cursor-pointer z-10"
+                      style={{
+                        objectFit: isCurrentImagePortrait && isMobile ? 'cover' : 'contain'
+                      }}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        setIsCurrentImagePortrait(img.naturalHeight > img.naturalWidth);
                       }}
                       onClick={() => setIsFullscreen(true)}
                     />
@@ -410,7 +440,7 @@ export default function ProfilePage() {
                       <>
                         <button
                           onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer z-20"
                           style={{
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
@@ -421,7 +451,7 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer z-20"
                           style={{
                             background: 'rgba(0, 0, 0, 0.5)',
                             color: 'var(--text-button)',
@@ -434,8 +464,8 @@ export default function ProfilePage() {
                     )}
 
                     {/* Image Counter */}
-                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-sm font-medium"
-                      style={{ 
+                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-sm font-medium z-20"
+                      style={{
                         background: 'rgba(0, 0, 0, 0.7)',
                         color: 'var(--text-button)'
                       }}>
@@ -450,37 +480,37 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-
-              {/* Thumbnail Gallery */}
-              {photos.length > 1 && (
-                <div className="p-4 flex gap-2 overflow-x-auto">
-                  {photos.map((photo, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer"
-                      style={{
-                        border: selectedImageIndex === index
-                          ? '2px solid var(--color-primary)'
-                          : '2px solid transparent',
-                        opacity: selectedImageIndex === index ? 1 : 0.6
-                      }}
-                    >
-                      <img
-                        src={photo}
-                        alt={`Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
+
+            {/* Thumbnail Gallery */}
+            {photos.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {photos.map((photo, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer border-depth"
+                    style={{
+                      border: selectedImageIndex === index
+                        ? '2px solid var(--color-primary)'
+                        : '2px solid var(--border)',
+                      opacity: selectedImageIndex === index ? 1 : 0.6
+                    }}
+                  >
+                    <img
+                      src={photo}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Profile Info - 1/3 width */}
           <div className="lg:col-span-1">
-            <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
+            <div className="rounded-lg p-6 border-depth space-y-6 lg:h-[600px] overflow-y-auto" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
                 {/* Show name only if showNameInProfile is true and name exists */}
