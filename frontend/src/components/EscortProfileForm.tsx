@@ -22,6 +22,7 @@ import {
   HAIR_LENGTHS,
   EYE_COLORS,
 } from '@/constants/escortProfileOptions';
+import MediaGalleryUpload from './MediaGalleryUpload';
 
 export default function EscortProfileForm() {
   const { user, setUser } = useAuthStore();
@@ -228,6 +229,7 @@ export default function EscortProfileForm() {
   const sections = [
     { id: 'persoenliche-daten', label: 'Persönliche Daten' },
     { id: 'erscheinungsbild', label: 'Erscheinungsbild' },
+    { id: 'mediengalerie', label: 'Fotos & Videos' },
     { id: 'service', label: 'Service' },
     { id: 'verfuegbarkeit', label: 'Verfügbarkeit' },
     { id: 'preise', label: 'Preise' },
@@ -766,6 +768,16 @@ export default function EscortProfileForm() {
                 </div>
               </div>
 
+            </div>
+
+            {/* Mediengalerie Section */}
+            <div
+              id="mediengalerie"
+              className={`scroll-mt-8 ${
+                activeSection === 'mediengalerie' ? 'block animate-slide-in-right' : 'hidden'
+              } ${activeSidebarSection === 'mediengalerie' ? 'lg:block' : 'lg:hidden'}`}
+            >
+              <MediaGalleryUpload />
             </div>
 
             {/* Service Section */}
