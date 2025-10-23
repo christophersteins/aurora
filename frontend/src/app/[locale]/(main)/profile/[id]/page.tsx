@@ -9,6 +9,7 @@ import { User } from '@/types/auth.types';
 import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import ProfileTabs from '@/components/ProfileTabs';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -632,15 +633,8 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Service Information Section - Full Width */}
-        <div className="rounded-lg p-8 border-depth" style={{ background: 'var(--background-primary)' }}>
-          <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
-            Service & Angebote
-          </h2>
-          <p style={{ color: 'var(--text-secondary)' }}>
-            Dieser Bereich wird in einem späteren Schritt implementiert.
-          </p>
-        </div>
+        {/* Profile Tabs Section - Full Width */}
+        <ProfileTabs escort={escort} />
 
         {/* Fullscreen Gallery Modal */}
         {isFullscreen && (
