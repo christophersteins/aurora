@@ -6,6 +6,9 @@ import { escortService } from '@/services/escortService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { galleryService, GalleryPhoto } from '@/services/galleryService';
 import { User } from '@/types/auth.types';
+import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -16,18 +19,83 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [locationText, setLocationText] = useState<string>('');
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const username = params.id as string;
         const data = await escortService.getEscortByUsername(username);
+
+        // Temporary: Add mock data for testing if backend doesn't provide it
+        if (!data.isOnline && !data.lastSeen) {
+          data.lastSeen = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
+        }
+
         setEscort(data);
-        
+
         // Load gallery photos
         if (data.id) {
           const photos = await galleryService.getPublicPhotos(data.id);
           setGalleryPhotos(photos);
+        }
+
+        // Fetch location from coordinates and calculate distance
+        if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
+          const [escortLon, escortLat] = data.location.coordinates;
+
+          // Fetch location name
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${escortLat}&lon=${escortLon}`
+            );
+            const locationData = await response.json();
+
+            const city = locationData.address?.city ||
+                        locationData.address?.town ||
+                        locationData.address?.village || '';
+            const postcode = locationData.address?.postcode || '';
+
+            if (postcode && city) {
+              setLocationText(`${postcode} ${city}`);
+            } else if (city) {
+              setLocationText(city);
+            } else {
+              setLocationText('Standort verfügbar');
+            }
+          } catch (error) {
+            console.error('Error fetching location:', error);
+            setLocationText('Standort verfügbar');
+          }
+
+          // Get user's location and calculate distance
+          try {
+            const ipResponse = await fetch('https://ipapi.co/json/');
+            const ipData = await ipResponse.json();
+
+            if (ipData.latitude && ipData.longitude) {
+              const userLat = ipData.latitude;
+              const userLon = ipData.longitude;
+
+              // Calculate distance using Haversine formula
+              const R = 6371; // Earth radius in km
+              const dLat = ((escortLat - userLat) * Math.PI) / 180;
+              const dLon = ((escortLon - userLon) * Math.PI) / 180;
+              const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos((userLat * Math.PI) / 180) *
+                  Math.cos((escortLat * Math.PI) / 180) *
+                  Math.sin(dLon / 2) *
+                  Math.sin(dLon / 2);
+              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+              const distance = R * c;
+
+              setDistanceKm(Math.round(distance));
+            }
+          } catch (error) {
+            console.error('Error calculating distance:', error);
+          }
         }
       } catch (err) {
         setError('Fehler beim Laden des Profils');
@@ -135,11 +203,6 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-        {/* Back Button */}
-        <button onClick={() => router.push('/escorts')} className="mb-6 btn-base btn-secondary cursor-pointer">
-          ← Zurück
-        </button>
-
         {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Photo Gallery - 2/3 width */}
@@ -245,52 +308,183 @@ export default function ProfilePage() {
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
-                <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text-heading)' }}>
-                  {escort.firstName && escort.lastName
-                    ? `${escort.firstName} ${escort.lastName}`
-                    : escort.username || 'Unbekannt'}
-                </h1>
-                <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
-                  @{escort.username}
-                </p>
-              </div>
-
-              {/* Basic Info */}
-              <div className="space-y-3 pb-6" style={{ borderBottom: '1px solid var(--border)' }}>
-                {age && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>🎂</span>
-                    <span style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
-                  </div>
+                {/* Show name only if showNameInProfile is true and name exists */}
+                {escort.showNameInProfile && escort.firstName && escort.lastName ? (
+                  <>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h1 className="text-xl font-bold" style={{ color: 'var(--text-heading)' }}>
+                        {escort.firstName} {escort.lastName}
+                      </h1>
+                      {/* Verified Badge */}
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                        <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                      </div>
+                      {/* Premium Badge */}
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
+                        backgroundColor: 'var(--color-primary)'
+                      }}>
+                        <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
+                      </div>
+                    </div>
+                    <p className="text-base mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      {escort.username}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className="text-xl font-bold" style={{ color: 'var(--text-heading)' }}>
+                        {escort.username || 'Unbekannt'}
+                      </p>
+                      {/* Verified Badge */}
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                        <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                      </div>
+                      {/* Premium Badge */}
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
+                        backgroundColor: 'var(--color-primary)'
+                      }}>
+                        <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
+                      </div>
+                    </div>
+                  </>
                 )}
 
-                {escort.nationalities && escort.nationalities.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>🌍</span>
-                    <span style={{ color: 'var(--text-regular)' }}>{escort.nationalities.join(', ')}</span>
-                  </div>
-                )}
+                {/* Location and Distance */}
+                <div className="space-y-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+                  {locationText && (
+                    <div className="flex items-center gap-2">
+                      <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {locationText}
+                      </span>
+                    </div>
+                  )}
 
-                {escort.languages && escort.languages.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>💬</span>
-                    <span style={{ color: 'var(--text-regular)' }}>{escort.languages.join(', ')}</span>
-                  </div>
-                )}
+                  {distanceKm !== null && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {distanceKm} km
+                      </span>
+                    </div>
+                  )}
 
-                {escort.height && (
+                  {/* Online Status */}
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>📏</span>
-                    <span style={{ color: 'var(--text-regular)' }}>{escort.height} cm</span>
+                    {escort.isOnline ? (
+                      <>
+                        <Circle className="w-4 h-4" style={{ color: '#10b981', fill: '#10b981' }} />
+                        <span className="text-sm" style={{ color: 'var(--color-primary)' }}>
+                          Jetzt online
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {escort.lastSeen ? (
+                            (() => {
+                              try {
+                                const lastSeenDate = new Date(escort.lastSeen);
+                                const timeAgo = formatDistanceToNow(lastSeenDate, {
+                                  addSuffix: false,
+                                  locale: de
+                                });
+                                return `Zuletzt online vor ${timeAgo}`;
+                              } catch (error) {
+                                console.error('Error formatting lastSeen:', error, escort.lastSeen);
+                                return 'Offline';
+                              }
+                            })()
+                          ) : (
+                            'Offline'
+                          )}
+                        </span>
+                      </>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {escort.bodyType && (
+                {/* Attributes */}
+                <div className="space-y-2">
+                  {age && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Alter:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
+                    </div>
+                  )}
+
+                  {escort.gender && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Geschlecht:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.gender}</span>
+                    </div>
+                  )}
+
+                  {escort.nationalities && escort.nationalities.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Nationalität:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.nationalities.join(', ')}</span>
+                    </div>
+                  )}
+
+                  {/* Körper */}
+                  {(escort.height || escort.weight || escort.bodyType) && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Körper:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                        {[
+                          escort.height ? `${escort.height} cm` : null,
+                          escort.weight ? `${escort.weight} kg` : null,
+                          escort.bodyType
+                        ].filter(Boolean).join(', ')}
+                      </span>
+                    </div>
+                  )}
+
+                  {escort.cupSize && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Oberweite:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.cupSize} Körbchen</span>
+                    </div>
+                  )}
+
+                  {/* Haar */}
+                  {(escort.hairLength || escort.hairColor) && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Haar:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                        {[escort.hairLength, escort.hairColor].filter(Boolean).join(', ')}
+                      </span>
+                    </div>
+                  )}
+
+                  {escort.eyeColor && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Augenfarbe:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.eyeColor}</span>
+                    </div>
+                  )}
+
+                  {escort.languages && escort.languages.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Sprachen:</span>
+                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.languages.join(', ')}</span>
+                    </div>
+                  )}
+
+                  {/* Körperschmuck */}
                   <div className="flex items-center gap-2">
-                    <span style={{ color: 'var(--text-secondary)' }}>💃</span>
-                    <span style={{ color: 'var(--text-regular)' }}>{escort.bodyType}</span>
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Körperschmuck:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {[
+                        escort.hasTattoos ? 'Tattoos' : null,
+                        escort.hasPiercings ? 'Piercings' : null
+                      ].filter(Boolean).join(', ') || 'Keiner'}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -299,48 +493,96 @@ export default function ProfilePage() {
                   onClick={handleMessageClick}
                   className="w-full btn-base btn-primary cursor-pointer"
                 >
-                  💬 Nachricht schreiben
+                  Nachricht schreiben
                 </button>
                 <button
                   onClick={handleDateClick}
                   className="w-full btn-base btn-secondary cursor-pointer"
                 >
-                  📅 Date vereinbaren
+                  Date vereinbaren
                 </button>
               </div>
 
               {/* Tags */}
-              {(escort.hasTattoos || escort.hasPiercings || escort.isSmoker) && (
+              {escort.isSmoker && (
                 <div className="flex flex-wrap gap-2 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-                  {escort.hasTattoos && (
-                    <span className="px-3 py-1 rounded-full text-xs font-medium"
-                      style={{ 
-                        background: 'rgba(139, 92, 246, 0.1)',
-                        color: 'var(--color-primary)'
-                      }}>
-                      🎨 Tattoos
-                    </span>
-                  )}
-                  {escort.hasPiercings && (
-                    <span className="px-3 py-1 rounded-full text-xs font-medium"
-                      style={{ 
-                        background: 'rgba(139, 92, 246, 0.1)',
-                        color: 'var(--color-primary)'
-                      }}>
-                      💎 Piercings
-                    </span>
-                  )}
-                  {escort.isSmoker && (
-                    <span className="px-3 py-1 rounded-full text-xs font-medium"
-                      style={{ 
-                        background: 'rgba(113, 118, 123, 0.1)',
-                        color: 'var(--text-secondary)'
-                      }}>
-                      🚬 Raucher/in
-                    </span>
-                  )}
+                  <span className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: 'rgba(113, 118, 123, 0.1)',
+                      color: 'var(--text-secondary)'
+                    }}>
+                    🚬 Raucher/in
+                  </span>
                 </div>
               )}
+            </div>
+
+            {/* Quick Actions - Outside Container */}
+            <div className="flex justify-center gap-12 mt-6">
+              <button className="flex flex-col items-center gap-2 cursor-pointer group">
+                <Bookmark
+                  className="w-5 h-5 transition-colors"
+                  style={{
+                    color: 'var(--color-primary)'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                />
+                <span
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Merken
+                </span>
+              </button>
+
+              <button className="flex flex-col items-center gap-2 cursor-pointer group">
+                <svg
+                  className="w-5 h-5 transition-colors"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ color: 'var(--color-primary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                >
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                  <polyline points="16 6 12 2 8 6"></polyline>
+                  <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+                <span
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Teilen
+                </span>
+              </button>
+
+              <button className="flex flex-col items-center gap-2 cursor-pointer group">
+                <Flag
+                  className="w-5 h-5 transition-colors"
+                  style={{
+                    color: 'var(--color-primary)'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                />
+                <span
+                  className="text-xs transition-colors"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-link-secondary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Melden
+                </span>
+              </button>
             </div>
           </div>
         </div>

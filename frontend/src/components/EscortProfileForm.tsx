@@ -42,6 +42,7 @@ export default function EscortProfileForm() {
     name: user?.name || '',
     showNameInProfile: user?.showNameInProfile || false,
     birthDate: formatDateForInput(user?.birthDate),
+    gender: user?.gender || '',
     nationalities: user?.nationalities || [],
     languages: user?.languages || [],
     height: user?.height || undefined,
@@ -108,7 +109,10 @@ export default function EscortProfileForm() {
 
       // Update the local form data with the response to ensure consistency
       setFormData({
+        name: updatedUser.name || '',
+        showNameInProfile: updatedUser.showNameInProfile || false,
         birthDate: formatDateForInput(updatedUser.birthDate),
+        gender: updatedUser.gender || '',
         nationalities: updatedUser.nationalities || [],
         languages: updatedUser.languages || [],
         height: updatedUser.height || undefined,
@@ -123,6 +127,15 @@ export default function EscortProfileForm() {
         hasPiercings: updatedUser.hasPiercings || false,
         isSmoker: updatedUser.isSmoker || false,
         description: updatedUser.description || '',
+        price30Min: updatedUser.price30Min || undefined,
+        price1Hour: updatedUser.price1Hour || undefined,
+        price2Hours: updatedUser.price2Hours || undefined,
+        price3Hours: updatedUser.price3Hours || undefined,
+        price6Hours: updatedUser.price6Hours || undefined,
+        price12Hours: updatedUser.price12Hours || undefined,
+        price24Hours: updatedUser.price24Hours || undefined,
+        priceOvernight: updatedUser.priceOvernight || undefined,
+        priceWeekend: updatedUser.priceWeekend || undefined,
       });
 
       setUser(updatedUser);
@@ -441,6 +454,26 @@ export default function EscortProfileForm() {
                   locale={locale}
                   className="w-full lg:flex-1"
                 />
+              </div>
+
+              {/* Gender */}
+              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+                  Geschlecht
+                </label>
+                <select
+                  value={formData.gender || ''}
+                  onChange={(e) => {
+                    const newData = { ...formData, gender: e.target.value };
+                    setFormData(newData);
+                    debouncedSave(newData);
+                  }}
+                  className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                >
+                  <option value="">Bitte wählen</option>
+                  <option value="Weiblich">Weiblich</option>
+                  <option value="Transgender">Transgender</option>
+                </select>
               </div>
 
               {/* Nationalities */}

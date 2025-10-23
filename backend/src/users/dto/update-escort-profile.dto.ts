@@ -14,6 +14,10 @@ export class UpdateEscortProfileDto {
   birthDate?: string;
 
   @IsOptional()
+  @IsString()
+  gender?: string;
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   nationalities?: string[];

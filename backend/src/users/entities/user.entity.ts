@@ -84,6 +84,9 @@ export class User {
   @Column({ type: 'date', nullable: true })
   birthDate: Date;
 
+  @Column({ nullable: true })
+  gender: string;
+
   @Column('text', { array: true, nullable: true })
   nationalities: string[];
 

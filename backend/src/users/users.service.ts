@@ -61,6 +61,7 @@ export class UsersService {
         'user.profilePicture',
         'user.role',
         'user.birthDate',
+        'user.gender',
         'user.nationalities',
         'user.languages',
         'user.type',
@@ -158,6 +159,7 @@ export class UsersService {
       name?: string;
       showNameInProfile?: boolean;
       birthDate?: string;
+      gender?: string;
       nationalities?: string[];
       languages?: string[];
       type?: string;
@@ -197,6 +199,9 @@ export class UsersService {
     if (updateData.birthDate !== undefined) {
       user.birthDate = new Date(updateData.birthDate);
     }
+
+    // Update gender
+    if (updateData.gender !== undefined) user.gender = updateData.gender;
 
     // Update other fields
     if (updateData.nationalities !== undefined) user.nationalities = updateData.nationalities;

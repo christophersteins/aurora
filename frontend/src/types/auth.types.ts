@@ -15,6 +15,7 @@ export interface User {
   name?: string;
   showNameInProfile?: boolean;
   birthDate?: string;
+  gender?: string;
   nationalities?: string[];
   languages?: string[];
   type?: string;
@@ -31,6 +32,8 @@ export interface User {
   hasPiercings?: boolean;
   isSmoker?: boolean;
   description?: string;
+  isOnline?: boolean;
+  lastSeen?: string;
   // Preise
   price30Min?: number;
   price1Hour?: number;
@@ -73,6 +76,7 @@ export interface UpdateEscortProfileDto {
   name?: string;
   showNameInProfile?: boolean;
   birthDate?: string;
+  gender?: string;
   nationalities?: string[];
   languages?: string[];
   type?: string;
