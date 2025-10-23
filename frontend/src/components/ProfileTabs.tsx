@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Star } from 'lucide-react';
+import { Clock, Star, ChevronDown } from 'lucide-react';
 
 interface ProfileTabsProps {
   escort?: {
@@ -19,99 +19,48 @@ interface ProfileTabsProps {
 export default function ProfileTabs({ escort, initialTab = 'service', onTabChange }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>(initialTab);
 
+  // Accordion state for mobile - only one section open at a time
+  const [openSection, setOpenSection] = useState<string>('service');
+  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   // Update active tab when initialTab changes
   useEffect(() => {
     setActiveTab(initialTab);
   }, [initialTab]);
-  const [isSticky, setIsSticky] = useState(false);
-  const [showHeader, setShowHeader] = useState(false);
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const lastScrollY = useRef(0);
-  const scrollUpDistance = useRef(0);
-  const stickyStartY = useRef(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!tabsRef.current) return;
-
-      const currentScrollY = window.scrollY;
-      const tabsOffsetTop = tabsRef.current.offsetTop;
-      const headerHeight = 64; // Adjust based on your header height
-
-      // Check if we're on mobile/tablet (less than 1024px)
-      const isMobileOrTablet = window.innerWidth < 1024;
-
-      if (!isMobileOrTablet) {
-        // On desktop, reset states
-        setIsSticky(false);
-        setShowHeader(false);
-        scrollUpDistance.current = 0;
-        return;
-      }
-
-      // Determine if tabs should be sticky
-      const shouldBeSticky = currentScrollY >= tabsOffsetTop - headerHeight;
-
-      // Track when sticky state changes
-      if (shouldBeSticky && !isSticky) {
-        stickyStartY.current = currentScrollY;
-        scrollUpDistance.current = 0;
-      }
-
-      setIsSticky(shouldBeSticky);
-
-      // Only track scroll when tabs are sticky
-      if (shouldBeSticky) {
-        const scrollingUp = currentScrollY < lastScrollY.current;
-        const scrollDelta = currentScrollY - lastScrollY.current;
-
-        if (scrollingUp) {
-          // Accumulate upward scroll distance
-          scrollUpDistance.current += Math.abs(scrollDelta);
-
-          // Show header if scrolled up at least 100px
-          if (scrollUpDistance.current >= 100) {
-            setShowHeader(true);
-          }
-        } else {
-          // Scrolling down - reset counter and hide header
-          scrollUpDistance.current = 0;
-          setShowHeader(false);
-        }
-      } else {
-        // Not sticky - reset
-        scrollUpDistance.current = 0;
-        setShowHeader(false);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isSticky]);
-
-  // Update header visibility via CSS class on body
-  useEffect(() => {
-    const header = document.querySelector('header');
-    if (!header) return;
-
-    const isMobileOrTablet = window.innerWidth < 1024;
-
-    if (isMobileOrTablet) {
-      if (isSticky && !showHeader) {
-        header.classList.add('header-hidden');
-      } else {
-        header.classList.remove('header-hidden');
-      }
-    } else {
-      header.classList.remove('header-hidden');
+  const toggleSection = (sectionId: string) => {
+    const headerElement = sectionRefs.current[sectionId];
+    if (!headerElement) {
+      setOpenSection(prev => prev === sectionId ? '' : sectionId);
+      return;
     }
-  }, [isSticky, showHeader]);
+
+    // Get current scroll position and header position
+    const scrollY = window.scrollY;
+    const headerRect = headerElement.getBoundingClientRect();
+    const headerTopRelativeToViewport = headerRect.top;
+    const headerTopAbsolute = scrollY + headerTopRelativeToViewport;
+
+    // Toggle the section
+    setOpenSection(prev => prev === sectionId ? '' : sectionId);
+
+    // After DOM update, restore scroll position to keep header in place
+    requestAnimationFrame(() => {
+      const newScrollY = window.scrollY;
+      const newHeaderRect = headerElement.getBoundingClientRect();
+      const newHeaderTopRelativeToViewport = newHeaderRect.top;
+      const newHeaderTopAbsolute = newScrollY + newHeaderTopRelativeToViewport;
+
+      // Calculate the difference and adjust scroll
+      const scrollDiff = newHeaderTopAbsolute - headerTopAbsolute;
+      if (Math.abs(scrollDiff) > 1) {
+        window.scrollTo({
+          top: newScrollY + scrollDiff,
+          behavior: 'instant',
+        });
+      }
+    });
+  };
 
   const tabs = [
     { id: 'service' as const, label: 'Service' },
@@ -121,28 +70,261 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
     { id: 'bewertungen' as const, label: 'Bewertungen' },
   ];
 
+  // Render helper for tab content
+  const renderTabContent = (tabId: string) => {
+    switch (tabId) {
+      case 'service':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Angebotene Services
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {[
+                'Girlfriend Experience',
+                'Massage',
+                'Erotische Massage',
+                'Outcall',
+                'Incall',
+                'Dinner Date',
+                'Travel Companion',
+                'Overnight',
+                'Role Play',
+              ].map((service) => (
+                <div
+                  key={service}
+                  className="flex items-center gap-3 p-4 rounded-lg border"
+                  style={{
+                    background: 'var(--background-secondary)',
+                    borderColor: 'var(--border)',
+                  }}
+                >
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'var(--color-primary)' }}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-heading)' }}>
+                    {service}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className="p-4 rounded-lg"
+              style={{
+                background: 'rgba(139, 92, 246, 0.05)',
+                border: '1px solid var(--color-primary)',
+              }}
+            >
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                💡 <strong>Hinweis:</strong> Alle Services werden mit höchster Diskretion und Professionalität durchgeführt.
+              </p>
+            </div>
+          </>
+        );
+      case 'preise':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Preisübersicht
+            </h3>
+
+            <div className="space-y-4">
+              {[
+                { duration: '30 Minuten', price: '150€' },
+                { duration: '1 Stunde', price: '250€', featured: true },
+                { duration: '2 Stunden', price: '450€' },
+                { duration: '3 Stunden', price: '600€' },
+                { duration: '6 Stunden', price: '1.000€' },
+                { duration: '12 Stunden', price: '1.800€' },
+                { duration: '24 Stunden', price: '3.000€' },
+                { duration: 'Übernachtung', price: '2.500€' },
+                { duration: 'Wochenende', price: '5.000€' },
+              ].map((item) => (
+                <div
+                  key={item.duration}
+                  className="flex items-center justify-between p-4 rounded-lg border transition-all hover:scale-[1.02]"
+                  style={{
+                    background: item.featured ? 'rgba(139, 92, 246, 0.1)' : 'var(--background-secondary)',
+                    borderColor: item.featured ? 'var(--color-primary)' : 'var(--border)',
+                    borderWidth: item.featured ? '2px' : '1px',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ background: item.featured ? 'var(--color-primary)' : 'var(--background-tertiary)' }}
+                    >
+                      <Clock className="w-5 h-5" style={{ color: item.featured ? 'white' : 'var(--color-primary)' }} />
+                    </div>
+                    <div>
+                      <p className="font-medium" style={{ color: 'var(--text-heading)' }}>
+                        {item.duration}
+                      </p>
+                      {item.featured && (
+                        <p className="text-xs" style={{ color: 'var(--color-primary)' }}>
+                          Beliebt
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                      {item.price}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--background-secondary)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                ℹ️ Alle Preise verstehen sich inklusive aller Services. Sonderwünsche nach Absprache.
+              </p>
+            </div>
+          </>
+        );
+      case 'zeiten':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Verfügbarkeit & Arbeitszeiten
+            </h3>
+
+            <div className="space-y-4 mb-6">
+              {[
+                { day: 'Montag', hours: '10:00 - 22:00', available: true },
+                { day: 'Dienstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Mittwoch', hours: '10:00 - 22:00', available: true },
+                { day: 'Donnerstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Freitag', hours: '12:00 - 02:00', available: true },
+                { day: 'Samstag', hours: '12:00 - 02:00', available: true },
+                { day: 'Sonntag', hours: 'Geschlossen', available: false },
+              ].map((day) => (
+                <div
+                  key={day.day}
+                  className="flex items-center justify-between p-4 rounded-lg border"
+                  style={{
+                    background: 'var(--background-secondary)',
+                    borderColor: 'var(--border)',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: day.available ? '#10b981' : '#ef4444' }}
+                    />
+                    <span className="font-medium" style={{ color: 'var(--text-heading)' }}>
+                      {day.day}
+                    </span>
+                  </div>
+                  <span
+                    className="text-sm"
+                    style={{ color: day.available ? 'var(--text-regular)' : 'var(--text-secondary)' }}
+                  >
+                    {day.hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        );
+      case 'ueber-mich':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Über mich
+            </h3>
+
+            <div className="space-y-6">
+              <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                Hallo! Ich bin eine professionelle Begleiterin mit langjähriger Erfahrung.
+                Ich lege großen Wert auf Diskretion, Professionalität und ein unvergessliches Erlebnis.
+              </p>
+              <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                In meiner Freizeit liebe ich es zu reisen, neue Kulturen kennenzulernen und gutes Essen zu genießen.
+                Ich spreche mehrere Sprachen und bin sehr gebildet.
+              </p>
+            </div>
+          </>
+        );
+      case 'bewertungen':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Bewertungen
+            </h3>
+
+            <div className="space-y-4">
+              {[1, 2, 3].map((review) => (
+                <div
+                  key={review}
+                  className="p-4 rounded-lg border"
+                  style={{
+                    background: 'var(--background-secondary)',
+                    borderColor: 'var(--border)',
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-semibold mb-1" style={{ color: 'var(--text-heading)' }}>
+                        Anonymer Nutzer
+                      </p>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-5 h-5"
+                            style={{ color: '#fbbf24', fill: '#fbbf24' }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      vor 2 Wochen
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                    Absolut professionell und eine wunderbare Erfahrung. Sehr zu empfehlen!
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 text-center">
+              <button className="btn-base btn-secondary cursor-pointer">
+                Alle Bewertungen anzeigen
+              </button>
+            </div>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div
-      className="rounded-lg border-depth"
-      style={{ background: 'var(--background-primary)' }}
-    >
-      {/* Tab Navigation */}
-      <div
-        ref={tabsRef}
-        className="relative transition-all duration-300 lg:static sticky z-30 rounded-t-lg overflow-hidden"
-        style={{
-          background: 'var(--background-primary)',
-          boxShadow: isSticky ? '0 2px 8px rgba(0, 0, 0, 0.3)' : 'none',
-          top: showHeader ? '64px' : '0',
-        }}
-      >
-        {/* Scrollable Tab Container */}
+    <>
+      {/* Desktop: Tabs */}
+      <div className="hidden lg:block rounded-lg border-depth" style={{ background: 'var(--background-primary)' }}>
+        {/* Tab Navigation */}
         <div
-          className="flex overflow-x-auto scrollbar-hide lg:overflow-x-visible"
+          className="flex border-b"
           style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch',
+            borderColor: 'var(--border)',
+            background: 'var(--background-primary)',
           }}
         >
           {tabs.map((tab) => {
@@ -155,12 +337,12 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                   setActiveTab(tab.id);
                   if (onTabChange) onTabChange(tab.id);
                 }}
-                className="flex-1 lg:flex-1 flex-shrink-0 px-4 py-4 flex items-center justify-center text-sm font-medium transition-all cursor-pointer relative whitespace-nowrap"
+                className="flex-1 px-6 py-4 flex items-center justify-center text-sm font-medium transition-all cursor-pointer relative"
                 style={{
                   color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  background: 'transparent',
-                  borderBottom: isActive ? '2px solid var(--color-primary)' : '2px solid var(--border)',
-                  minWidth: '120px',
+                  background: isActive ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
+                  borderBottom: isActive ? '3px solid var(--color-primary)' : '1px solid var(--border)',
+                  fontWeight: isActive ? '600' : '500',
                 }}
               >
                 <span>{tab.label}</span>
@@ -169,25 +351,8 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           })}
         </div>
 
-        {/* Left Gradient Fade Indicator */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-8 pointer-events-none lg:hidden"
-          style={{
-            background: 'linear-gradient(to right, var(--background-primary), transparent)',
-          }}
-        />
-
-        {/* Right Gradient Fade Indicator */}
-        <div
-          className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none lg:hidden"
-          style={{
-            background: 'linear-gradient(to left, var(--background-primary), transparent)',
-          }}
-        />
-      </div>
-
-      {/* Tab Content */}
-      <div className="p-6 sm:p-8">
+        {/* Tab Content */}
+        <div className="p-6 sm:p-8">
         {/* Service Tab */}
         {activeTab === 'service' && (
           <div className="animate-fade-in">
@@ -587,5 +752,53 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         )}
       </div>
     </div>
+
+      {/* Mobile/Tablet: Accordion */}
+      <div className="lg:hidden space-y-3">
+        {tabs.map((tab) => {
+          const isOpen = openSection === tab.id;
+
+          return (
+            <div
+              key={tab.id}
+              ref={(el) => (sectionRefs.current[tab.id] = el)}
+              className="rounded-lg border-depth overflow-hidden"
+              style={{ background: 'var(--background-primary)' }}
+            >
+              {/* Accordion Header */}
+              <button
+                onClick={() => toggleSection(tab.id)}
+                className="w-full px-6 py-4 flex items-center justify-between transition-colors cursor-pointer"
+                style={{
+                  background: isOpen ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
+                  borderBottom: isOpen ? `1px solid var(--border)` : 'none',
+                }}
+              >
+                <span
+                  className="text-base font-semibold"
+                  style={{ color: isOpen ? 'var(--color-primary)' : 'var(--text-heading)' }}
+                >
+                  {tab.label}
+                </span>
+                <ChevronDown
+                  className="w-5 h-5 transition-transform duration-300"
+                  style={{
+                    color: isOpen ? 'var(--color-primary)' : 'var(--text-secondary)',
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
+                />
+              </button>
+
+              {/* Accordion Content */}
+              {isOpen && (
+                <div className="p-6 animate-fade-in">
+                  {renderTabContent(tab.id)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
