@@ -457,4 +457,43 @@ export class UsersService {
 
     return this.usersRepository.save(user);
   }
+
+  async updateProfile(
+    userId: string,
+    updateData: { username?: string; firstName?: string; lastName?: string }
+  ): Promise<Omit<User, 'password'>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if username is being changed and if it's already taken
+    if (updateData.username && updateData.username !== user.username) {
+      const existingUser = await this.usersRepository.findOne({
+        where: { username: updateData.username.toLowerCase() }
+      });
+
+      if (existingUser) {
+        throw new BadRequestException('Username already taken');
+      }
+
+      user.username = updateData.username.toLowerCase();
+    }
+
+    // Update other fields
+    if (updateData.firstName !== undefined) {
+      user.firstName = updateData.firstName;
+    }
+
+    if (updateData.lastName !== undefined) {
+      user.lastName = updateData.lastName;
+    }
+
+    const updatedUser = await this.usersRepository.save(user);
+
+    // Remove password from response
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  }
 }

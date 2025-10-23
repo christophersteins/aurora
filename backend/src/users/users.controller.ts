@@ -23,6 +23,7 @@ import { UpdateEscortProfileDto } from './dto/update-escort-profile.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { User } from './entities/user.entity';
 import { GalleryPhoto } from './entities/gallery-photo.entity';
 import { multerConfig, galleryMulterConfig } from '../config/multer.config';
@@ -84,6 +85,16 @@ export class UsersController {
       updateLocationDto.latitude,
       updateLocationDto.longitude,
     );
+  }
+
+  @Patch('profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<Omit<User, 'password'>> {
+    const userId = req.user.id;
+    return this.usersService.updateProfile(userId, updateProfileDto);
   }
 
   @Patch('escort-profile')

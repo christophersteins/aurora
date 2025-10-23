@@ -34,8 +34,11 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
     try {
       const response = await authService.login({ emailOrUsername, password });
       setAuth(response.user, response.access_token);
+
+      // Close modal and stay on current page
       onClose();
-      router.push('/');
+
+      // No redirect - user stays on the page where they opened the modal
     } catch (err) {
       const errorMessage = err instanceof Error
         ? err.message

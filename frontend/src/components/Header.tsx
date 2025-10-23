@@ -297,7 +297,7 @@ export default function Header() {
                   </Link>
 
                   <Link
-                    href="/escort-profile"
+                    href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
                     onClick={closeMobileMenu}
                     className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >

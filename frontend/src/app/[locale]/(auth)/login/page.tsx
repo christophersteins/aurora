@@ -28,7 +28,16 @@ export default function LoginPage() {
     try {
       const response = await authService.login({ emailOrUsername, password });
       setAuth(response.user, response.access_token);
-      router.push('/');
+
+      // Redirect based on user role
+      // Customers go to home page, escorts go to their profile or dashboard
+      if (response.user.role === 'customer') {
+        router.push('/');
+      } else if (response.user.role === 'escort') {
+        router.push('/escort-profile');
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error
         ? err.message

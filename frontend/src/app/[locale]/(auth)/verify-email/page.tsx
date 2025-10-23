@@ -49,8 +49,15 @@ export default function VerifyEmailPage() {
       // Store auth data
       setAuth(response.access_token, response.user);
 
-      // Redirect to profile
-      router.push('/escort-profile');
+      // Redirect based on role
+      // Customers go to home page, escorts go to their profile
+      if (role === 'customer') {
+        router.push('/');
+      } else if (role === 'escort') {
+        router.push('/escort-profile');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || t('verificationFailed');
       setError(errorMessage);
