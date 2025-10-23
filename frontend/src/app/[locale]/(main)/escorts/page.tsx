@@ -77,6 +77,7 @@ const initialFilters: Filters = {
 
 const FILTER_STORAGE_KEY = 'aurora_member_filters';
 const LOCATION_SEARCH_KEY = 'aurora_location_search';
+const SORT_STORAGE_KEY = 'aurora_member_sort';
 
 type GridView = 'compact' | 'comfortable';
 
@@ -111,7 +112,32 @@ export default function MembersPage() {
     return initialFilters;
   });
 
-  const [sortBy, setSortBy] = useState<'distance'>('distance');
+  type SortOption =
+    | 'distance'
+    | 'age-desc'
+    | 'age-asc'
+    | 'cupSize-desc'
+    | 'cupSize-asc'
+    | 'height-desc'
+    | 'height-asc'
+    | 'weight-desc'
+    | 'weight-asc';
+
+  // Initialize sortBy from localStorage
+  const [sortBy, setSortBy] = useState<SortOption>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedSort = localStorage.getItem(SORT_STORAGE_KEY);
+        if (savedSort) {
+          return savedSort as SortOption;
+        }
+      } catch (error) {
+        console.error('Error loading sort preference during initialization:', error);
+      }
+    }
+    return 'distance';
+  });
+
   const [gridView, setGridView] = useState<GridView>('comfortable');
 
   // Location search states - also initialize from localStorage
@@ -299,6 +325,30 @@ export default function MembersPage() {
       console.error('Error saving location search to LocalStorage:', error);
     }
   }, [locationSearch]);
+
+  // Save sort preference to LocalStorage on changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(SORT_STORAGE_KEY, sortBy);
+    } catch (error) {
+      console.error('Error saving sort preference to LocalStorage:', error);
+    }
+  }, [sortBy]);
+
+  // Save filters to LocalStorage on changes
+  useEffect(() => {
+    // Skip saving on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    try {
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+    } catch (error) {
+      console.error('Error saving filters to LocalStorage:', error);
+    }
+  }, [filters]);
 
   // Load all escorts on mount
   useEffect(() => {
@@ -622,36 +672,89 @@ export default function MembersPage() {
     return true;
   });
 
-  // Sort by distance (ascending - nearest first)
+  // Helper function to calculate distance for secondary sorting
+  const getDistance = (escort: User) => {
+    if (!filters.useRadius || !filters.userLatitude || !filters.userLongitude) {
+      return Infinity;
+    }
+    const coords = escort.location?.coordinates;
+    if (!coords || coords.length !== 2) return Infinity;
+    const [lon, lat] = coords;
+    return calculateDistance(filters.userLatitude, filters.userLongitude, lat, lon);
+  };
+
+  // Helper function to calculate age from birthdate
+  const getAge = (birthDate: string | undefined): number => {
+    if (!birthDate) return 0;
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Helper function to convert cup size to numeric value for sorting
+  const cupSizeToNumber = (cupSize: string | undefined): number => {
+    if (!cupSize) return 0;
+    const sizes = ['A', 'B', 'C', 'D', 'DD', 'E', 'F', 'G', 'H'];
+    const index = sizes.indexOf(cupSize.toUpperCase());
+    return index >= 0 ? index : 0;
+  };
+
+  // Sort escorts
   const sortedEscorts = [...filteredEscorts].sort((a, b) => {
-    if (sortBy === 'distance' && filters.useRadius && filters.userLatitude && filters.userLongitude) {
-      const aCoords = a.location?.coordinates;
-      const bCoords = b.location?.coordinates;
+    let primaryComparison = 0;
 
-      if (!aCoords || aCoords.length !== 2) return 1;
-      if (!bCoords || bCoords.length !== 2) return -1;
+    switch (sortBy) {
+      case 'distance':
+        primaryComparison = getDistance(a) - getDistance(b);
+        break;
 
-      const [aLon, aLat] = aCoords;
-      const [bLon, bLat] = bCoords;
+      case 'age-desc':
+        primaryComparison = getAge(b.birthDate) - getAge(a.birthDate);
+        break;
 
-      const distanceA = calculateDistance(
-        filters.userLatitude,
-        filters.userLongitude,
-        aLat,
-        aLon
-      );
+      case 'age-asc':
+        primaryComparison = getAge(a.birthDate) - getAge(b.birthDate);
+        break;
 
-      const distanceB = calculateDistance(
-        filters.userLatitude,
-        filters.userLongitude,
-        bLat,
-        bLon
-      );
+      case 'cupSize-desc':
+        primaryComparison = cupSizeToNumber(b.cupSize) - cupSizeToNumber(a.cupSize);
+        break;
 
-      return distanceA - distanceB;
+      case 'cupSize-asc':
+        primaryComparison = cupSizeToNumber(a.cupSize) - cupSizeToNumber(b.cupSize);
+        break;
+
+      case 'height-desc':
+        primaryComparison = (b.height || 0) - (a.height || 0);
+        break;
+
+      case 'height-asc':
+        primaryComparison = (a.height || 0) - (b.height || 0);
+        break;
+
+      case 'weight-desc':
+        primaryComparison = (b.weight || 0) - (a.weight || 0);
+        break;
+
+      case 'weight-asc':
+        primaryComparison = (a.weight || 0) - (b.weight || 0);
+        break;
+
+      default:
+        primaryComparison = 0;
     }
 
-    return 0;
+    // If primary comparison is equal, sort by distance (secondary sort)
+    if (primaryComparison === 0) {
+      return getDistance(a) - getDistance(b);
+    }
+
+    return primaryComparison;
   });
 
   // Navigate to profile
@@ -891,6 +994,118 @@ export default function MembersPage() {
                           )}
                         </div>
                       </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('age-desc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortAgeDesc')}</span>
+                          {sortBy === 'age-desc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('age-asc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortAgeAsc')}</span>
+                          {sortBy === 'age-asc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('cupSize-desc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortCupSizeDesc')}</span>
+                          {sortBy === 'cupSize-desc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('cupSize-asc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortCupSizeAsc')}</span>
+                          {sortBy === 'cupSize-asc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('height-desc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortHeightDesc')}</span>
+                          {sortBy === 'height-desc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('height-asc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortHeightAsc')}</span>
+                          {sortBy === 'height-asc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('weight-desc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortWeightDesc')}</span>
+                          {sortBy === 'weight-desc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortBy('weight-asc');
+                          setShowMobileSortDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-body">{t('sortWeightAsc')}</span>
+                          {sortBy === 'weight-asc' && (
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                          )}
+                        </div>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -1041,10 +1256,18 @@ export default function MembersPage() {
               <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'distance')}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
                 className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-muted appearance-none cursor-pointer"
               >
                 <option value="distance">{t('sortDistanceAsc')}</option>
+                <option value="age-desc">{t('sortAgeDesc')}</option>
+                <option value="age-asc">{t('sortAgeAsc')}</option>
+                <option value="cupSize-desc">{t('sortCupSizeDesc')}</option>
+                <option value="cupSize-asc">{t('sortCupSizeAsc')}</option>
+                <option value="height-desc">{t('sortHeightDesc')}</option>
+                <option value="height-asc">{t('sortHeightAsc')}</option>
+                <option value="weight-desc">{t('sortWeightDesc')}</option>
+                <option value="weight-asc">{t('sortWeightAsc')}</option>
               </select>
             </div>
 
