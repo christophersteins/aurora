@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '@/contexts/SocketContext';
 
 interface Message {
@@ -43,6 +43,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load conversation details to get other user's name
   useEffect(() => {
@@ -129,6 +130,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     };
   }, [socket, conversationId]);
 
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || !conversationId || !socket) return;
 
@@ -140,59 +146,91 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
     console.log('📤 Sende Nachricht:', messageData);
     socket.emit('sendMessage', messageData);
-    
+
     setInputValue('');
   };
 
   if (!conversationId) {
     return (
       <div className="flex items-center justify-center h-full bg-page-primary">
-        <p className="text-muted">Wähle eine Konversation aus</p>
+        <div className="text-center">
+          <svg className="w-20 h-20 mx-auto mb-4 text-muted opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+          <p className="text-muted text-lg">Wähle eine Konversation aus</p>
+          <p className="text-muted text-sm mt-2 opacity-75">oder starte eine neue Unterhaltung</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-page-primary">
-      <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center">
-        <h2 className="font-semibold text-heading">
+    <div className="flex flex-col h-full bg-page-primary w-full">
+      {/* Header */}
+      <div className="p-4 border-b border-default bg-page-primary sticky top-0 z-10">
+        <h2 className="font-bold text-lg text-heading">
           {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
         </h2>
-        <span className={`text-sm ${isConnected ? 'text-success' : 'text-error'}`}>
-          {isConnected ? '🟢 Verbunden' : '🔴 Getrennt'}
+        <span className={`text-xs px-3 py-1 rounded-full font-medium inline-block mt-2 ${
+          isConnected
+            ? 'bg-success/10 text-success'
+            : 'bg-error/10 text-error'
+        }`}>
+          <span className={`inline-block w-2 h-2 rounded-full mr-1.5 ${
+            isConnected ? 'bg-success' : 'bg-error'
+          }`}></span>
+          {isConnected ? 'Verbunden' : 'Getrennt'}
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary">
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide">
         {isLoading ? (
-          <p className="text-muted text-center">Lade Nachrichten...</p>
-        ) : messages.length === 0 ? (
-          <p className="text-muted text-center">Noch keine Nachrichten</p>
-        ) : (
-          messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-xs px-4 py-2 rounded-lg ${
-                  msg.senderId === currentUserId
-                    ? 'bg-action-primary text-button-primary'
-                    : 'bg-page-secondary text-body'
-                }`}
-              >
-                <p>{msg.content}</p>
-                <span className="text-xs opacity-75">
-                  {msg.timestamp.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+              <p className="text-muted">Lade Nachrichten...</p>
             </div>
-          ))
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <svg className="w-16 h-16 mx-auto mb-3 text-muted opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <p className="text-muted">Noch keine Nachrichten</p>
+              <p className="text-muted text-sm mt-1 opacity-75">Schreibe die erste Nachricht</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              >
+                <div
+                  className={`max-w-full md:max-w-[85%] px-4 py-2.5 rounded-2xl shadow-sm ${
+                    msg.senderId === currentUserId
+                      ? 'bg-action-primary text-button-primary rounded-br-md'
+                      : 'bg-page-secondary text-body rounded-bl-md border border-default'
+                  }`}
+                >
+                  <p className="break-words">{msg.content}</p>
+                  <span className="text-xs opacity-70 block mt-1">
+                    {msg.timestamp.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </>
         )}
       </div>
 
+      {/* Input Area */}
       <div className="p-4 border-t border-default bg-page-primary">
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="text"
             value={inputValue}
@@ -200,14 +238,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Nachricht eingeben..."
             disabled={!isConnected || isLoading}
-            className="flex-1 px-4 py-2 border border-default rounded-lg focus:outline-none disabled:opacity-50 bg-page-secondary text-body"
+            className="flex-1 px-4 py-3 border border-default rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
           />
           <button
             onClick={handleSendMessage}
-            disabled={!isConnected || isLoading}
-            className="px-6 py-2 bg-action-primary text-button-primary rounded-lg hover:bg-action-primary-hover transition disabled:opacity-50"
+            disabled={!isConnected || isLoading || !inputValue.trim()}
+            className="px-6 py-3 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 flex items-center gap-2"
           >
-            Senden
+            <span>Senden</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </button>
         </div>
       </div>
