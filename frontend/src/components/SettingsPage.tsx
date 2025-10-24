@@ -25,6 +25,42 @@ export default function SettingsPage() {
   // Track if component is mounting (to disable animations on initial load)
   const [isMounting, setIsMounting] = useState(true);
 
+  // Define sections array
+  const sections = [
+    { id: 'konto', label: t('sections.account'), icon: User },
+    { id: 'sicherheit', label: t('sections.security'), icon: Lock },
+    { id: 'datenschutz', label: t('sections.privacy'), icon: Shield },
+    { id: 'mitteilungen', label: t('sections.notifications'), icon: Bell },
+    { id: 'premium', label: t('sections.premium'), icon: Star },
+    { id: 'barrierefreiheit', label: t('sections.accessibility'), icon: Accessibility },
+    { id: 'sprache', label: t('sections.language'), icon: Globe },
+  ];
+
+  // Scroll spy effect for desktop navigation
+  useEffect(() => {
+    // Only run on desktop
+    if (typeof window === 'undefined' || window.innerWidth < 1024) return;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150; // Offset for sticky header
+
+      // Find which section is currently in view
+      for (const section of sections) {
+        const element = document.getElementById(section.id);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSidebarSection(section.id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Account settings state
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
@@ -194,15 +230,16 @@ export default function SettingsPage() {
     });
   };
 
-  const sections = [
-    { id: 'konto', label: t('sections.account'), icon: User },
-    { id: 'sicherheit', label: t('sections.security'), icon: Lock },
-    { id: 'datenschutz', label: t('sections.privacy'), icon: Shield },
-    { id: 'mitteilungen', label: t('sections.notifications'), icon: Bell },
-    { id: 'premium', label: t('sections.premium'), icon: Star },
-    { id: 'barrierefreiheit', label: t('sections.accessibility'), icon: Accessibility },
-    { id: 'sprache', label: t('sections.language'), icon: Globe },
-  ];
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offsetTop = element.offsetTop - 100; // Offset for sticky header and padding
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <div>
@@ -262,10 +299,7 @@ export default function SettingsPage() {
               return (
                 <button
                   key={section.id}
-                  onClick={() => {
-                    setActiveSidebarSection(section.id);
-                    localStorage.setItem('settings-active-section', section.id);
-                  }}
+                  onClick={() => scrollToSection(section.id)}
                   className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
                     isActive
                       ? 'text-action-primary'
@@ -291,7 +325,7 @@ export default function SettingsPage() {
               id="konto"
               className={`scroll-mt-8 ${
                 activeSection === 'konto' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'konto' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('account.title')}</h2>
 
@@ -504,7 +538,7 @@ export default function SettingsPage() {
               id="sicherheit"
               className={`scroll-mt-8 ${
                 activeSection === 'sicherheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'sicherheit' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Sicherheit</h2>
               <p className="text-muted">Sicherheitseinstellungen werden hier angezeigt.</p>
@@ -515,7 +549,7 @@ export default function SettingsPage() {
               id="datenschutz"
               className={`scroll-mt-8 ${
                 activeSection === 'datenschutz' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'datenschutz' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Datenschutz</h2>
               <p className="text-muted">Datenschutzeinstellungen werden hier angezeigt.</p>
@@ -526,7 +560,7 @@ export default function SettingsPage() {
               id="mitteilungen"
               className={`scroll-mt-8 ${
                 activeSection === 'mitteilungen' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'mitteilungen' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Mitteilungen</h2>
               <p className="text-muted">Mitteilungseinstellungen werden hier angezeigt.</p>
@@ -537,7 +571,7 @@ export default function SettingsPage() {
               id="premium"
               className={`scroll-mt-8 ${
                 activeSection === 'premium' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'premium' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Premium</h2>
               <p className="text-muted">Premium-Einstellungen werden hier angezeigt.</p>
@@ -548,7 +582,7 @@ export default function SettingsPage() {
               id="barrierefreiheit"
               className={`scroll-mt-8 ${
                 activeSection === 'barrierefreiheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'barrierefreiheit' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Barrierefreiheit</h2>
               <p className="text-muted">Barrierefreiheitseinstellungen werden hier angezeigt.</p>
@@ -559,7 +593,7 @@ export default function SettingsPage() {
               id="sprache"
               className={`scroll-mt-8 ${
                 activeSection === 'sprache' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } ${activeSidebarSection === 'sprache' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('language.title')}</h2>
               <p className="text-muted mb-6">{t('language.description')}</p>
