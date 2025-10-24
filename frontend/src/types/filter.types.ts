@@ -1,5 +1,13 @@
 export interface MemberFilters {
   searchQuery: string;
+  // Nur anzeigen
+  availableNow: boolean;
+  onlineNow: boolean;
+  verified: boolean;
+  withPhoto: boolean;
+  newProfile: boolean;
+  showsPrices: boolean;
+  withReviews: boolean;
   ageMin: number | null;
   ageMax: number | null;
   nationalities: string[];
@@ -17,7 +25,6 @@ export interface MemberFilters {
   intimateHair: string[];
   hasTattoos: 'all' | 'yes' | 'no';
   hasPiercings: 'all' | 'yes' | 'no';
-  isSmoker: 'all' | 'yes' | 'no';
   // Radius-Filter
   useRadius: boolean;
   radiusKm: number;
@@ -27,6 +34,14 @@ export interface MemberFilters {
 
 export const initialFilters: MemberFilters = {
   searchQuery: '',
+  // Nur anzeigen
+  availableNow: false,
+  onlineNow: false,
+  verified: false,
+  withPhoto: false,
+  newProfile: false,
+  showsPrices: false,
+  withReviews: false,
   ageMin: null,
   ageMax: null,
   nationalities: [],
@@ -44,7 +59,6 @@ export const initialFilters: MemberFilters = {
   intimateHair: [],
   hasTattoos: 'all',
   hasPiercings: 'all',
-  isSmoker: 'all',
   // Radius-Filter Defaults
   useRadius: false,
   radiusKm: 50,

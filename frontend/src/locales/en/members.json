@@ -34,6 +34,15 @@
   "filters": {
     "title": "Filter",
     "search": "Search",
+    "searchPlaceholder": "Name or username...",
+    "showOnly": "Show only",
+    "availableNow": "Available now",
+    "onlineNow": "Online now",
+    "verified": "Verified",
+    "withPhoto": "With photo",
+    "newProfile": "New profile",
+    "showsPrices": "Shows prices",
+    "withReviews": "With reviews",
     "radiusSearch": "Radius search",
     "radiusActive": "Radius search active",
     "radiusEnable": "Enable radius search",
@@ -43,9 +52,9 @@
     "nationality": "Nationality",
     "languages": "Languages",
     "type": "Type",
-    "height": "Height (cm)",
-    "weight": "Weight (kg)",
-    "bodyType": "Body Type",
+    "height": "Height",
+    "weight": "Weight",
+    "bodyType": "Body",
     "cupSize": "Cup Size",
     "hairColor": "Hair Color",
     "hairLength": "Hair Length",
@@ -56,6 +65,11 @@
     "smoker": "Smoker",
     "all": "All",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "units": {
+      "age": "years",
+      "cm": "cm",
+      "kg": "kg"
+    }
   }
 }

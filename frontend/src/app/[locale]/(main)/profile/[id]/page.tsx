@@ -11,10 +11,13 @@ import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import ProfileTabs from '@/components/ProfileTabs';
 import { scrollPositionUtil } from '@/utils/scrollPosition';
+import { useAuthStore } from '@/store/authStore';
+import axios from 'axios';
 
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const { user, token } = useAuthStore();
   const [escort, setEscort] = useState<User | null>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +31,10 @@ export default function ProfilePage() {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [isCurrentImagePortrait, setIsCurrentImagePortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [phoneCopied, setPhoneCopied] = useState(false);
+  const [mediaTab, setMediaTab] = useState<'fotos' | 'videos'>('fotos');
 
   // Detect if mobile on client side
   useEffect(() => {
@@ -41,10 +48,35 @@ export default function ProfilePage() {
 
   // Mock data for reviews (replace with real data later)
   const reviewCount = 24;
-  const averageRating = 3.5;
+  const averageRating = 2.4;
 
   // Mock phone number (replace with real data later)
   const phoneNumber = '+49 151 12345678';
+
+  // Check if escort is bookmarked
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      if (!user || !escort || user.role !== 'customer' || !token) {
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/users/bookmarks/check/${escort.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setIsBookmarked(response.data.isBookmarked);
+      } catch (error) {
+        console.error('Error checking bookmark status:', error);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [user, escort, token]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -95,7 +127,14 @@ export default function ProfilePage() {
 
           // Get user's location and calculate distance
           try {
-            const ipResponse = await fetch('https://ipapi.co/json/');
+            const ipResponse = await fetch('https://ipapi.co/json/', {
+              signal: AbortSignal.timeout(5000) // 5 second timeout
+            });
+
+            if (!ipResponse.ok) {
+              throw new Error('IP API request failed');
+            }
+
             const ipData = await ipResponse.json();
 
             if (ipData.latitude && ipData.longitude) {
@@ -118,7 +157,8 @@ export default function ProfilePage() {
               setDistanceKm(Math.round(distance));
             }
           } catch (error) {
-            console.error('Error calculating distance:', error);
+            // Silently fail - distance calculation is not critical
+            // User will simply not see distance information
           }
         }
       } catch (err) {
@@ -274,8 +314,12 @@ export default function ProfilePage() {
   const handleCopyPhone = async () => {
     try {
       await navigator.clipboard.writeText(phoneNumber);
-      alert('Telefonnummer wurde kopiert!');
-      setShowPhoneModal(false);
+      setPhoneCopied(true);
+      // Wait 1.5 seconds, then close the modal
+      setTimeout(() => {
+        setShowPhoneModal(false);
+        setPhoneCopied(false);
+      }, 1500);
     } catch (error) {
       console.error('Failed to copy phone number:', error);
     }
@@ -294,6 +338,44 @@ export default function ProfilePage() {
   const handleTelegram = () => {
     window.open(`https://t.me/${phoneNumber.replace(/\s+/g, '')}`, '_blank');
     setShowPhoneModal(false);
+  };
+
+  const handleBookmarkClick = async () => {
+    if (!user || !escort || !token) {
+      router.push('/login');
+      return;
+    }
+
+    if (user.role !== 'customer') {
+      return;
+    }
+
+    setBookmarkLoading(true);
+    try {
+      if (isBookmarked) {
+        await axios.delete(`http://localhost:4000/users/bookmarks/${escort.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setIsBookmarked(false);
+      } else {
+        await axios.post(
+          `http://localhost:4000/users/bookmarks/${escort.id}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setIsBookmarked(true);
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    } finally {
+      setBookmarkLoading(false);
+    }
   };
 
   if (loading) {
@@ -332,9 +414,9 @@ export default function ProfilePage() {
           <button
             onClick={handleBackClick}
             className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-            style={{ color: 'var(--color-primary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Zurück</span>
@@ -342,24 +424,31 @@ export default function ProfilePage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-6">
-            {/* Bookmark */}
-            <button
-              className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-              style={{ color: 'var(--text-secondary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-            >
-              <Bookmark className="w-5 h-5" />
-              <span className="hidden sm:inline">Merken</span>
-            </button>
+            {/* Bookmark - Only visible for customers */}
+            {user && user.role === 'customer' && (
+              <button
+                onClick={handleBookmarkClick}
+                disabled={bookmarkLoading}
+                className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ color: 'var(--color-primary)' }}
+                onMouseEnter={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+                onMouseLeave={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--color-primary)')}
+              >
+                <Bookmark
+                  className="w-5 h-5"
+                  fill={isBookmarked ? 'currentColor' : 'none'}
+                />
+                <span className="hidden sm:inline">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
+              </button>
+            )}
 
             {/* Share */}
             <button
               onClick={handleShareClick}
               className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-              style={{ color: 'var(--text-secondary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              style={{ color: 'var(--color-primary)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
             >
               <svg
                 className="w-5 h-5"
@@ -367,12 +456,8 @@ export default function ProfilePage() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
               >
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                <polyline points="16 6 12 2 8 6"></polyline>
-                <line x1="12" y1="2" x2="12" y2="15"></line>
+                <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
               </svg>
               <span className="hidden sm:inline">Teilen</span>
             </button>
@@ -380,9 +465,9 @@ export default function ProfilePage() {
             {/* Report */}
             <button
               className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-              style={{ color: 'var(--text-secondary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              style={{ color: 'var(--color-primary)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
             >
               <Flag className="w-5 h-5" />
               <span className="hidden sm:inline">Melden</span>
@@ -391,7 +476,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
           {/* Photo Gallery - 2/3 width */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-primary)' }}>
@@ -413,9 +498,9 @@ export default function ProfilePage() {
                           backgroundImage: `url(${photos[selectedImageIndex]})`,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
-                          filter: 'blur(20px)',
-                          transform: 'scale(1.1)',
-                          opacity: 0.8
+                          filter: 'blur(60px)',
+                          transform: 'scale(1.15)',
+                          opacity: 0.7
                         }}
                       />
                     )}
@@ -510,7 +595,7 @@ export default function ProfilePage() {
 
           {/* Profile Info - 1/3 width */}
           <div className="lg:col-span-1">
-            <div className="rounded-lg p-6 border-depth space-y-6 lg:h-[600px] overflow-y-auto" style={{ background: 'var(--background-primary)' }}>
+            <div className="rounded-lg p-6 border-depth space-y-6 lg:h-[600px]" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
                 {/* Show name only if showNameInProfile is true and name exists */}
@@ -558,15 +643,32 @@ export default function ProfilePage() {
                 {/* Rating - directly below username */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex items-center gap-0.5">
+                    <svg width="0" height="0" style={{ position: 'absolute' }}>
+                      <defs>
+                        {[...Array(5)].map((_, i) => {
+                          const fillPercentage = Math.min(Math.max((averageRating - i) * 100, 0), 100);
+                          return (
+                            <linearGradient key={i} id={`star-gradient-${i}`}>
+                              <stop offset={`${fillPercentage}%`} stopColor="var(--color-primary)" />
+                              <stop offset={`${fillPercentage}%`} stopColor="var(--background-secondary)" />
+                            </linearGradient>
+                          );
+                        })}
+                      </defs>
+                    </svg>
                     {[...Array(5)].map((_, i) => (
-                      <Star
+                      <svg
                         key={i}
                         className="w-4 h-4"
-                        style={{
-                          color: i < Math.floor(averageRating) ? 'var(--color-primary)' : 'var(--background-secondary)',
-                          fill: i < Math.floor(averageRating) ? 'var(--color-primary)' : 'var(--background-secondary)',
-                        }}
-                      />
+                        viewBox="0 0 24 24"
+                        fill={`url(#star-gradient-${i})`}
+                        stroke={`url(#star-gradient-${i})`}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
                     ))}
                   </div>
                   <span className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>
@@ -585,21 +687,24 @@ export default function ProfilePage() {
 
                 {/* Location and Distance */}
                 <div className="space-y-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
-                  {locationText && (
-                    <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {locationText}
-                      </span>
-                    </div>
-                  )}
-
-                  {distanceKm !== null && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {distanceKm} km
-                      </span>
+                  {(locationText || distanceKm !== null) && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {locationText && (
+                        <>
+                          <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            {locationText}
+                          </span>
+                        </>
+                      )}
+                      {distanceKm !== null && (
+                        <>
+                          <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                            {distanceKm} km
+                          </span>
+                        </>
+                      )}
                     </div>
                   )}
 
@@ -641,71 +746,71 @@ export default function ProfilePage() {
 
                 {/* Attributes */}
                 <div className="space-y-2">
-                  {age && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Alter:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{age} Jahre</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Alter:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {age ? `${age} Jahre` : 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {escort.gender && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Geschlecht:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.gender}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Geschlecht:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {escort.gender || 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {escort.nationalities && escort.nationalities.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Nationalität:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.nationalities.join(', ')}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Nationalität:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {escort.nationalities && escort.nationalities.length > 0 ? escort.nationalities.join(', ') : 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {/* Körper */}
-                  {(escort.height || escort.weight || escort.bodyType) && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Körper:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                        {[
-                          escort.height ? `${escort.height} cm` : null,
-                          escort.weight ? `${escort.weight} kg` : null,
-                          escort.bodyType
-                        ].filter(Boolean).join(', ')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Körper - only show "keine Angabe" if ALL sub-attributes are empty */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Körper:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {(escort.height || escort.weight || escort.bodyType)
+                        ? [
+                            escort.height ? `${escort.height} cm` : null,
+                            escort.weight ? `${escort.weight} kg` : null,
+                            escort.bodyType
+                          ].filter(Boolean).join(', ')
+                        : 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {escort.cupSize && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Oberweite:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.cupSize} Körbchen</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Oberweite:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {escort.cupSize ? `${escort.cupSize} Körbchen` : 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {/* Haar */}
-                  {(escort.hairLength || escort.hairColor) && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Haar:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                        {[escort.hairLength, escort.hairColor].filter(Boolean).join(', ')}
-                      </span>
-                    </div>
-                  )}
+                  {/* Haare - only show "keine Angabe" if ALL sub-attributes are empty */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Haare:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {(escort.hairLength || escort.hairColor)
+                        ? [escort.hairLength, escort.hairColor].filter(Boolean).join(', ')
+                        : 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {escort.eyeColor && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Augenfarbe:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.eyeColor}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Augenfarbe:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {escort.eyeColor || 'keine Angabe'}
+                    </span>
+                  </div>
 
-                  {escort.languages && escort.languages.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Sprachen:</span>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>{escort.languages.join(', ')}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Sprachen:</span>
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {escort.languages && escort.languages.length > 0 ? escort.languages.join(', ') : 'keine Angabe'}
+                    </span>
+                  </div>
 
                   {/* Körperschmuck */}
                   <div className="flex items-center gap-2">
@@ -847,8 +952,7 @@ export default function ProfilePage() {
         {/* Phone Modal */}
         {showPhoneModal && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center mobile-menu-backdrop"
-            style={{ background: 'rgba(0, 0, 0, 0.7)' }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 mobile-menu-backdrop"
             onClick={() => setShowPhoneModal(false)}
           >
             <div
@@ -885,19 +989,30 @@ export default function ProfilePage() {
                 <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text-heading)' }}>
                   Telefonnummer
                 </h3>
-                <p className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
-                  {phoneNumber}
-                </p>
+                {phoneCopied ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" style={{ color: 'var(--color-primary)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <p className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
+                      Telefonnummer wurde kopiert!
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
+                    {phoneNumber}
+                  </p>
+                )}
               </div>
 
-              {/* Action Links - Horizontal Grid */}
-              <div className="grid grid-cols-4 gap-4">
+              {/* Action Links - Horizontal on Desktop, Vertical on Mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <button
                   onClick={handleCopyPhone}
                   className="flex flex-col items-center gap-2 py-4 px-2 rounded-lg transition-all cursor-pointer border-depth"
                   style={{
-                    background: 'var(--background-secondary)',
-                    color: 'var(--text-heading)',
+                    background: 'var(--background-primary)',
+                    color: 'var(--color-primary)',
                     border: '1px solid var(--border)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
@@ -918,8 +1033,8 @@ export default function ProfilePage() {
                   onClick={handleCallPhone}
                   className="flex flex-col items-center gap-2 py-4 px-2 rounded-lg transition-all cursor-pointer border-depth"
                   style={{
-                    background: 'var(--background-secondary)',
-                    color: 'var(--text-heading)',
+                    background: 'var(--background-primary)',
+                    color: 'var(--color-primary)',
                     border: '1px solid var(--border)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
@@ -940,8 +1055,8 @@ export default function ProfilePage() {
                   onClick={handleWhatsApp}
                   className="flex flex-col items-center gap-2 py-4 px-2 rounded-lg transition-all cursor-pointer border-depth"
                   style={{
-                    background: 'var(--background-secondary)',
-                    color: 'var(--text-heading)',
+                    background: 'var(--background-primary)',
+                    color: 'var(--color-primary)',
                     border: '1px solid var(--border)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
@@ -964,8 +1079,8 @@ export default function ProfilePage() {
                   onClick={handleTelegram}
                   className="flex flex-col items-center gap-2 py-4 px-2 rounded-lg transition-all cursor-pointer border-depth"
                   style={{
-                    background: 'var(--background-secondary)',
-                    color: 'var(--text-heading)',
+                    background: 'var(--background-primary)',
+                    color: 'var(--color-primary)',
                     border: '1px solid var(--border)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}

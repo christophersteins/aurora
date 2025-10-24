@@ -80,7 +80,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Angebotene Services
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
               {[
                 'Girlfriend Experience',
                 'Massage',
@@ -94,29 +94,25 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               ].map((service) => (
                 <div
                   key={service}
-                  className="flex items-center gap-3 p-4 rounded-lg border"
+                  className="group relative px-4 py-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
                   style={{
-                    background: 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
+                    background: 'var(--background-primary)',
+                    borderColor: 'var(--color-primary)',
+                    borderWidth: '1.5px',
                   }}
                 >
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-primary)' }}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                      style={{ background: 'var(--color-primary)' }}
+                    />
+                    <span
+                      className="text-sm font-medium leading-tight"
+                      style={{ color: 'var(--text-heading)' }}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                      {service}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--text-heading)' }}>
-                    {service}
-                  </span>
                 </div>
               ))}
             </div>
@@ -360,7 +356,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Angebotene Services
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
               {[
                 'Girlfriend Experience',
                 'Massage',
@@ -374,29 +370,25 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               ].map((service) => (
                 <div
                   key={service}
-                  className="flex items-center gap-3 p-4 rounded-lg border"
+                  className="group relative px-4 py-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
                   style={{
-                    background: 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
+                    background: 'var(--background-primary)',
+                    borderColor: 'var(--color-primary)',
+                    borderWidth: '1.5px',
                   }}
                 >
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-primary)' }}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="white"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                      style={{ background: 'var(--color-primary)' }}
+                    />
+                    <span
+                      className="text-sm font-medium leading-tight"
+                      style={{ color: 'var(--text-heading)' }}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                      {service}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--text-heading)' }}>
-                    {service}
-                  </span>
                 </div>
               ))}
             </div>

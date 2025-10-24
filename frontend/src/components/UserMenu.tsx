@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState, useRef, useEffect } from 'react';
-import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { User, Settings, LogOut, ChevronDown, Bookmark } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LogoutModal from './LogoutModal';
 
@@ -120,6 +120,18 @@ export default function UserMenu() {
               <User size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('myProfile')}</span>
             </Link>
+
+            {/* Merkliste - nur für Kunden */}
+            {user.role === 'customer' && (
+              <Link
+                href="/merkliste"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
+              >
+                <Bookmark size={18} className="text-[#71767b]" />
+                <span className="font-medium">{t('bookmarks')}</span>
+              </Link>
+            )}
 
             <Link
               href="/settings"

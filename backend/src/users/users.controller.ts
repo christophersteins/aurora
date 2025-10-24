@@ -144,6 +144,38 @@ export class UsersController {
     };
   }
 
+  @Patch('profile-picture/from-gallery')
+  @UseGuards(JwtAuthGuard)
+  async setProfilePictureFromGallery(
+    @Request() req,
+    @Body() body: { photoUrl: string },
+  ) {
+    const userId = req.user.id;
+    const { photoUrl } = body;
+
+    if (!photoUrl) {
+      throw new BadRequestException('Photo URL is required');
+    }
+
+    // Verify that the photo belongs to the user
+    const photo = await this.galleryPhotosService.getUserPhotos(userId);
+    const photoExists = photo.some(p => p.photoUrl === photoUrl);
+
+    if (!photoExists) {
+      throw new BadRequestException('Photo not found in gallery');
+    }
+
+    // Update user's profile picture
+    await this.usersService.updateUser(userId, {
+      profilePicture: photoUrl,
+    });
+
+    return {
+      message: 'Profile picture updated successfully',
+      profilePicture: photoUrl,
+    };
+  }
+
   // Gallery Photo Endpoints
   @Post('upload-gallery-photos')
   @UseGuards(JwtAuthGuard)
@@ -257,6 +289,38 @@ export class UsersController {
     );
 
     return { message: 'Password updated successfully' };
+  }
+
+  // Bookmark / Merkliste Endpoints
+  @Post('bookmarks/:escortId')
+  @UseGuards(JwtAuthGuard)
+  async addBookmark(@Request() req, @Param('escortId') escortId: string) {
+    const userId = req.user.id;
+    await this.usersService.addBookmark(userId, escortId);
+    return { message: 'Escort added to bookmarks' };
+  }
+
+  @Delete('bookmarks/:escortId')
+  @UseGuards(JwtAuthGuard)
+  async removeBookmark(@Request() req, @Param('escortId') escortId: string) {
+    const userId = req.user.id;
+    await this.usersService.removeBookmark(userId, escortId);
+    return { message: 'Escort removed from bookmarks' };
+  }
+
+  @Get('bookmarks')
+  @UseGuards(JwtAuthGuard)
+  async getBookmarks(@Request() req) {
+    const userId = req.user.id;
+    return this.usersService.getBookmarkedEscorts(userId);
+  }
+
+  @Get('bookmarks/check/:escortId')
+  @UseGuards(JwtAuthGuard)
+  async checkBookmark(@Request() req, @Param('escortId') escortId: string) {
+    const userId = req.user.id;
+    const isBookmarked = await this.usersService.isBookmarked(userId, escortId);
+    return { isBookmarked };
   }
 
   @Get(':id')

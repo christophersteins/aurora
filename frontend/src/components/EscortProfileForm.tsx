@@ -8,7 +8,7 @@ import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
 import ToggleSwitch from './ToggleSwitch';
-import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
+import { ArrowLeft, User, Sparkles, Image, Briefcase, Calendar, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
   NATIONALITIES,
@@ -32,6 +32,7 @@ export default function EscortProfileForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const profilePictureInputRef = useRef<HTMLInputElement>(null);
 
   const formatDateForInput = (dateString?: string) => {
     if (!dateString) return '';
@@ -76,12 +77,28 @@ export default function EscortProfileForm() {
   );
   const [uploadingPicture, setUploadingPicture] = useState(false);
   const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+  const [modalView, setModalView] = useState<'choice' | 'upload' | 'gallery'>('choice');
+  const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
+  const [loadingGallery, setLoadingGallery] = useState(false);
 
   // Mobile navigation state - null means menu is shown, string means section is shown
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   // Desktop sidebar navigation state - tracks active section on desktop
   const [activeSidebarSection, setActiveSidebarSection] = useState<string>('persoenliche-daten');
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (showProfilePictureModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showProfilePictureModal]);
 
   // Auto-save function with debouncing - accepts the data to save
   const autoSave = useCallback(async (dataToSave: UpdateEscortProfileDto) => {
@@ -171,12 +188,105 @@ export default function EscortProfileForm() {
     const file = e.target.files?.[0];
     if (file) {
       setProfilePicture(file);
-      
+      setModalView('upload');
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicturePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const loadGalleryPhotos = async () => {
+    setLoadingGallery(true);
+    setError(null);
+    try {
+      // Get token from Zustand storage
+      const storedAuth = localStorage.getItem('aurora-auth-storage');
+      let token = null;
+      if (storedAuth) {
+        try {
+          const parsedAuth = JSON.parse(storedAuth);
+          token = parsedAuth.state?.token;
+        } catch (e) {
+          console.error('Error parsing auth storage:', e);
+        }
+      }
+
+      console.log('Loading gallery photos...');
+      const response = await fetch('http://localhost:4000/users/gallery-photos', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Gallery photos data:', data);
+      console.log('Is array?', Array.isArray(data));
+      console.log('Length:', data?.length);
+
+      // Ensure data is an array
+      setGalleryPhotos(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error loading gallery:', error);
+      setError('Fehler beim Laden der Galerie: ' + (error instanceof Error ? error.message : 'Unbekannter Fehler'));
+      setGalleryPhotos([]);
+    } finally {
+      setLoadingGallery(false);
+    }
+  };
+
+  const handleSelectGalleryPhoto = async (photoUrl: string) => {
+    setUploadingPicture(true);
+    setError(null);
+
+    try {
+      // Get token from Zustand storage
+      const storedAuth = localStorage.getItem('aurora-auth-storage');
+      let token = null;
+      if (storedAuth) {
+        try {
+          const parsedAuth = JSON.parse(storedAuth);
+          token = parsedAuth.state?.token;
+        } catch (e) {
+          console.error('Error parsing auth storage:', e);
+        }
+      }
+
+      const response = await fetch('http://localhost:4000/users/profile-picture/from-gallery', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ photoUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Fehler beim Setzen des Profilbildes');
+      }
+
+      const data = await response.json();
+      const fullUrl = profilePictureService.getProfilePictureUrl(data.profilePicture);
+
+      if (user) {
+        setUser({ ...user, profilePicture: data.profilePicture });
+      }
+
+      setProfilePicturePreview(fullUrl);
+      setShowProfilePictureModal(false);
+      setModalView('choice');
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Fehler beim Setzen des Profilbildes');
+    } finally {
+      setUploadingPicture(false);
     }
   };
 
@@ -197,6 +307,7 @@ export default function EscortProfileForm() {
       setProfilePicturePreview(fullUrl);
       setProfilePicture(null);
       setShowProfilePictureModal(false);
+      setModalView('choice');
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -227,14 +338,14 @@ export default function EscortProfileForm() {
   };
 
   const sections = [
-    { id: 'persoenliche-daten', label: 'Persönliche Daten' },
-    { id: 'erscheinungsbild', label: 'Erscheinungsbild' },
-    { id: 'mediengalerie', label: 'Fotos & Videos' },
-    { id: 'service', label: 'Service' },
-    { id: 'verfuegbarkeit', label: 'Verfügbarkeit' },
-    { id: 'preise', label: 'Preise' },
-    { id: 'beschreibung', label: 'Beschreibung' },
-    { id: 'verifizierung', label: 'Verifizierung' },
+    { id: 'persoenliche-daten', label: 'Persönliche Daten', icon: User },
+    { id: 'erscheinungsbild', label: 'Erscheinungsbild', icon: Sparkles },
+    { id: 'mediengalerie', label: 'Fotos & Videos', icon: Image },
+    { id: 'service', label: 'Service', icon: Briefcase },
+    { id: 'verfuegbarkeit', label: 'Verfügbarkeit', icon: Calendar },
+    { id: 'preise', label: 'Preise', icon: Euro },
+    { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
+    { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
   ];
 
   return (
@@ -283,17 +394,18 @@ export default function EscortProfileForm() {
             <nav>
               {sections.map((section, index) => {
                 const isLast = index === sections.length - 1;
+                const Icon = section.icon;
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
                     style={{ borderRadius: 0 }}
                   >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-left">{section.label}</span>
-                    <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
                   </button>
                 );
               })}
@@ -318,24 +430,28 @@ export default function EscortProfileForm() {
       {/* Überschrift - Desktop only */}
       <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">Profil bearbeiten</h1>
 
-      <div className="flex gap-0">
+      <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start lg:border lg:border-[#2f3336] lg:shadow-md lg:bg-page-primary lg:rounded-l-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
           <nav>
             {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSidebarSection === section.id;
               return (
                 <button
                   key={section.id}
                   onClick={() => setActiveSidebarSection(section.id)}
-                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary cursor-pointer ${
-                    activeSidebarSection === section.id
-                      ? 'bg-page-secondary'
-                      : 'bg-page-primary'
+                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
+                    isActive
+                      ? 'text-action-primary'
+                      : 'text-body'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{
+                    borderRadius: 0
+                  }}
                 >
-                  <span className="text-left">{section.label}</span>
-                  <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`} />
+                  <span className={`text-left transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`}>{section.label}</span>
                 </button>
               );
             })}
@@ -344,46 +460,42 @@ export default function EscortProfileForm() {
 
       {/* Main Content */}
       <div className={`flex-1 ${activeSection === null ? 'hidden lg:block' : 'block lg:block'} ${activeSection !== null ? 'animate-slide-in-right lg:animate-none' : ''}`}>
-        <div className="lg:p-8 lg:pr-16 bg-page-primary lg:border lg:border-[#2f3336] lg:shadow-md lg:rounded-r-lg lg:border-l-0">
-          <div className="mb-6">
-            {/* Saving indicator - only shown while saving */}
-            {isSaving && (
-              <div className="flex items-center justify-end">
-                <span className="flex items-center gap-2 text-sm text-muted">
-                  <span className="w-4 h-4 border-2 border-muted border-t-transparent rounded-full animate-spin"></span>
-                  Speichert...
-                </span>
-              </div>
-            )}
-          </div>
+        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:shadow-md lg:rounded-lg' : 'p-6'}`}>
+          {/* Saving indicator - only shown while saving */}
+          {isSaving && (
+            <div className="flex items-center justify-end mb-6">
+              <span className="flex items-center gap-2 text-sm text-muted">
+                <span className="w-4 h-4 border-2 border-muted border-t-transparent rounded-full animate-spin"></span>
+                Speichert...
+              </span>
+            </div>
+          )}
 
           {/* Profile Picture Section - Desktop only */}
           <div
             id="profilbild"
             className="mb-8 scroll-mt-8 hidden lg:block"
           >
-            <div className="flex items-center gap-8">
-              <div className="w-48 flex justify-end flex-shrink-0">
-                <div
-                  className="cursor-pointer transition-opacity hover:opacity-80"
-                  onClick={() => setShowProfilePictureModal(true)}
-                >
-                  {profilePicturePreview ? (
-                    <img
-                      src={profilePicturePreview}
-                      alt="Profilbild"
-                      className="w-16 h-16 object-cover rounded-full"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 border border-default rounded-full flex items-center justify-center">
-                      <span className="text-heading font-bold text-lg">
-                        {user?.firstName?.[0] || user?.username?.[0] || '?'}
-                      </span>
-                    </div>
-                  )}
-                </div>
+            <div className="flex items-center gap-4">
+              <div
+                className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
+                onClick={() => setShowProfilePictureModal(true)}
+              >
+                {profilePicturePreview ? (
+                  <img
+                    src={profilePicturePreview}
+                    alt="Profilbild"
+                    className="w-16 h-16 object-cover rounded-full"
+                  />
+                ) : (
+                  <div className="w-16 h-16 border border-default rounded-full flex items-center justify-center">
+                    <span className="text-heading font-bold text-lg">
+                      {user?.firstName?.[0] || user?.username?.[0] || '?'}
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="flex-1">
+              <div>
                 <p className="text-heading text-base font-medium mb-1">
                   {user?.username || user?.email}
                 </p>
@@ -407,9 +519,11 @@ export default function EscortProfileForm() {
                 activeSection === 'persoenliche-daten' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'persoenliche-daten' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Persönliche Daten</h2>
+
               {/* Name */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 text-muted">
                   Name
                 </label>
                 <div className="lg:flex-1 flex items-center gap-4">
@@ -443,8 +557,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Birth Date */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Geburtsdatum
                 </label>
                 <DatePicker
@@ -461,8 +575,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Gender */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Geschlecht
                 </label>
                 <select
@@ -481,9 +595,9 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Nationalities */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Nationalitäten
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
+                  Nationalität
                 </label>
                 <div className="lg:flex-1">
                   <MultiSelectDropdown
@@ -494,14 +608,14 @@ export default function EscortProfileForm() {
                       setFormData(newData);
                       debouncedSave(newData);
                     }}
-                    placeholder="Wähle Nationalitäten"
+                    placeholder="Wähle Nationalität"
                   />
                 </div>
               </div>
 
               {/* Languages */}
-              <div className="lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Sprachen
                 </label>
                 <div className="lg:flex-1">
@@ -526,9 +640,11 @@ export default function EscortProfileForm() {
                 activeSection === 'erscheinungsbild' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'erscheinungsbild' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Erscheinungsbild</h2>
+
               {/* Größe */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Größe
                 </label>
                 <select
@@ -548,8 +664,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Gewicht */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Gewicht
                 </label>
                 <select
@@ -568,31 +684,10 @@ export default function EscortProfileForm() {
                 </select>
               </div>
 
-              {/* Konfektionsgröße */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Konfektionsgröße
-                </label>
-                <select
-                  value={formData.clothingSize || ''}
-                  onChange={(e) => {
-                    const newData = { ...formData, clothingSize: e.target.value };
-                    setFormData(newData);
-                    debouncedSave(newData);
-                  }}
-                  className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
-                >
-                  <option value="">Bitte wählen</option>
-                  {CLOTHING_SIZES.map((size) => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
-              </div>
-
               {/* Körpertyp */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                  Körpertyp
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
+                  Körper
                 </label>
                 <select
                   value={formData.bodyType || ''}
@@ -611,8 +706,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Oberweite */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Oberweite
                 </label>
                 <select
@@ -632,8 +727,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Haarfarbe */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Haarfarbe
                 </label>
                 <select
@@ -653,8 +748,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Haarlänge */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Haarlänge
                 </label>
                 <select
@@ -674,8 +769,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Augenfarbe */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Augenfarbe
                 </label>
                 <select
@@ -695,8 +790,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Tattoos - Checkboxes */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Tattoos
                 </label>
                 <div className="lg:flex-1 flex items-center gap-6">
@@ -732,8 +827,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Piercings - Checkboxes */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Piercings
                 </label>
                 <div className="lg:flex-1 flex items-center gap-6">
@@ -777,6 +872,7 @@ export default function EscortProfileForm() {
                 activeSection === 'mediengalerie' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'mediengalerie' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Fotos & Videos</h2>
               <MediaGalleryUpload />
             </div>
 
@@ -787,9 +883,11 @@ export default function EscortProfileForm() {
                 activeSection === 'service' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'service' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Service</h2>
+
               {/* Services */}
-              <div className="mb-4 lg:flex lg:gap-6">
-                <label className="block text-sm mb-3 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:gap-1">
+                <label className="block text-sm mb-3 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3  text-muted">
                   Angebotene Services
                 </label>
                 <div className="lg:flex-1">
@@ -824,15 +922,11 @@ export default function EscortProfileForm() {
                             setFormData(newData);
                             debouncedSave(newData);
                           }}
-                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+                          className={`px-3 py-1.5 text-sm rounded-full border transition cursor-pointer ${
                             isSelected
-                              ? 'text-button-primary border-2'
-                              : 'text-muted border-2 border-default hover:border-primary'
+                              ? 'bg-action-primary text-button-primary border-primary'
+                              : 'bg-page-secondary text-body border-default hover:border-primary'
                           }`}
-                          style={{
-                            backgroundColor: isSelected ? 'var(--color-primary)' : 'transparent',
-                            borderColor: isSelected ? 'var(--color-primary)' : undefined,
-                          }}
                         >
                           {service}
                         </button>
@@ -853,6 +947,7 @@ export default function EscortProfileForm() {
                 activeSection === 'verfuegbarkeit' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'verfuegbarkeit' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verfügbarkeit</h2>
               <p className="text-muted text-sm">Verfügbarkeits-Felder (Arbeitszeiten & Arbeitsort) werden hier hinzugefügt.</p>
             </div>
 
@@ -863,9 +958,11 @@ export default function EscortProfileForm() {
                 activeSection === 'preise' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'preise' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Preise</h2>
+
               {/* 30 Minuten */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   30 Minuten
                 </label>
                 <div className="lg:flex-1">
@@ -890,8 +987,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 1 Stunde */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   1 Stunde
                 </label>
                 <div className="lg:flex-1">
@@ -916,8 +1013,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 2 Stunden */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   2 Stunden
                 </label>
                 <div className="lg:flex-1">
@@ -942,8 +1039,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 3 Stunden */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   3 Stunden
                 </label>
                 <div className="lg:flex-1">
@@ -968,8 +1065,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 6 Stunden */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   6 Stunden
                 </label>
                 <div className="lg:flex-1">
@@ -994,8 +1091,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 12 Stunden */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   12 Stunden
                 </label>
                 <div className="lg:flex-1">
@@ -1020,8 +1117,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* 24 Stunden */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   24 Stunden
                 </label>
                 <div className="lg:flex-1">
@@ -1046,8 +1143,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Übernachtung */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Übernachtung
                 </label>
                 <div className="lg:flex-1">
@@ -1072,8 +1169,8 @@ export default function EscortProfileForm() {
               </div>
 
               {/* Wochenende */}
-              <div className="mb-4 lg:flex lg:items-center lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
+              <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0  text-muted">
                   Wochenende
                 </label>
                 <div className="lg:flex-1">
@@ -1105,8 +1202,10 @@ export default function EscortProfileForm() {
                 activeSection === 'beschreibung' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'beschreibung' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <div className="lg:flex lg:gap-6">
-                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3 lg:text-right text-muted">
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Beschreibung</h2>
+
+              <div className="lg:flex lg:gap-1">
+                <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:pt-3  text-muted">
                   Beschreibung
                 </label>
                 <textarea
@@ -1127,6 +1226,7 @@ export default function EscortProfileForm() {
                 activeSection === 'verifizierung' ? 'block animate-slide-in-right' : 'hidden'
               } ${activeSidebarSection === 'verifizierung' ? 'lg:block' : 'lg:hidden'}`}
             >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verifizierung</h2>
               <p className="text-muted text-sm">Verifizierungs-Felder werden hier hinzugefügt.</p>
             </div>
           </div>
@@ -1171,14 +1271,26 @@ export default function EscortProfileForm() {
 
       {/* Profile Picture Upload Modal */}
       {showProfilePictureModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="bg-page-primary border border-[#2f3336] rounded-lg shadow-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
+          <div className="bg-page-primary border border-[#2f3336] rounded-lg shadow-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            {/* Hidden File Input */}
+            <input
+              ref={profilePictureInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleProfilePictureChange}
+              className="hidden"
+            />
+
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-heading">Profilbild ändern</h2>
+              <h2 className="text-xl font-bold text-heading">
+                {modalView === 'choice' ? 'Profilbild ändern' : modalView === 'upload' ? 'Neues Foto hochladen' : 'Aus Galerie wählen'}
+              </h2>
               <button
                 onClick={() => {
                   setShowProfilePictureModal(false);
                   setProfilePicture(null);
+                  setModalView('choice');
                 }}
                 className="text-muted hover:text-heading transition-colors cursor-pointer"
               >
@@ -1186,63 +1298,164 @@ export default function EscortProfileForm() {
               </button>
             </div>
 
-            <div className="mb-6">
-              <div className="flex justify-center mb-6">
-                {profilePicture ? (
-                  <img
-                    src={URL.createObjectURL(profilePicture)}
-                    alt="Vorschau"
-                    className="w-32 h-32 object-cover rounded-full"
-                  />
-                ) : profilePicturePreview ? (
-                  <img
-                    src={profilePicturePreview}
-                    alt="Aktuelles Profilbild"
-                    className="w-32 h-32 object-cover rounded-full"
-                  />
+            {/* Choice View - Two Buttons */}
+            {modalView === 'choice' && (
+              <div className="space-y-4">
+                <button
+                  onClick={() => profilePictureInputRef.current?.click()}
+                  className="w-full px-6 py-8 border-2 border-default rounded-lg hover:border-primary hover:bg-page-secondary transition-all cursor-pointer flex flex-col items-center gap-3"
+                >
+                  <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <div className="text-center">
+                    <p className="text-heading font-semibold text-lg">Neues Foto hochladen</p>
+                    <p className="text-muted text-sm mt-1">Lade ein neues Bild von deinem Gerät hoch</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setModalView('gallery');
+                    loadGalleryPhotos();
+                  }}
+                  className="w-full px-6 py-8 border-2 border-default rounded-lg hover:border-primary hover:bg-page-secondary transition-all cursor-pointer flex flex-col items-center gap-3"
+                >
+                  <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  <div className="text-center">
+                    <p className="text-heading font-semibold text-lg">Aus Galerie wählen</p>
+                    <p className="text-muted text-sm mt-1">Wähle ein Foto aus deiner bestehenden Galerie</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfilePictureModal(false);
+                    setModalView('choice');
+                  }}
+                  className="w-full btn-base btn-secondary cursor-pointer"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            )}
+
+            {/* Upload View */}
+            {modalView === 'upload' && (
+              <div>
+                <button
+                  onClick={() => setModalView('choice')}
+                  className="mb-4 text-action-primary hover:underline flex items-center gap-2 cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Zurück
+                </button>
+
+                <div className="mb-6">
+                  <div className="flex justify-center mb-6">
+                    {profilePicture ? (
+                      <img
+                        src={URL.createObjectURL(profilePicture)}
+                        alt="Vorschau"
+                        className="w-32 h-32 object-cover rounded-full"
+                      />
+                    ) : profilePicturePreview ? (
+                      <img
+                        src={profilePicturePreview}
+                        alt="Aktuelles Profilbild"
+                        className="w-32 h-32 object-cover rounded-full"
+                      />
+                    ) : (
+                      <div className="w-32 h-32 border border-default rounded-full flex items-center justify-center">
+                        <span className="text-heading font-bold text-2xl">
+                          {user?.firstName?.[0] || user?.username?.[0] || '?'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {error && (
+                    <div className="mb-4 p-3 rounded-lg bg-error-light border border-error">
+                      <p className="text-error text-sm">{error}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalView('choice');
+                      setProfilePicture(null);
+                    }}
+                    className="flex-1 btn-base btn-secondary cursor-pointer"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUploadProfilePicture}
+                    disabled={!profilePicture || uploadingPicture}
+                    className="flex-1 btn-base btn-primary cursor-pointer"
+                  >
+                    {uploadingPicture ? 'Lädt hoch...' : 'Hochladen'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Gallery View */}
+            {modalView === 'gallery' && (
+              <div>
+                <button
+                  onClick={() => setModalView('choice')}
+                  className="mb-4 text-action-primary hover:underline flex items-center gap-2 cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Zurück
+                </button>
+
+                {loadingGallery ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                ) : galleryPhotos.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-muted">Keine Fotos in der Galerie</p>
+                    <p className="text-sm text-muted mt-2">Lade zuerst Fotos in deine Galerie hoch</p>
+                  </div>
                 ) : (
-                  <div className="w-32 h-32 border border-default rounded-full flex items-center justify-center">
-                    <span className="text-heading font-bold text-2xl">
-                      {user?.firstName?.[0] || user?.username?.[0] || '?'}
-                    </span>
+                  <div className="grid grid-cols-3 gap-4">
+                    {galleryPhotos.map((photo) => (
+                      <button
+                        key={photo.id}
+                        onClick={() => handleSelectGalleryPhoto(photo.photoUrl)}
+                        disabled={uploadingPicture}
+                        className="aspect-square rounded-lg overflow-hidden border-2 border-default hover:border-primary transition cursor-pointer disabled:opacity-50 relative group"
+                      >
+                        <img
+                          src={`http://localhost:4000${photo.photoUrl}`}
+                          alt="Galerie Foto"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
+                          <Check className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {error && (
+                  <div className="mt-4 p-3 rounded-lg bg-error-light border border-error">
+                    <p className="text-error text-sm">{error}</p>
                   </div>
                 )}
               </div>
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePictureChange}
-                className="mb-4 block w-full text-sm text-body file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-action-primary hover:file:bg-action-primary-hover hover:file:text-white file:transition-all file:cursor-pointer"
-              />
-
-              {error && (
-                <div className="mb-4 p-3 rounded-lg bg-error-light border border-error">
-                  <p className="text-error text-sm">{error}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProfilePictureModal(false);
-                  setProfilePicture(null);
-                }}
-                className="flex-1 px-4 py-2 rounded-lg border border-[#2f3336] text-body hover-bg-page-secondary transition-all cursor-pointer"
-              >
-                Abbrechen
-              </button>
-              <button
-                type="button"
-                onClick={handleUploadProfilePicture}
-                disabled={!profilePicture || uploadingPicture}
-                className="flex-1 btn-base btn-primary cursor-pointer"
-              >
-                {uploadingPicture ? 'Lädt hoch...' : 'Hochladen'}
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}

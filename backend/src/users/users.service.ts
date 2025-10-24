@@ -496,4 +496,66 @@ export class UsersService {
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
+
+  // Bookmark / Merkliste methods
+  async addBookmark(userId: string, escortId: string): Promise<void> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // Initialize bookmarkedEscorts if null
+    if (!user.bookmarkedEscorts) {
+      user.bookmarkedEscorts = [];
+    }
+
+    // Check if already bookmarked
+    if (!user.bookmarkedEscorts.includes(escortId)) {
+      user.bookmarkedEscorts.push(escortId);
+      await this.usersRepository.save(user);
+    }
+  }
+
+  async removeBookmark(userId: string, escortId: string): Promise<void> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (user.bookmarkedEscorts) {
+      user.bookmarkedEscorts = user.bookmarkedEscorts.filter(
+        (id) => id !== escortId,
+      );
+      await this.usersRepository.save(user);
+    }
+  }
+
+  async getBookmarkedEscorts(userId: string): Promise<User[]> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!user.bookmarkedEscorts || user.bookmarkedEscorts.length === 0) {
+      return [];
+    }
+
+    // Fetch all bookmarked escorts
+    const escorts = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.id IN (:...ids)', { ids: user.bookmarkedEscorts })
+      .andWhere('user.role = :role', { role: UserRole.ESCORT })
+      .getMany();
+
+    // Remove passwords from response
+    return escorts.map(({ password, ...escort }) => escort as User);
+  }
+
+  async isBookmarked(userId: string, escortId: string): Promise<boolean> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user || !user.bookmarkedEscorts) {
+      return false;
+    }
+    return user.bookmarkedEscorts.includes(escortId);
+  }
 }

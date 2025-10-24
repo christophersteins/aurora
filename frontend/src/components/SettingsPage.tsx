@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { ArrowLeft, ChevronRight, Check, AlertCircle } from 'lucide-react';
+import { ArrowLeft, User, Lock, Shield, Bell, Star, Accessibility, Globe, AlertCircle, Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -195,26 +195,24 @@ export default function SettingsPage() {
   };
 
   const sections = [
-    { id: 'konto', label: t('sections.account') },
-    { id: 'sicherheit', label: t('sections.security') },
-    { id: 'datenschutz', label: t('sections.privacy') },
-    { id: 'mitteilungen', label: t('sections.notifications') },
-    { id: 'premium', label: t('sections.premium') },
-    { id: 'barrierefreiheit', label: t('sections.accessibility') },
-    { id: 'sprache', label: t('sections.language') },
+    { id: 'konto', label: t('sections.account'), icon: User },
+    { id: 'sicherheit', label: t('sections.security'), icon: Lock },
+    { id: 'datenschutz', label: t('sections.privacy'), icon: Shield },
+    { id: 'mitteilungen', label: t('sections.notifications'), icon: Bell },
+    { id: 'premium', label: t('sections.premium'), icon: Star },
+    { id: 'barrierefreiheit', label: t('sections.accessibility'), icon: Accessibility },
+    { id: 'sprache', label: t('sections.language'), icon: Globe },
   ];
 
   return (
     <div>
-      {/* Überschrift - immer sichtbar */}
-      <h1 className="text-3xl font-bold text-heading mb-6">{t('title')}</h1>
-
       {/* Mobile/Tablet Navigation - shown only when no section is active */}
       {activeSection === null && (
         <div className={`lg:hidden mb-6 ${!isMounting ? 'animate-slide-in-left' : ''}`}>
           <div className="border border-[#2f3336] shadow-md bg-page-primary rounded-lg overflow-hidden">
             <nav>
               {sections.map((section, index) => {
+                const Icon = section.icon;
                 const isLast = index === sections.length - 1;
                 return (
                   <button
@@ -223,13 +221,13 @@ export default function SettingsPage() {
                       setActiveSection(section.id);
                       localStorage.setItem('settings-active-section', section.id);
                     }}
-                    className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer text-body hover:text-[#b8b9bb] ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
                     style={{ borderRadius: 0 }}
                   >
-                    <span className="text-left">{section.label}</span>
-                    <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-left flex-1">{section.label}</span>
                   </button>
                 );
               })}
@@ -246,16 +244,21 @@ export default function SettingsPage() {
             className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>{t('back')}</span>
+            <span>Zurück</span>
           </button>
         </div>
       )}
 
-      <div className="flex gap-0">
+      {/* Überschrift - Desktop only */}
+      <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">{t('title')}</h1>
+
+      <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start lg:border lg:border-[#2f3336] lg:shadow-md lg:bg-page-primary lg:rounded-l-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
           <nav>
             {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSidebarSection === section.id;
               return (
                 <button
                   key={section.id}
@@ -263,15 +266,15 @@ export default function SettingsPage() {
                     setActiveSidebarSection(section.id);
                     localStorage.setItem('settings-active-section', section.id);
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary cursor-pointer ${
-                    activeSidebarSection === section.id
-                      ? 'bg-page-secondary'
-                      : 'bg-page-primary'
+                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
+                    isActive
+                      ? 'text-action-primary'
+                      : 'text-body'
                   }`}
                   style={{ borderRadius: 0 }}
                 >
-                  <span className="text-left">{section.label}</span>
-                  <ChevronRight className="w-5 h-5 flex-shrink-0 text-muted" />
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`} />
+                  <span className={`text-left transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`}>{section.label}</span>
                 </button>
               );
             })}
@@ -280,7 +283,7 @@ export default function SettingsPage() {
 
       {/* Main Content */}
       <div className={`flex-1 ${activeSection === null ? 'hidden lg:block' : 'block lg:block'} ${activeSection !== null && !isMounting ? 'animate-slide-in-right lg:animate-none' : ''}`}>
-        <div className="lg:p-8 lg:pr-16 bg-page-primary lg:border lg:border-[#2f3336] lg:shadow-md lg:rounded-r-lg lg:border-l-0">
+        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:shadow-md lg:rounded-lg' : 'p-6'}`}>
           {/* Content */}
           <div className="space-y-8">
             {/* Konto Section */}
@@ -290,7 +293,7 @@ export default function SettingsPage() {
                 activeSection === 'konto' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'konto' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-6 lg:hidden">{t('account.title')}</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('account.title')}</h2>
 
               <div className="space-y-6">
                 {/* Username Field */}
@@ -503,7 +506,7 @@ export default function SettingsPage() {
                 activeSection === 'sicherheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'sicherheit' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Sicherheit</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Sicherheit</h2>
               <p className="text-muted">Sicherheitseinstellungen werden hier angezeigt.</p>
             </div>
 
@@ -514,7 +517,7 @@ export default function SettingsPage() {
                 activeSection === 'datenschutz' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'datenschutz' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Datenschutz</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Datenschutz</h2>
               <p className="text-muted">Datenschutzeinstellungen werden hier angezeigt.</p>
             </div>
 
@@ -525,7 +528,7 @@ export default function SettingsPage() {
                 activeSection === 'mitteilungen' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'mitteilungen' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Mitteilungen</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Mitteilungen</h2>
               <p className="text-muted">Mitteilungseinstellungen werden hier angezeigt.</p>
             </div>
 
@@ -536,7 +539,7 @@ export default function SettingsPage() {
                 activeSection === 'premium' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'premium' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Premium</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Premium</h2>
               <p className="text-muted">Premium-Einstellungen werden hier angezeigt.</p>
             </div>
 
@@ -547,7 +550,7 @@ export default function SettingsPage() {
                 activeSection === 'barrierefreiheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'barrierefreiheit' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">Barrierefreiheit</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Barrierefreiheit</h2>
               <p className="text-muted">Barrierefreiheitseinstellungen werden hier angezeigt.</p>
             </div>
 
@@ -558,7 +561,7 @@ export default function SettingsPage() {
                 activeSection === 'sprache' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
               } ${activeSidebarSection === 'sprache' ? 'lg:block' : 'lg:hidden'}`}
             >
-              <h2 className="text-xl font-semibold text-heading mb-4">{t('language.title')}</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('language.title')}</h2>
               <p className="text-muted mb-6">{t('language.description')}</p>
 
               <div className="space-y-3">

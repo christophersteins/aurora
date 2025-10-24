@@ -98,6 +98,7 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         emailVerified: user.emailVerified,
+        profilePicture: user.profilePicture,
       },
     };
   }

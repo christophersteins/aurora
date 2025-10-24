@@ -34,6 +34,15 @@
   "filters": {
     "title": "Filter",
     "search": "Suche",
+    "searchPlaceholder": "Name oder Benutzername...",
+    "showOnly": "Nur anzeigen",
+    "availableNow": "Jetzt verfügbar",
+    "onlineNow": "Gerade online",
+    "verified": "Verifiziert",
+    "withPhoto": "Mit Foto",
+    "newProfile": "Neues Profil",
+    "showsPrices": "Zeigt Preise",
+    "withReviews": "Mit Bewertungen",
     "radiusSearch": "Umkreissuche",
     "radiusActive": "Umkreissuche aktiv",
     "radiusEnable": "Umkreissuche aktivieren",
@@ -43,9 +52,9 @@
     "nationality": "Nationalität",
     "languages": "Sprachen",
     "type": "Typ",
-    "height": "Größe (cm)",
-    "weight": "Gewicht (kg)",
-    "bodyType": "Figur",
+    "height": "Größe",
+    "weight": "Gewicht",
+    "bodyType": "Körper",
     "cupSize": "Oberweite",
     "hairColor": "Haarfarbe",
     "hairLength": "Haarlänge",
@@ -56,6 +65,11 @@
     "smoker": "Raucher/in",
     "all": "Alle",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "units": {
+      "age": "Jahre",
+      "cm": "cm",
+      "kg": "kg"
+    }
   }
 }

@@ -167,8 +167,13 @@ export class User {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   priceWeekend: number; // Wochenende
 
+  // === CUSTOMER-SPEZIFISCHE FELDER ===
+
+  @Column({ type: 'simple-array', nullable: true })
+  bookmarkedEscorts: string[]; // Array of escort user IDs
+
   // === RELATIONS ===
-  
+
   @OneToMany(() => GalleryPhoto, (photo) => photo.user)
   galleryPhotos: GalleryPhoto[];
 

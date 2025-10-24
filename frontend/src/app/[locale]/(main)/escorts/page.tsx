@@ -12,6 +12,14 @@ import { scrollPositionUtil } from '@/utils/scrollPosition';
 // Filter-Interface
 interface Filters {
   searchQuery: string;
+  // Nur anzeigen
+  availableNow: boolean;
+  onlineNow: boolean;
+  verified: boolean;
+  withPhoto: boolean;
+  newProfile: boolean;
+  showsPrices: boolean;
+  withReviews: boolean;
   ageMin: number | null;
   ageMax: number | null;
   nationalities: string[];
@@ -29,7 +37,6 @@ interface Filters {
   intimateHair: string[];
   hasTattoos: 'all' | 'yes' | 'no';
   hasPiercings: 'all' | 'yes' | 'no';
-  isSmoker: 'all' | 'yes' | 'no';
   useRadius: boolean;
   radiusKm: number;
   userLatitude: number | null;
@@ -51,6 +58,14 @@ interface LocationSuggestion {
 
 const initialFilters: Filters = {
   searchQuery: '',
+  // Nur anzeigen
+  availableNow: false,
+  onlineNow: false,
+  verified: false,
+  withPhoto: false,
+  newProfile: false,
+  showsPrices: false,
+  withReviews: false,
   ageMin: null,
   ageMax: null,
   nationalities: [],
@@ -68,7 +83,6 @@ const initialFilters: Filters = {
   intimateHair: [],
   hasTattoos: 'all',
   hasPiercings: 'all',
-  isSmoker: 'all',
   useRadius: false,
   radiusKm: 100,
   userLatitude: null,
@@ -662,11 +676,16 @@ export default function MembersPage() {
       if (filters.hasPiercings === 'no' && hasPiercings) return false;
     }
 
-    // Smoker
-    if (filters.isSmoker !== 'all') {
-      const isSmoker = escort.isSmoker === true;
-      if (filters.isSmoker === 'yes' && !isSmoker) return false;
-      if (filters.isSmoker === 'no' && isSmoker) return false;
+    // Nur anzeigen filters
+    if (filters.onlineNow && !escort.isOnline) return false;
+    if (filters.withPhoto && !escort.profilePicture) return false;
+
+    // New profile (< 90 days old)
+    if (filters.newProfile) {
+      if (!escort.createdAt) return false;
+      const createdDate = new Date(escort.createdAt);
+      const daysSinceCreation = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceCreation >= 90) return false;
     }
 
     return true;
@@ -788,6 +807,13 @@ export default function MembersPage() {
   const hasActiveFilters = () => {
     return (
       filters.searchQuery.trim() !== '' ||
+      filters.availableNow ||
+      filters.onlineNow ||
+      filters.verified ||
+      filters.withPhoto ||
+      filters.newProfile ||
+      filters.showsPrices ||
+      filters.withReviews ||
       filters.ageMin !== null ||
       filters.ageMax !== null ||
       filters.nationalities.length > 0 ||
@@ -804,8 +830,7 @@ export default function MembersPage() {
       filters.eyeColors.length > 0 ||
       filters.intimateHair.length > 0 ||
       filters.hasTattoos !== 'all' ||
-      filters.hasPiercings !== 'all' ||
-      filters.isSmoker !== 'all'
+      filters.hasPiercings !== 'all'
     );
   };
 
