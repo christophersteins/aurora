@@ -558,4 +558,207 @@ export class UsersService {
     }
     return user.bookmarkedEscorts.includes(escortId);
   }
+
+  async findSimilarEscorts(
+    currentEscortId: string,
+    filters: any,
+    userLat: number | null,
+    userLon: number | null,
+    limit: number = 6,
+  ): Promise<User[]> {
+    // Build base query
+    const query = this.usersRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.username',
+        'user.firstName',
+        'user.lastName',
+        'user.profilePicture',
+        'user.birthDate',
+        'user.gender',
+        'user.nationalities',
+        'user.languages',
+        'user.type',
+        'user.height',
+        'user.weight',
+        'user.bodyType',
+        'user.cupSize',
+        'user.hairColor',
+        'user.hairLength',
+        'user.eyeColor',
+        'user.intimateHair',
+        'user.hasTattoos',
+        'user.hasPiercings',
+        'user.isSmoker',
+        'user.showNameInProfile',
+      ])
+      .addSelect('ST_AsGeoJSON(user.location)::json', 'location')
+      .where('user.role = :role', { role: UserRole.ESCORT })
+      .andWhere('user.id != :currentId', { currentId: currentEscortId });
+
+    // Add distance calculation if user location is provided
+    if (userLat !== null && userLon !== null) {
+      query.addSelect(
+        `ST_DistanceSphere(
+          user.location,
+          ST_SetSRID(ST_MakePoint(:userLon, :userLat), 4326)
+        ) / 1000`,
+        'distance',
+      );
+      query.setParameter('userLon', userLon);
+      query.setParameter('userLat', userLat);
+
+      // Apply radius filter if provided in filters
+      if (filters?.useRadius && filters?.radiusKm) {
+        query.andWhere(
+          `ST_DistanceSphere(
+            user.location,
+            ST_SetSRID(ST_MakePoint(:userLon, :userLat), 4326)
+          ) / 1000 <= :radius`,
+        );
+        query.setParameter('radius', filters.radiusKm);
+      }
+    }
+
+    const result = await query.getRawAndEntities();
+
+    // Map location data and calculate match scores
+    const escorts = result.entities.map((entity, index) => {
+      const rawData = result.raw[index];
+      if (rawData?.location) {
+        entity.location = rawData.location;
+      }
+      return {
+        escort: entity,
+        distance: rawData?.distance || Infinity,
+        matchScore: this.calculateMatchScore(entity, filters),
+      };
+    });
+
+    // Sort by match score (descending), then by distance (ascending)
+    escorts.sort((a, b) => {
+      if (a.matchScore !== b.matchScore) {
+        return b.matchScore - a.matchScore;
+      }
+      return a.distance - b.distance;
+    });
+
+    // Return top results without password
+    return escorts
+      .slice(0, limit)
+      .map(({ escort }) => {
+        const { password, ...escortWithoutPassword } = escort;
+        return escortWithoutPassword as User;
+      });
+  }
+
+  private calculateMatchScore(escort: User, filters: any): number {
+    if (!filters) return 0;
+
+    let score = 0;
+
+    // Age match
+    if (filters.ageMin !== null || filters.ageMax !== null) {
+      if (escort.birthDate) {
+        const age = this.calculateAge(escort.birthDate);
+        const ageMatch =
+          (filters.ageMin === null || age >= filters.ageMin) &&
+          (filters.ageMax === null || age <= filters.ageMax);
+        if (ageMatch) score += 10;
+      }
+    }
+
+    // Nationalities match
+    if (filters.nationalities?.length > 0 && escort.nationalities?.length > 0) {
+      const hasMatch = filters.nationalities.some((nat: string) =>
+        escort.nationalities.includes(nat),
+      );
+      if (hasMatch) score += 10;
+    }
+
+    // Languages match
+    if (filters.languages?.length > 0 && escort.languages?.length > 0) {
+      const hasMatch = filters.languages.some((lang: string) =>
+        escort.languages.includes(lang),
+      );
+      if (hasMatch) score += 8;
+    }
+
+    // Type match
+    if (filters.types?.length > 0 && escort.type) {
+      if (filters.types.includes(escort.type)) score += 10;
+    }
+
+    // Height match
+    if (filters.heightMin !== null || filters.heightMax !== null) {
+      if (escort.height) {
+        const heightMatch =
+          (filters.heightMin === null || escort.height >= filters.heightMin) &&
+          (filters.heightMax === null || escort.height <= filters.heightMax);
+        if (heightMatch) score += 5;
+      }
+    }
+
+    // Weight match
+    if (filters.weightMin !== null || filters.weightMax !== null) {
+      if (escort.weight) {
+        const weightMatch =
+          (filters.weightMin === null || escort.weight >= filters.weightMin) &&
+          (filters.weightMax === null || escort.weight <= filters.weightMax);
+        if (weightMatch) score += 5;
+      }
+    }
+
+    // Body types match
+    if (filters.bodyTypes?.length > 0 && escort.bodyType) {
+      if (filters.bodyTypes.includes(escort.bodyType)) score += 8;
+    }
+
+    // Cup sizes match
+    if (filters.cupSizes?.length > 0 && escort.cupSize) {
+      if (filters.cupSizes.includes(escort.cupSize)) score += 8;
+    }
+
+    // Hair colors match
+    if (filters.hairColors?.length > 0 && escort.hairColor) {
+      if (filters.hairColors.includes(escort.hairColor)) score += 5;
+    }
+
+    // Hair lengths match
+    if (filters.hairLengths?.length > 0 && escort.hairLength) {
+      if (filters.hairLengths.includes(escort.hairLength)) score += 5;
+    }
+
+    // Eye colors match
+    if (filters.eyeColors?.length > 0 && escort.eyeColor) {
+      if (filters.eyeColors.includes(escort.eyeColor)) score += 5;
+    }
+
+    // Intimate hair match
+    if (filters.intimateHair?.length > 0 && escort.intimateHair) {
+      if (filters.intimateHair.includes(escort.intimateHair)) score += 5;
+    }
+
+    // Tattoos match
+    if (filters.hasTattoos === 'yes' && escort.hasTattoos) score += 3;
+    if (filters.hasTattoos === 'no' && !escort.hasTattoos) score += 3;
+
+    // Piercings match
+    if (filters.hasPiercings === 'yes' && escort.hasPiercings) score += 3;
+    if (filters.hasPiercings === 'no' && !escort.hasPiercings) score += 3;
+
+    return score;
+  }
+
+  private calculateAge(birthDate: string | Date): number {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  }
 }

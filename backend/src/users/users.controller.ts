@@ -59,6 +59,28 @@ export class UsersController {
     return this.usersService.findAllEscorts();
   }
 
+  @Get('escorts/similar')
+  async getSimilarEscorts(
+    @Query('currentEscortId') currentEscortId: string,
+    @Query('filters') filtersJson: string,
+    @Query('userLat') userLat: string,
+    @Query('userLon') userLon: string,
+    @Query('limit') limit: string,
+  ) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 6;
+    const filters = filtersJson ? JSON.parse(filtersJson) : null;
+    const lat = userLat ? parseFloat(userLat) : null;
+    const lon = userLon ? parseFloat(userLon) : null;
+
+    return this.usersService.findSimilarEscorts(
+      currentEscortId,
+      filters,
+      lat,
+      lon,
+      parsedLimit,
+    );
+  }
+
   @Get('username/:username')
   async getEscortByUsername(@Param('username') username: string) {
     const user = await this.usersService.findByUsername(username.toLowerCase());

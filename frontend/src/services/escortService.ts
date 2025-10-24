@@ -18,4 +18,28 @@ export const escortService = {
     const response = await apiClient.get(`/users/username/${lowercaseUsername}`);
     return response.data;
   },
+
+  async getSimilarEscorts(
+    currentEscortId: string,
+    filters: any,
+    userLat?: number,
+    userLon?: number,
+    limit: number = 6
+  ): Promise<User[]> {
+    const params = new URLSearchParams();
+    params.append('currentEscortId', currentEscortId);
+    params.append('limit', limit.toString());
+
+    if (userLat !== undefined && userLon !== undefined) {
+      params.append('userLat', userLat.toString());
+      params.append('userLon', userLon.toString());
+    }
+
+    if (filters) {
+      params.append('filters', JSON.stringify(filters));
+    }
+
+    const response = await apiClient.get(`/users/escorts/similar?${params.toString()}`);
+    return response.data;
+  },
 };

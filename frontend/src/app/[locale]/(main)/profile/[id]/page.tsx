@@ -35,6 +35,8 @@ export default function ProfilePage() {
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [mediaTab, setMediaTab] = useState<'fotos' | 'videos'>('fotos');
+  const [similarEscorts, setSimilarEscorts] = useState<User[]>([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
 
   // Detect if mobile on client side
   useEffect(() => {
@@ -77,6 +79,55 @@ export default function ProfilePage() {
 
     checkBookmarkStatus();
   }, [user, escort, token]);
+
+  // Load similar escorts
+  useEffect(() => {
+    const loadSimilarEscorts = async () => {
+      if (!escort?.id) return;
+
+      setLoadingSimilar(true);
+      try {
+        // Load filters from localStorage
+        const savedFilters = localStorage.getItem('aurora_member_filters');
+        const filters = savedFilters ? JSON.parse(savedFilters) : null;
+
+        // Get user location from filters or IP
+        let userLat = filters?.userLatitude;
+        let userLon = filters?.userLongitude;
+
+        // If no saved location, try to get from IP
+        if (!userLat || !userLon) {
+          try {
+            const ipResponse = await fetch('https://ipapi.co/json/', {
+              signal: AbortSignal.timeout(5000),
+            });
+            if (ipResponse.ok) {
+              const ipData = await ipResponse.json();
+              userLat = ipData.latitude;
+              userLon = ipData.longitude;
+            }
+          } catch (error) {
+            // Silently fail - similar escorts will just be sorted by match score only
+          }
+        }
+
+        const similar = await escortService.getSimilarEscorts(
+          escort.id,
+          filters,
+          userLat,
+          userLon,
+          12,
+        );
+        setSimilarEscorts(similar);
+      } catch (error) {
+        console.error('Error loading similar escorts:', error);
+      } finally {
+        setLoadingSimilar(false);
+      }
+    };
+
+    loadSimilarEscorts();
+  }, [escort?.id]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -875,6 +926,130 @@ export default function ProfilePage() {
         <div ref={tabsContainerRef}>
           <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
         </div>
+
+        {/* Similar Escorts Section */}
+        {similarEscorts.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Weitere Escorts in deiner Nähe
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {similarEscorts.map((similarEscort) => {
+                const similarAge = similarEscort.birthDate ? calculateAge(similarEscort.birthDate) : null;
+
+                return (
+                  <div
+                    key={similarEscort.id}
+                    onClick={() => {
+                      router.push(`/profile/${similarEscort.username}`);
+                    }}
+                    className="bg-page-primary border-depth rounded-lg overflow-hidden cursor-pointer transition-all"
+                  >
+                    {/* Profile Picture */}
+                    <div className="aspect-square bg-page-secondary flex items-center justify-center relative">
+                      {similarEscort.profilePicture ? (
+                        <img
+                          src={profilePictureService.getProfilePictureUrl(similarEscort.profilePicture)}
+                          alt={similarEscort.username || 'Profilbild'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-muted text-6xl">
+                          {(
+                            similarEscort.firstName?.[0] ||
+                            similarEscort.username?.[0] ||
+                            '?'
+                          ).toUpperCase()}
+                        </div>
+                      )}
+
+                      {/* Premium Badge */}
+                      <div
+                        className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 rounded-full backdrop-blur-sm"
+                        style={{
+                          backgroundColor: 'var(--color-primary)',
+                          opacity: 0.85,
+                        }}
+                      >
+                        <Gem
+                          className="w-3.5 h-3.5"
+                          style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Information */}
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-base font-normal text-body">
+                          {similarEscort.username || 'Unbekannt'}
+                        </h3>
+                        <div
+                          className="flex items-center justify-center w-4 h-4 rounded-full"
+                          style={{ backgroundColor: 'var(--color-secondary)' }}
+                        >
+                          <Check
+                            className="w-2.5 h-2.5"
+                            style={{ color: 'var(--text-button)', strokeWidth: 3 }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-muted">
+                        {/* Show distance if location available */}
+                        {similarEscort.location ? (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {(() => {
+                              const coords = similarEscort.location.coordinates;
+                              if (!coords || coords.length !== 2) return '';
+
+                              const [escortLon, escortLat] = coords;
+
+                              // Get user location from localStorage or current location
+                              const savedFilters = localStorage.getItem('aurora_member_filters');
+                              const filters = savedFilters ? JSON.parse(savedFilters) : null;
+                              const userLat = filters?.userLatitude;
+                              const userLon = filters?.userLongitude;
+
+                              if (!userLat || !userLon) return '';
+
+                              // Calculate distance using Haversine formula
+                              const R = 6371; // Earth radius in km
+                              const dLat = ((escortLat - userLat) * Math.PI) / 180;
+                              const dLon = ((escortLon - userLon) * Math.PI) / 180;
+                              const a =
+                                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                Math.cos((userLat * Math.PI) / 180) *
+                                  Math.cos((escortLat * Math.PI) / 180) *
+                                  Math.sin(dLon / 2) *
+                                  Math.sin(dLon / 2);
+                              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                              const distance = R * c;
+
+                              return `${Math.round(distance)} km`;
+                            })()}
+                          </span>
+                        ) : (
+                          <span></span>
+                        )}
+
+                        {/* Star Rating */}
+                        <div className="flex items-center gap-1">
+                          <Star
+                            className="w-3.5 h-3.5"
+                            style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }}
+                          />
+                          <span className="text-sm text-body font-normal">2.5</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Fullscreen Gallery Modal */}
         {isFullscreen && (
