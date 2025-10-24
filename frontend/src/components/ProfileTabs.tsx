@@ -28,6 +28,34 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
     setActiveTab(initialTab);
   }, [initialTab]);
 
+  // Intersection Observer for Desktop to track which section is visible
+  useEffect(() => {
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.target.id) {
+          setActiveTab(entry.target.id as typeof activeTab);
+          if (onTabChange) onTabChange(entry.target.id as typeof activeTab);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+      threshold: 0.5,
+      rootMargin: '-100px 0px -50% 0px',
+    });
+
+    // Observe all sections on desktop
+    const tabs = ['service', 'preise', 'zeiten', 'treffpunkte', 'ueber-mich', 'bewertungen'];
+    tabs.forEach((tabId) => {
+      const element = document.getElementById(tabId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [onTabChange]);
+
   const toggleSection = (sectionId: string) => {
     const headerElement = sectionRefs.current[sectionId];
     if (!headerElement) {
@@ -465,13 +493,12 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
 
   return (
     <>
-      {/* Desktop: Tabs */}
+      {/* Desktop: All Content with Anchor Navigation */}
       <div className="hidden lg:block rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
-        {/* Tab Navigation */}
+        {/* Anchor Navigation */}
         <div
-          className="flex border-b"
+          className="flex gap-8 pt-6 sticky top-0 z-10"
           style={{
-            borderColor: 'var(--border)',
             background: 'var(--background-primary)',
           }}
         >
@@ -479,31 +506,51 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
             const isActive = activeTab === tab.id;
 
             return (
-              <button
+              <a
                 key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (onTabChange) onTabChange(tab.id);
+                href={`#${tab.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(tab.id);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setActiveTab(tab.id);
+                    if (onTabChange) onTabChange(tab.id);
+                  }
                 }}
-                className="flex-1 px-6 py-4 flex items-center justify-center text-sm font-medium transition-all cursor-pointer relative"
-                style={{
-                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  background: isActive ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
-                  borderBottom: isActive ? '3px solid var(--color-primary)' : '1px solid var(--border)',
-                  fontWeight: isActive ? '600' : '500',
-                }}
+                className="pb-3 text-base font-medium transition-colors flex flex-col items-center justify-start cursor-pointer"
               >
-                <span>{tab.label}</span>
-              </button>
+                <div className="flex flex-col items-center">
+                  <span
+                    className="relative inline-block"
+                    style={{
+                      color: isActive ? 'var(--color-link-secondary)' : 'var(--text-secondary)',
+                      lineHeight: '1'
+                    }}
+                  >
+                    {tab.label}
+                  </span>
+                  {isActive && (
+                    <div
+                      className="mt-3"
+                      style={{
+                        width: '100%',
+                        height: '4px',
+                        backgroundColor: 'var(--color-primary)',
+                        borderRadius: '9999px'
+                      }}
+                    />
+                  )}
+                </div>
+              </a>
             );
           })}
         </div>
 
-        {/* Tab Content */}
-        <div className="p-6 sm:p-8 border-depth" style={{ borderTop: 'none' }}>
-        {/* Service Tab */}
-        {activeTab === 'service' && (
-          <div className="animate-fade-in">
+        {/* All Content Sections */}
+        <div className="py-6 sm:py-8 space-y-12" style={{ borderTop: 'none' }}>
+        {/* Service Section */}
+          <div id="service" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Angebotene Services
             </h3>
@@ -557,11 +604,9 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </p>
             </div>
           </div>
-        )}
 
-        {/* Preise Tab */}
-        {activeTab === 'preise' && (
-          <div className="animate-fade-in">
+        {/* Preise Section */}
+          <div id="preise" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Preisübersicht
             </h3>
@@ -620,11 +665,9 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </p>
             </div>
           </div>
-        )}
 
-        {/* Zeiten Tab */}
-        {activeTab === 'zeiten' && (
-          <div className="animate-fade-in">
+        {/* Zeiten Section */}
+          <div id="zeiten" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Verfügbarkeit & Arbeitszeiten
             </h3>
@@ -742,11 +785,9 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </div>
             </div>
           </div>
-        )}
 
-        {/* Treffpunkte Tab */}
-        {activeTab === 'treffpunkte' && (
-          <div className="animate-fade-in">
+        {/* Treffpunkte Section */}
+          <div id="treffpunkte" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Treffpunkte
             </h3>
@@ -818,11 +859,9 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </div>
             </div>
           </div>
-        )}
 
-        {/* Über mich Tab */}
-        {activeTab === 'ueber-mich' && (
-          <div className="animate-fade-in">
+        {/* Über mich Section */}
+          <div id="ueber-mich" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Über mich
             </h3>
@@ -906,11 +945,9 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </div>
             </div>
           </div>
-        )}
 
-        {/* Bewertungen Tab */}
-        {activeTab === 'bewertungen' && (
-          <div className="animate-fade-in">
+        {/* Bewertungen Section */}
+          <div id="bewertungen" className="scroll-mt-24">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold" style={{ color: 'var(--text-heading)' }}>
                 Bewertungen
@@ -997,9 +1034,8 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
 
       {/* Mobile/Tablet: Accordion */}
       <div className="lg:hidden space-y-3">
