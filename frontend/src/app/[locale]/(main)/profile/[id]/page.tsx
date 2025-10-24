@@ -26,7 +26,7 @@ export default function ProfilePage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [locationText, setLocationText] = useState<string>('');
   const [distanceKm, setDistanceKm] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>('service');
+  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen'>('service');
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [isCurrentImagePortrait, setIsCurrentImagePortrait] = useState(false);
@@ -414,9 +414,9 @@ export default function ProfilePage() {
           <button
             onClick={handleBackClick}
             className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-            style={{ color: 'var(--text-secondary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            style={{ color: 'var(--color-primary)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Zurück</span>
@@ -829,14 +829,16 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <button
                   onClick={handleMessageClick}
-                  className="w-full btn-base btn-primary cursor-pointer"
+                  className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center gap-2"
                 >
+                  <MessageCircle className="w-5 h-5" />
                   Nachricht schreiben
                 </button>
                 <button
                   onClick={handleDateClick}
-                  className="w-full btn-base btn-secondary cursor-pointer"
+                  className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center gap-2"
                 >
+                  <Send className="w-5 h-5" />
                   Date vereinbaren
                 </button>
               </div>

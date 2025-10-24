@@ -12,12 +12,12 @@ interface ProfileTabsProps {
     priceOvernight?: number;
     description?: string;
   };
-  initialTab?: 'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen';
-  onTabChange?: (tab: 'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen') => void;
+  initialTab?: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen';
+  onTabChange?: (tab: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen') => void;
 }
 
 export default function ProfileTabs({ escort, initialTab = 'service', onTabChange }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'ueber-mich' | 'bewertungen'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen'>(initialTab);
 
   // Accordion state for mobile - only one section open at a time
   const [openSection, setOpenSection] = useState<string>('service');
@@ -66,6 +66,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
     { id: 'service' as const, label: 'Service' },
     { id: 'preise' as const, label: 'Preise' },
     { id: 'zeiten' as const, label: 'Zeiten' },
+    { id: 'treffpunkte' as const, label: 'Treffpunkte' },
     { id: 'ueber-mich' as const, label: 'Über mich' },
     { id: 'bewertungen' as const, label: 'Bewertungen' },
   ];
@@ -199,41 +200,192 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Verfügbarkeit & Arbeitszeiten
             </h3>
 
-            <div className="space-y-4 mb-6">
+            {/* Weekly Schedule Grid */}
+            <div className="space-y-3 mb-6">
               {[
-                { day: 'Montag', hours: '10:00 - 22:00', available: true },
-                { day: 'Dienstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Mittwoch', hours: '10:00 - 22:00', available: true },
-                { day: 'Donnerstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Freitag', hours: '12:00 - 02:00', available: true },
-                { day: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'Sonntag', hours: 'Geschlossen', available: false },
+                { day: 'Mo', fullDay: 'Montag', hours: '10:00 - 22:00', available: true },
+                { day: 'Di', fullDay: 'Dienstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Mi', fullDay: 'Mittwoch', hours: '10:00 - 22:00', available: true },
+                { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
+                { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
+                { day: 'So', fullDay: 'Sonntag', hours: 'Geschlossen', available: false },
               ].map((day) => (
                 <div
                   key={day.day}
-                  className="flex items-center justify-between p-4 rounded-lg border"
+                  className="relative p-4 rounded-xl border"
                   style={{
-                    background: 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
+                    background: day.available
+                      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
+                      : 'var(--background-secondary)',
+                    borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
+                    borderWidth: day.available ? '1.5px' : '1px',
                   }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ background: day.available ? '#10b981' : '#ef4444' }}
-                    />
-                    <span className="font-medium" style={{ color: 'var(--text-heading)' }}>
-                      {day.day}
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
+                        style={{
+                          background: day.available ? 'var(--color-primary)' : 'var(--background-tertiary)',
+                          color: day.available ? 'white' : 'var(--text-secondary)',
+                        }}
+                      >
+                        {day.day}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: 'var(--text-heading)' }}>
+                          {day.fullDay}
+                        </p>
+                        <p className="text-xs" style={{ color: day.available ? 'var(--color-primary)' : 'var(--text-secondary)' }}>
+                          {day.available ? 'Verfügbar' : 'Nicht verfügbar'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: day.available ? 'var(--text-heading)' : 'var(--text-secondary)' }}
+                      >
+                        {day.hours}
+                      </p>
+                    </div>
                   </div>
-                  <span
-                    className="text-sm"
-                    style={{ color: day.available ? 'var(--text-regular)' : 'var(--text-secondary)' }}
-                  >
-                    {day.hours}
-                  </span>
                 </div>
               ))}
+            </div>
+
+            {/* Additional Info Cards */}
+            <div className="space-y-3">
+              <div
+                className="p-5 rounded-xl border"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                  borderColor: 'var(--color-primary)',
+                  borderWidth: '1.5px',
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'var(--color-primary)' }}
+                  >
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
+                      Spontane Termine
+                    </h4>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      Kurzfristige Buchungen innerhalb von 2-3 Stunden möglich
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="p-5 rounded-xl border"
+                style={{
+                  background: 'var(--background-secondary)',
+                  borderColor: 'var(--border)',
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'var(--background-tertiary)' }}
+                  >
+                    <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
+                      Vorausbuchung
+                    </h4>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      Termine können bis zu 2 Wochen im Voraus gebucht werden
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      case 'treffpunkte':
+        return (
+          <>
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Treffpunkte
+            </h3>
+
+            <div className="space-y-6">
+              {/* Incall */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Incall - Bei mir
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Ich empfange Sie in einer diskreten, sauberen und gepflegten Wohnung in zentraler Lage.
+                    Parkplätze sind in der Nähe vorhanden.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Zentrale Lage, genaue Adresse nach Terminvereinbarung</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Outcall */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Outcall - Bei Ihnen
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Ich besuche Sie gerne in Ihrem Hotel oder Ihrer Wohnung. Outcall-Termine sind im gesamten Stadtgebiet möglich.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Mindestdauer: 2 Stunden</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Anfahrt im Stadtgebiet inklusive, außerhalb zzgl. 50€</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hotels */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Hotels & Dinner Dates
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Für Hotelbesuche und Dinner Dates stehe ich sehr gerne zur Verfügung.
+                    Ich begleite Sie auch zu gesellschaftlichen Anlässen und Events.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-primary)' }}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Bitte bei der Buchung angeben</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         );
@@ -314,7 +466,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
   return (
     <>
       {/* Desktop: Tabs */}
-      <div className="hidden lg:block rounded-lg border-depth" style={{ background: 'var(--background-primary)' }}>
+      <div className="hidden lg:block rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
         {/* Tab Navigation */}
         <div
           className="flex border-b"
@@ -348,7 +500,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 sm:p-8">
+        <div className="p-6 sm:p-8 border-depth" style={{ borderTop: 'none' }}>
         {/* Service Tab */}
         {activeTab === 'service' && (
           <div className="animate-fade-in">
@@ -477,88 +629,192 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Verfügbarkeit & Arbeitszeiten
             </h3>
 
-            <div className="space-y-4 mb-6">
+            {/* Weekly Schedule Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {[
-                { day: 'Montag', hours: '10:00 - 22:00', available: true },
-                { day: 'Dienstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Mittwoch', hours: '10:00 - 22:00', available: true },
-                { day: 'Donnerstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Freitag', hours: '12:00 - 02:00', available: true },
-                { day: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'Sonntag', hours: 'Geschlossen', available: false },
+                { day: 'Mo', fullDay: 'Montag', hours: '10:00 - 22:00', available: true },
+                { day: 'Di', fullDay: 'Dienstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Mi', fullDay: 'Mittwoch', hours: '10:00 - 22:00', available: true },
+                { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
+                { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
+                { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
+                { day: 'So', fullDay: 'Sonntag', hours: 'Geschlossen', available: false },
               ].map((day) => (
                 <div
                   key={day.day}
-                  className="flex items-center justify-between p-4 rounded-lg border"
+                  className="relative p-4 rounded-xl border transition-all hover:scale-[1.02]"
                   style={{
-                    background: 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
+                    background: day.available
+                      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
+                      : 'var(--background-secondary)',
+                    borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
+                    borderWidth: day.available ? '1.5px' : '1px',
                   }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ background: day.available ? '#10b981' : '#ef4444' }}
-                    />
-                    <span className="font-medium" style={{ color: 'var(--text-heading)' }}>
-                      {day.day}
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
+                        style={{
+                          background: day.available ? 'var(--color-primary)' : 'var(--background-tertiary)',
+                          color: day.available ? 'white' : 'var(--text-secondary)',
+                        }}
+                      >
+                        {day.day}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: 'var(--text-heading)' }}>
+                          {day.fullDay}
+                        </p>
+                        <p className="text-xs" style={{ color: day.available ? 'var(--color-primary)' : 'var(--text-secondary)' }}>
+                          {day.available ? 'Verfügbar' : 'Nicht verfügbar'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: day.available ? 'var(--text-heading)' : 'var(--text-secondary)' }}
+                      >
+                        {day.hours}
+                      </p>
+                    </div>
                   </div>
-                  <span
-                    className="text-sm"
-                    style={{ color: day.available ? 'var(--text-regular)' : 'var(--text-secondary)' }}
-                  >
-                    {day.hours}
-                  </span>
                 </div>
               ))}
             </div>
 
+            {/* Additional Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
-                className="p-4 rounded-lg border"
+                className="p-5 rounded-xl border transition-all hover:scale-[1.02]"
                 style={{
-                  background: 'var(--background-secondary)',
-                  borderColor: 'var(--border)',
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                  borderColor: 'var(--color-primary)',
+                  borderWidth: '1.5px',
                 }}
               >
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-start gap-3">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ background: 'var(--color-primary)' }}
                   >
-                    <Clock className="w-4 h-4 text-white" />
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                   </div>
-                  <h4 className="font-semibold" style={{ color: 'var(--text-heading)' }}>
-                    Spontane Termine
-                  </h4>
+                  <div className="flex-1">
+                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
+                      Spontane Termine
+                    </h4>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      Kurzfristige Buchungen innerhalb von 2-3 Stunden möglich
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Kurzfristige Buchungen innerhalb von 2-3 Stunden möglich
-                </p>
               </div>
 
               <div
-                className="p-4 rounded-lg border"
+                className="p-5 rounded-xl border transition-all hover:scale-[1.02]"
                 style={{
                   background: 'var(--background-secondary)',
                   borderColor: 'var(--border)',
                 }}
               >
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-start gap-3">
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: 'var(--color-secondary)' }}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'var(--background-tertiary)' }}
                   >
-                    <Clock className="w-4 h-4 text-white" />
+                    <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
-                  <h4 className="font-semibold" style={{ color: 'var(--text-heading)' }}>
-                    Vorausbuchung
-                  </h4>
+                  <div className="flex-1">
+                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
+                      Vorausbuchung
+                    </h4>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      Termine können bis zu 2 Wochen im Voraus gebucht werden
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Termine können bis zu 2 Wochen im Voraus gebucht werden
-                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Treffpunkte Tab */}
+        {activeTab === 'treffpunkte' && (
+          <div className="animate-fade-in">
+            <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
+              Treffpunkte
+            </h3>
+
+            <div className="space-y-6">
+              {/* Incall */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Incall - Bei mir
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Ich empfange Sie in einer diskreten, sauberen und gepflegten Wohnung in zentraler Lage.
+                    Parkplätze sind in der Nähe vorhanden.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Zentrale Lage, genaue Adresse nach Terminvereinbarung</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Outcall */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Outcall - Bei Ihnen
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Ich besuche Sie gerne in Ihrem Hotel oder Ihrer Wohnung. Outcall-Termine sind im gesamten Stadtgebiet möglich.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Mindestdauer: 2 Stunden</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Anfahrt im Stadtgebiet inklusive, außerhalb zzgl. 50€</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hotels */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
+                  Hotels & Dinner Dates
+                </h4>
+                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
+                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
+                    Für Hotelbesuche und Dinner Dates stehe ich sehr gerne zur Verfügung.
+                    Ich begleite Sie auch zu gesellschaftlichen Anlässen und Events.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-primary)' }}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Bitte bei der Buchung angeben</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
