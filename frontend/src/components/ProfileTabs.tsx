@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Star, ChevronDown } from 'lucide-react';
+import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileText, MessageSquare } from 'lucide-react';
 
 interface ProfileTabsProps {
   escort?: {
@@ -91,12 +91,12 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
   };
 
   const tabs = [
-    { id: 'service' as const, label: 'Service' },
-    { id: 'preise' as const, label: 'Preise' },
-    { id: 'zeiten' as const, label: 'Zeiten' },
-    { id: 'treffpunkte' as const, label: 'Treffpunkte' },
-    { id: 'ueber-mich' as const, label: 'Über mich' },
-    { id: 'bewertungen' as const, label: 'Bewertungen' },
+    { id: 'service' as const, label: 'Service', icon: Briefcase },
+    { id: 'preise' as const, label: 'Preise', icon: Euro },
+    { id: 'zeiten' as const, label: 'Zeiten', icon: Clock },
+    { id: 'treffpunkte' as const, label: 'Treffpunkte', icon: MapPinned },
+    { id: 'ueber-mich' as const, label: 'Über mich', icon: FileText },
+    { id: 'bewertungen' as const, label: 'Bewertungen', icon: Star },
   ];
 
   // Render helper for tab content
@@ -493,62 +493,54 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
 
   return (
     <>
-      {/* Desktop: All Content with Anchor Navigation */}
-      <div className="hidden lg:block rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
-        {/* Anchor Navigation */}
-        <div
-          className="flex gap-8 pt-6 sticky top-0 z-10"
-          style={{
-            background: 'var(--background-primary)',
-          }}
-        >
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
+      {/* Desktop: Sidebar Navigation + Content */}
+      <div className="hidden lg:flex gap-8 rounded-lg" style={{ background: 'var(--background-primary)' }}>
+        {/* Left Sidebar: Anchor Navigation */}
+        <div className="w-48 flex-shrink-0">
+          <div className="sticky top-24 space-y-2">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
 
-            return (
-              <a
-                key={tab.id}
-                href={`#${tab.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById(tab.id);
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    setActiveTab(tab.id);
-                    if (onTabChange) onTabChange(tab.id);
-                  }
-                }}
-                className="pb-3 text-base font-medium transition-colors flex flex-col items-center justify-start cursor-pointer"
-              >
-                <div className="flex flex-col items-center">
-                  <span
-                    className="relative inline-block"
-                    style={{
-                      color: isActive ? 'var(--color-link-secondary)' : 'var(--text-secondary)',
-                      lineHeight: '1'
-                    }}
-                  >
-                    {tab.label}
-                  </span>
-                  {isActive && (
-                    <div
-                      className="mt-3"
-                      style={{
-                        width: '100%',
-                        height: '4px',
-                        backgroundColor: 'var(--color-primary)',
-                        borderRadius: '9999px'
-                      }}
-                    />
-                  )}
-                </div>
-              </a>
-            );
-          })}
+              return (
+                <a
+                  key={tab.id}
+                  href={`#${tab.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.getElementById(tab.id);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setActiveTab(tab.id);
+                      if (onTabChange) onTabChange(tab.id);
+                    }
+                  }}
+                  className="flex items-center gap-3 px-4 py-2 text-sm font-medium transition-colors cursor-pointer rounded-lg"
+                  style={{
+                    color: isActive ? 'var(--color-primary)' : 'var(--color-link-secondary)',
+                    background: isActive ? 'rgba(139, 92, 246, 0.1)' : 'transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.opacity = '0.7';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.opacity = '1';
+                    }
+                  }}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span>{tab.label}</span>
+                </a>
+              );
+            })}
+          </div>
         </div>
 
-        {/* All Content Sections */}
-        <div className="py-6 sm:py-8 space-y-12" style={{ borderTop: 'none' }}>
+        {/* Right Content Area */}
+        <div className="flex-1 py-6 sm:py-8 space-y-12">
         {/* Service Section */}
           <div id="service" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>

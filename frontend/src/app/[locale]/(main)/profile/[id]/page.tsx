@@ -6,7 +6,7 @@ import { escortService } from '@/services/escortService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { galleryService, GalleryPhoto } from '@/services/galleryService';
 import { User } from '@/types/auth.types';
-import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag, ArrowLeft, Star, Phone, Copy, MessageCircle } from 'lucide-react';
+import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag, ArrowLeft, Star, Phone, Copy, MessageCircle, Expand, Heart, MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import ProfileTabs from '@/components/ProfileTabs';
@@ -693,15 +693,6 @@ export default function ProfilePage() {
                         </button>
                       </>
                     )}
-
-                    {/* Image Counter */}
-                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-sm font-medium z-20"
-                      style={{
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        color: 'var(--text-button)'
-                      }}>
-                      {selectedImageIndex + 1} / {photos.length}
-                    </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full gap-6 px-6">
@@ -773,6 +764,30 @@ export default function ProfilePage() {
                     )}
                   </div>
                 )}
+              </div>
+
+              {/* Photo Counter and Fullscreen Button Container */}
+              <div className="flex items-center justify-between px-4 py-2">
+                {/* Empty left space for alignment */}
+                <div className="w-5"></div>
+
+                {/* Center: Photo Counter */}
+                <div className="text-sm font-medium" style={{ color: 'var(--text-regular)' }}>
+                  {selectedImageIndex + 1} / {photos.length}
+                </div>
+
+                {/* Right side: Fullscreen */}
+                <button
+                  onClick={() => setIsFullscreen(true)}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--color-primary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                  </svg>
+                </button>
               </div>
 
               {/* Thumbnail Gallery */}
