@@ -38,6 +38,11 @@ export default function ProfilePage() {
   const [similarEscorts, setSimilarEscorts] = useState<User[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
 
+  // Reset selected image index when switching tabs
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [mediaTab]);
+
   // Detect if mobile on client side
   useEffect(() => {
     const checkMobile = () => {
@@ -223,20 +228,34 @@ export default function ProfilePage() {
     fetchProfile();
   }, [params.id]);
 
-  // Generate photos array: profile picture first, then gallery photos
+  // Helper function to check if a URL is a video
+  const isVideoUrl = (url: string): boolean => {
+    const videoExtensions = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/i;
+    return videoExtensions.test(url);
+  };
+
+  // Generate photos array: profile picture first, then gallery photos (filtered by media tab)
   const photos = (() => {
     const allPhotos: string[] = [];
-    
-    // Add profile picture first if it exists
-    if (escort?.profilePicture) {
+
+    // Add profile picture first if it exists (only in fotos tab)
+    if (mediaTab === 'fotos' && escort?.profilePicture) {
       allPhotos.push(profilePictureService.getProfilePictureUrl(escort.profilePicture));
     }
-    
-    // Add gallery photos
+
+    // Add gallery photos, filtered by media type
     galleryPhotos.forEach((photo) => {
-      allPhotos.push(galleryService.getPhotoUrl(photo.photoUrl));
+      const photoUrl = galleryService.getPhotoUrl(photo.photoUrl);
+      const isVideo = isVideoUrl(photoUrl);
+
+      // Add to array based on active tab
+      if (mediaTab === 'fotos' && !isVideo) {
+        allPhotos.push(photoUrl);
+      } else if (mediaTab === 'videos' && isVideo) {
+        allPhotos.push(photoUrl);
+      }
     });
-    
+
     return allPhotos;
   })();
 
@@ -531,20 +550,82 @@ export default function ProfilePage() {
         {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
           {/* Photo Gallery - 2/3 width */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            <div className="rounded-lg overflow-hidden border-depth" style={{ background: 'var(--background-primary)' }}>
-              {/* Main Image - fixed height on desktop, no cropping */}
-              <div
-                className="relative w-full flex items-center justify-center overflow-hidden"
-                style={{
-                  height: '600px',
-                  background: 'var(--background-secondary)'
-                }}
-              >
+          <div className="lg:col-span-2 flex flex-col">
+            <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
+              {/* Media Tabs */}
+              <div className="flex">
+                <button
+                  onClick={() => setMediaTab('fotos')}
+                  className="flex-1 px-4 pb-3 text-sm font-medium transition-colors flex flex-col items-center justify-start cursor-pointer"
+                  style={{ paddingTop: 0 }}
+                >
+                  <div className="flex flex-col items-center">
+                    <span
+                      className="relative inline-block"
+                      style={{
+                        color: mediaTab === 'fotos' ? 'var(--color-link-secondary)' : 'var(--text-secondary)',
+                        lineHeight: '1'
+                      }}
+                    >
+                      Fotos
+                    </span>
+                    {mediaTab === 'fotos' && (
+                      <div
+                        className="mt-3"
+                        style={{
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: 'var(--color-primary)',
+                          borderRadius: '9999px'
+                        }}
+                      />
+                    )}
+                  </div>
+                </button>
+                <button
+                  onClick={() => setMediaTab('videos')}
+                  className="flex-1 px-4 pb-3 text-sm font-medium transition-colors flex flex-col items-center justify-start cursor-pointer"
+                  style={{ paddingTop: 0 }}
+                >
+                  <div className="flex flex-col items-center">
+                    <span
+                      className="relative inline-block"
+                      style={{
+                        color: mediaTab === 'videos' ? 'var(--color-link-secondary)' : 'var(--text-secondary)',
+                        lineHeight: '1'
+                      }}
+                    >
+                      Videos
+                    </span>
+                    {mediaTab === 'videos' && (
+                      <div
+                        className="mt-3"
+                        style={{
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: 'var(--color-primary)',
+                          borderRadius: '9999px'
+                        }}
+                      />
+                    )}
+                  </div>
+                </button>
+              </div>
+
+              {/* Gallery Content */}
+              <div>
+                {/* Main Image - fixed height on desktop, no cropping */}
+                <div
+                  className="relative w-full flex items-center justify-center overflow-hidden"
+                  style={{
+                    height: '600px',
+                    background: 'var(--background-secondary)'
+                  }}
+                >
                 {photos.length > 0 ? (
                   <>
-                    {/* Background: Blurred version of current image (only show on desktop OR on mobile for landscape images) */}
-                    {(!isCurrentImagePortrait || !isMobile) && (
+                    {/* Background: Blurred version of current image (only show on desktop OR on mobile for landscape images, and not for videos) */}
+                    {!isVideoUrl(photos[selectedImageIndex]) && (!isCurrentImagePortrait || !isMobile) && (
                       <div
                         className="absolute inset-0"
                         style={{
@@ -558,20 +639,32 @@ export default function ProfilePage() {
                       />
                     )}
 
-                    {/* Foreground: Sharp image */}
-                    <img
-                      src={photos[selectedImageIndex]}
-                      alt={`Foto ${selectedImageIndex + 1}`}
-                      className="relative w-full h-full cursor-pointer z-10"
-                      style={{
-                        objectFit: isCurrentImagePortrait && isMobile ? 'cover' : 'contain'
-                      }}
-                      onLoad={(e) => {
-                        const img = e.currentTarget;
-                        setIsCurrentImagePortrait(img.naturalHeight > img.naturalWidth);
-                      }}
-                      onClick={() => setIsFullscreen(true)}
-                    />
+                    {/* Foreground: Sharp image or video */}
+                    {isVideoUrl(photos[selectedImageIndex]) ? (
+                      <video
+                        src={photos[selectedImageIndex]}
+                        className="relative w-full h-full cursor-pointer z-10"
+                        style={{
+                          objectFit: 'contain'
+                        }}
+                        controls
+                        onClick={() => setIsFullscreen(true)}
+                      />
+                    ) : (
+                      <img
+                        src={photos[selectedImageIndex]}
+                        alt={`Foto ${selectedImageIndex + 1}`}
+                        className="relative w-full h-full cursor-pointer z-10"
+                        style={{
+                          objectFit: isCurrentImagePortrait && isMobile ? 'cover' : 'contain'
+                        }}
+                        onLoad={(e) => {
+                          const img = e.currentTarget;
+                          setIsCurrentImagePortrait(img.naturalHeight > img.naturalWidth);
+                        }}
+                        onClick={() => setIsFullscreen(true)}
+                      />
+                    )}
                     
                     {/* Navigation Arrows */}
                     {photos.length > 1 && (
@@ -611,39 +704,117 @@ export default function ProfilePage() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-9xl font-bold" style={{ color: 'var(--text-heading)' }}>
-                      {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
-                    </div>
+                  <div className="flex flex-col items-center justify-center h-full gap-6 px-6">
+                    {mediaTab === 'videos' ? (
+                      <>
+                        <div
+                          className="w-32 h-32 rounded-full flex items-center justify-center"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+                            border: '2px solid',
+                            borderColor: 'var(--border)'
+                          }}
+                        >
+                          <svg
+                            className="w-16 h-16"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            style={{ color: 'var(--color-primary)', opacity: 0.6 }}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="text-center space-y-4">
+                          <div className="space-y-2">
+                            <h3
+                              className="text-xl font-semibold"
+                              style={{ color: 'var(--text-heading)' }}
+                            >
+                              Noch keine Videos
+                            </h3>
+                            <p
+                              className="text-sm max-w-xs"
+                              style={{ color: 'var(--text-secondary)' }}
+                            >
+                              {escort.username} hat noch keine Videos hochgeladen. Schau später nochmal vorbei!
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setMediaTab('fotos')}
+                            className="btn-base btn-primary cursor-pointer inline-flex items-center gap-2"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            Fotos ansehen
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-9xl font-bold" style={{ color: 'var(--text-heading)' }}>
+                        {escort.firstName?.[0]?.toUpperCase() || escort.username?.[0]?.toUpperCase() || '?'}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Thumbnail Gallery */}
-            {photos.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {photos.map((photo, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer border-depth"
-                    style={{
-                      border: selectedImageIndex === index
-                        ? '2px solid var(--color-primary)'
-                        : '2px solid var(--border)',
-                      opacity: selectedImageIndex === index ? 1 : 0.6
-                    }}
-                  >
-                    <img
-                      src={photo}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+              {/* Thumbnail Gallery */}
+              {photos.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2 px-4">
+                  {photos.map((photo, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer border-depth relative"
+                      style={{
+                        border: selectedImageIndex === index
+                          ? '2px solid var(--color-primary)'
+                          : '2px solid var(--border)',
+                        opacity: selectedImageIndex === index ? 1 : 0.6
+                      }}
+                    >
+                      {isVideoUrl(photo) ? (
+                        <>
+                          <video
+                            src={photo}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
+                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          </div>
+                        </>
+                      ) : (
+                        <img
+                          src={photo}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Profile Info - 1/3 width */}
@@ -1073,20 +1244,35 @@ export default function ProfilePage() {
               ✕
             </button>
 
-            {/* Image */}
+            {/* Image or Video */}
             <div className="relative w-full h-full flex items-center justify-center mx-4">
-              <img
-                src={photos[selectedImageIndex]}
-                alt={`Foto ${selectedImageIndex + 1}`}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  width: 'auto',
-                  height: 'auto',
-                  objectFit: 'contain'
-                }}
-                onClick={(e) => e.stopPropagation()}
-              />
+              {isVideoUrl(photos[selectedImageIndex]) ? (
+                <video
+                  src={photos[selectedImageIndex]}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
+                  controls
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <img
+                  src={photos[selectedImageIndex]}
+                  alt={`Foto ${selectedImageIndex + 1}`}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
 
               {/* Navigation */}
               {photos.length > 1 && (
