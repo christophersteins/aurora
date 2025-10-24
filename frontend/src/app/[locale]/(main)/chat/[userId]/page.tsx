@@ -4,16 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { ArrowLeft } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ChatPage() {
+  const { user } = useAuthStore();
   const params = useParams();
   const router = useRouter();
   const recipientId = params.userId as string;
-  const currentUserId = 'temp-user-123';
 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [otherUserName, setOtherUserName] = useState<string>('');
 
   useEffect(() => {
     const findOrCreateConversation = async () => {
@@ -21,9 +23,24 @@ export default function ChatPage() {
         setIsLoading(true);
         setError(null);
 
+        // Get JWT token from localStorage
+        const storedAuth = localStorage.getItem('aurora-auth-storage');
+        let token = '';
+        if (storedAuth) {
+          try {
+            const parsedAuth = JSON.parse(storedAuth);
+            token = parsedAuth.state?.token || '';
+          } catch (e) {
+            console.error('Error parsing auth:', e);
+          }
+        }
+
         const response = await fetch('http://localhost:4000/chat/conversations', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           credentials: 'include',
           body: JSON.stringify({ otherUserId: recipientId }),
         });
@@ -31,7 +48,10 @@ export default function ChatPage() {
         if (response.ok) {
           const conversation = await response.json();
           setConversationId(conversation.id);
+          setOtherUserName(conversation.otherUserName || 'User');
         } else {
+          const errorText = await response.text();
+          console.error('Server error:', response.status, errorText);
           setError('Could not load conversation');
         }
       } catch (err) {
@@ -80,7 +100,9 @@ export default function ChatPage() {
         >
           <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-body)' }} />
         </button>
-        <h1 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Zurück</h1>
+        <h1 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>
+          {otherUserName || 'Zurück'}
+        </h1>
       </div>
 
       {/* Chat container with max width */}
@@ -88,7 +110,7 @@ export default function ChatPage() {
         <div className="mx-auto h-full" style={{ maxWidth: 'var(--max-content-width)' }}>
           <ChatWindow
             conversationId={conversationId}
-            currentUserId={currentUserId}
+            currentUserId={user?.id || ''}
           />
         </div>
       </div>

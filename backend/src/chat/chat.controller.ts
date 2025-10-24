@@ -3,7 +3,7 @@ import { ChatService } from './chat.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('chat')
-// @UseGuards(JwtAuthGuard)  // TODO: Wieder aktivieren nach Auth-Implementierung
+@UseGuards(JwtAuthGuard)
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
@@ -12,15 +12,13 @@ export class ChatController {
     @Req() req,
     @Body('otherUserId') otherUserId: string,
   ) {
-    // Temporär: Nutze test-user-123 wenn kein Auth
-    const userId = req.user?.id || 'test-user-123';
+    const userId = req.user.id;
     return await this.chatService.createConversation(userId, otherUserId);
   }
 
   @Get('conversations')
   async getConversations(@Req() req) {
-    // Temporär: Nutze test-user-123 wenn kein Auth
-    const userId = req.user?.id || 'test-user-123';
+    const userId = req.user.id;
     return await this.chatService.getUserConversationsWithLastMessage(userId);
   }
 
@@ -37,8 +35,7 @@ export class ChatController {
     @Param('conversationId') conversationId: string,
     @Body('content') content: string,
   ) {
-    // Temporär: Nutze test-user-123 wenn kein Auth
-    const userId = req.user?.id || 'test-user-123';
+    const userId = req.user.id;
     return await this.chatService.sendMessage(conversationId, userId, content);
   }
 }

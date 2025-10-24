@@ -32,11 +32,57 @@ interface IncomingMessage {
   timestamp: string;
 }
 
+interface Conversation {
+  id: string;
+  otherUserName: string;
+}
+
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
   const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+
+  // Load conversation details to get other user's name
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const loadConversation = async () => {
+      try {
+        // Get JWT token from localStorage
+        const storedAuth = localStorage.getItem('aurora-auth-storage');
+        let token = '';
+        if (storedAuth) {
+          try {
+            const parsedAuth = JSON.parse(storedAuth);
+            token = parsedAuth.state?.token || '';
+          } catch (e) {
+            console.error('Error parsing auth:', e);
+          }
+        }
+
+        const response = await fetch('http://localhost:4000/chat/conversations', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const conversations = await response.json();
+          const currentConv = conversations.find((c: Conversation) => c.id === conversationId);
+          if (currentConv) {
+            setConversation(currentConv);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading conversation details:', error);
+      }
+    };
+
+    loadConversation();
+  }, [conversationId]);
 
   useEffect(() => {
     if (!socket || !conversationId) return;
@@ -109,7 +155,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   return (
     <div className="flex flex-col h-full bg-page-secondary">
       <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center">
-        <h2 className="font-semibold text-heading">Chat #{conversationId}</h2>
+        <h2 className="font-semibold text-heading">
+          {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
+        </h2>
         <span className={`text-sm ${isConnected ? 'text-success' : 'text-error'}`}>
           {isConnected ? '🟢 Verbunden' : '🔴 Getrennt'}
         </span>

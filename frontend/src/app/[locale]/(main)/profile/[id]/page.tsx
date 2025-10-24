@@ -300,8 +300,10 @@ export default function ProfilePage() {
   };
 
   const handleMessageClick = () => {
-    // TODO: Navigate to chat
-    console.log('Navigate to chat');
+    if (!escort?.id) return;
+
+    // Navigate to chat with this escort
+    router.push(`/chat/${escort.id}`);
   };
 
   const handleDateClick = () => {
