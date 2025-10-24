@@ -6,9 +6,10 @@ import { galleryService, GalleryPhoto } from '@/services/galleryService';
 
 interface MediaGalleryUploadProps {
   onUploadComplete?: () => void;
+  mediaType?: 'image' | 'video';
 }
 
-export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUploadProps) {
+export default function MediaGalleryUpload({ onUploadComplete, mediaType }: MediaGalleryUploadProps) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -23,13 +24,29 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
   // Load existing photos
   useEffect(() => {
     loadGallery();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadGallery = async () => {
     try {
       setIsLoadingGallery(true);
       const galleryPhotos = await galleryService.getMyPhotos();
-      setPhotos(galleryPhotos);
+
+      // Filter photos based on mediaType
+      const filteredPhotos = mediaType
+        ? galleryPhotos.filter(photo => {
+            // Check if the photo URL ends with common image or video extensions
+            const url = photo.photoUrl.toLowerCase();
+            const isImage = /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/.test(url);
+            const isVideo = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/.test(url);
+
+            if (mediaType === 'image') return isImage;
+            if (mediaType === 'video') return isVideo;
+            return true;
+          })
+        : galleryPhotos;
+
+      setPhotos(filteredPhotos);
     } catch (err) {
       console.error('Error loading gallery:', err);
     } finally {
@@ -38,15 +55,28 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
   };
 
   const addFiles = useCallback((files: File[]) => {
-    // Filter for images and videos
+    // Filter for images and videos based on mediaType
     const validFiles = files.filter(file => {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
+
+      if (mediaType === 'image') {
+        return isImage;
+      } else if (mediaType === 'video') {
+        return isVideo;
+      }
+
+      // If no mediaType specified, allow both
       return isImage || isVideo;
     });
 
     if (validFiles.length !== files.length) {
-      setError('Einige Dateien wurden übersprungen. Nur Bilder und Videos sind erlaubt.');
+      const errorMessage = mediaType === 'image'
+        ? 'Einige Dateien wurden übersprungen. Nur Bilder sind erlaubt.'
+        : mediaType === 'video'
+        ? 'Einige Dateien wurden übersprungen. Nur Videos sind erlaubt.'
+        : 'Einige Dateien wurden übersprungen. Nur Bilder und Videos sind erlaubt.';
+      setError(errorMessage);
       setTimeout(() => setError(null), 5000);
     }
 
@@ -68,7 +98,7 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
       };
       reader.readAsDataURL(file);
     });
-  }, []);
+  }, [mediaType]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -183,7 +213,7 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*,video/*"
+          accept={mediaType === 'image' ? 'image/*' : mediaType === 'video' ? 'video/*' : 'image/*,video/*'}
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -197,7 +227,7 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
             </div>
 
             <h3 className="text-xl font-semibold text-heading mb-2">
-              Fotos & Videos hochladen
+              {mediaType === 'image' ? 'Fotos hochladen' : mediaType === 'video' ? 'Videos hochladen' : 'Fotos & Videos hochladen'}
             </h3>
             <p className="text-muted mb-6 max-w-md mx-auto">
               Ziehe Dateien hierher oder klicke auf den Button unten. Du kannst bis zu 10 Dateien gleichzeitig hochladen.
@@ -212,7 +242,11 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
             </button>
 
             <p className="text-xs text-muted mt-4">
-              Unterstützte Formate: JPG, PNG, GIF, MP4, MOV
+              {mediaType === 'image'
+                ? 'Unterstützte Formate: JPG, PNG, GIF, WEBP'
+                : mediaType === 'video'
+                ? 'Unterstützte Formate: MP4, MOV, AVI, WEBM'
+                : 'Unterstützte Formate: JPG, PNG, GIF, MP4, MOV'}
             </p>
           </div>
         ) : (
@@ -228,8 +262,15 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
                     className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group"
                   >
                     {isVideo ? (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Film className="w-12 h-12 text-action-primary" />
+                      <div className="w-full h-full flex items-center justify-center relative">
+                        <video
+                          src={url}
+                          className="w-full h-full object-cover"
+                          muted
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
+                          <Film className="w-12 h-12 text-white" />
+                        </div>
                       </div>
                     ) : (
                       <img
@@ -297,7 +338,7 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
       {/* Existing Gallery */}
       <div>
         <h3 className="text-lg font-semibold text-heading mb-4">
-          Deine Galerie ({photos.length})
+          {mediaType === 'image' ? 'Deine Fotos' : mediaType === 'video' ? 'Deine Videos' : 'Deine Galerie'} ({photos.length})
         </h3>
 
         {isLoadingGallery ? (
@@ -306,33 +347,54 @@ export default function MediaGalleryUpload({ onUploadComplete }: MediaGalleryUpl
           </div>
         ) : photos.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-default rounded-lg">
-            <ImageIcon className="w-16 h-16 text-muted mx-auto mb-4" />
+            {mediaType === 'video' ? (
+              <Film className="w-16 h-16 text-muted mx-auto mb-4" />
+            ) : (
+              <ImageIcon className="w-16 h-16 text-muted mx-auto mb-4" />
+            )}
             <p className="text-muted">
-              Du hast noch keine Fotos hochgeladen
+              {mediaType === 'image'
+                ? 'Du hast noch keine Fotos hochgeladen'
+                : mediaType === 'video'
+                ? 'Du hast noch keine Videos hochgeladen'
+                : 'Du hast noch keine Fotos hochgeladen'}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group"
-              >
-                <img
-                  src={galleryService.getPhotoUrl(photo.photoUrl)}
-                  alt="Gallery photo"
-                  className="w-full h-full object-cover"
-                />
+            {photos.map((photo) => {
+              const url = photo.photoUrl.toLowerCase();
+              const isVideo = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/.test(url);
 
-                <button
-                  onClick={() => handleDeletePhoto(photo.id)}
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-error hover:bg-error-hover flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
-                  title="Foto löschen"
+              return (
+                <div
+                  key={photo.id}
+                  className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group"
                 >
-                  <Trash2 className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            ))}
+                  {isVideo ? (
+                    <video
+                      src={galleryService.getPhotoUrl(photo.photoUrl)}
+                      className="w-full h-full object-cover"
+                      controls
+                    />
+                  ) : (
+                    <img
+                      src={galleryService.getPhotoUrl(photo.photoUrl)}
+                      alt="Gallery photo"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+
+                  <button
+                    onClick={() => handleDeletePhoto(photo.id)}
+                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-error hover:bg-error-hover flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                    title={isVideo ? "Video löschen" : "Foto löschen"}
+                  >
+                    <Trash2 className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

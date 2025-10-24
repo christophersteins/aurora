@@ -8,7 +8,7 @@ import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
 import ToggleSwitch from './ToggleSwitch';
-import { ArrowLeft, User, Sparkles, Image, Briefcase, Calendar, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
+import { ArrowLeft, User, Sparkles, Image, Video, Briefcase, Calendar, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
   NATIONALITIES,
@@ -86,6 +86,44 @@ export default function EscortProfileForm() {
 
   // Desktop sidebar navigation state - tracks active section on desktop
   const [activeSidebarSection, setActiveSidebarSection] = useState<string>('persoenliche-daten');
+
+  // Define sections array
+  const sections = [
+    { id: 'persoenliche-daten', label: 'Persönliche Daten', icon: User },
+    { id: 'erscheinungsbild', label: 'Erscheinungsbild', icon: Sparkles },
+    { id: 'fotos', label: 'Fotos', icon: Image },
+    { id: 'videos', label: 'Videos', icon: Video },
+    { id: 'service', label: 'Service', icon: Briefcase },
+    { id: 'verfuegbarkeit', label: 'Verfügbarkeit', icon: Calendar },
+    { id: 'preise', label: 'Preise', icon: Euro },
+    { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
+    { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
+  ];
+
+  // Scroll spy effect for desktop navigation
+  useEffect(() => {
+    // Only run on desktop
+    if (typeof window === 'undefined' || window.innerWidth < 1024) return;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150; // Offset for sticky header
+
+      // Find which section is currently in view
+      for (const section of sections) {
+        const element = document.getElementById(section.id);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSidebarSection(section.id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -333,20 +371,13 @@ export default function EscortProfileForm() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const offsetTop = element.offsetTop - 100; // Offset for sticky header and padding
+      window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth'
+      });
     }
   };
-
-  const sections = [
-    { id: 'persoenliche-daten', label: 'Persönliche Daten', icon: User },
-    { id: 'erscheinungsbild', label: 'Erscheinungsbild', icon: Sparkles },
-    { id: 'mediengalerie', label: 'Fotos & Videos', icon: Image },
-    { id: 'service', label: 'Service', icon: Briefcase },
-    { id: 'verfuegbarkeit', label: 'Verfügbarkeit', icon: Calendar },
-    { id: 'preise', label: 'Preise', icon: Euro },
-    { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
-    { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
-  ];
 
   return (
     <div>
@@ -440,7 +471,7 @@ export default function EscortProfileForm() {
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSidebarSection(section.id)}
+                  onClick={() => scrollToSection(section.id)}
                   className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
                     isActive
                       ? 'text-action-primary'
@@ -517,7 +548,7 @@ export default function EscortProfileForm() {
               id="persoenliche-daten"
               className={`scroll-mt-8 ${
                 activeSection === 'persoenliche-daten' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'persoenliche-daten' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Persönliche Daten</h2>
 
@@ -638,7 +669,7 @@ export default function EscortProfileForm() {
               id="erscheinungsbild"
               className={`scroll-mt-8 ${
                 activeSection === 'erscheinungsbild' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'erscheinungsbild' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Erscheinungsbild</h2>
 
@@ -865,15 +896,26 @@ export default function EscortProfileForm() {
 
             </div>
 
-            {/* Mediengalerie Section */}
+            {/* Fotos Section */}
             <div
-              id="mediengalerie"
+              id="fotos"
               className={`scroll-mt-8 ${
-                activeSection === 'mediengalerie' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'mediengalerie' ? 'lg:block' : 'lg:hidden'}`}
+                activeSection === 'fotos' ? 'block animate-slide-in-right' : 'hidden'
+              } lg:block lg:mb-12`}
             >
-              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Fotos & Videos</h2>
-              <MediaGalleryUpload />
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Fotos</h2>
+              <MediaGalleryUpload mediaType="image" />
+            </div>
+
+            {/* Videos Section */}
+            <div
+              id="videos"
+              className={`scroll-mt-8 ${
+                activeSection === 'videos' ? 'block animate-slide-in-right' : 'hidden'
+              } lg:block lg:mb-12`}
+            >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Videos</h2>
+              <MediaGalleryUpload mediaType="video" />
             </div>
 
             {/* Service Section */}
@@ -881,7 +923,7 @@ export default function EscortProfileForm() {
               id="service"
               className={`scroll-mt-8 ${
                 activeSection === 'service' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'service' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Service</h2>
 
@@ -945,7 +987,7 @@ export default function EscortProfileForm() {
               id="verfuegbarkeit"
               className={`scroll-mt-8 ${
                 activeSection === 'verfuegbarkeit' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'verfuegbarkeit' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verfügbarkeit</h2>
               <p className="text-muted text-sm">Verfügbarkeits-Felder (Arbeitszeiten & Arbeitsort) werden hier hinzugefügt.</p>
@@ -956,7 +998,7 @@ export default function EscortProfileForm() {
               id="preise"
               className={`scroll-mt-8 ${
                 activeSection === 'preise' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'preise' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Preise</h2>
 
@@ -1200,7 +1242,7 @@ export default function EscortProfileForm() {
               id="beschreibung"
               className={`scroll-mt-8 ${
                 activeSection === 'beschreibung' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'beschreibung' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block lg:mb-12`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Beschreibung</h2>
 
@@ -1224,7 +1266,7 @@ export default function EscortProfileForm() {
               id="verifizierung"
               className={`scroll-mt-8 ${
                 activeSection === 'verifizierung' ? 'block animate-slide-in-right' : 'hidden'
-              } ${activeSidebarSection === 'verifizierung' ? 'lg:block' : 'lg:hidden'}`}
+              } lg:block`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verifizierung</h2>
               <p className="text-muted text-sm">Verifizierungs-Felder werden hier hinzugefügt.</p>
