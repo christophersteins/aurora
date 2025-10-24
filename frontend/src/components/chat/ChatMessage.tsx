@@ -25,16 +25,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       <div
         className={`max-w-[70%] rounded-lg px-4 py-2 ${
           isOwnMessage
-            ? 'bg-blue-500 text-white'
-            : 'bg-gray-200 text-gray-900'
+            ? 'bg-action-primary text-button-primary'
+            : 'bg-page-secondary text-body'
         }`}
       >
         <p className="text-sm break-words">{message.content}</p>
-        <span
-          className={`text-xs mt-1 block ${
-            isOwnMessage ? 'text-blue-100' : 'text-gray-500'
-          }`}
-        >
+        <span className="text-xs mt-1 block opacity-75">
           {formatDistanceToNow(new Date(message.timestamp), {
             addSuffix: true,
             locale: de,

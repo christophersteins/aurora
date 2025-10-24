@@ -153,7 +153,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   }
 
   return (
-    <div className="flex flex-col h-full bg-page-secondary">
+    <div className="flex flex-col h-full bg-page-primary">
       <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center">
         <h2 className="font-semibold text-heading">
           {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
@@ -163,7 +163,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary">
         {isLoading ? (
           <p className="text-muted text-center">Lade Nachrichten...</p>
         ) : messages.length === 0 ? (
@@ -178,7 +178,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                 className={`max-w-xs px-4 py-2 rounded-lg ${
                   msg.senderId === currentUserId
                     ? 'bg-action-primary text-button-primary'
-                    : 'bg-page-primary text-body'
+                    : 'bg-page-secondary text-body'
                 }`}
               >
                 <p>{msg.content}</p>

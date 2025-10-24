@@ -988,25 +988,25 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Alter:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {age ? `${age} Jahre` : 'keine Angabe'}
+                      {age ? `${age} Jahre` : 'Keine Angabe'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Geschlecht:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {escort.gender || 'keine Angabe'}
+                      {escort.gender || 'Keine Angabe'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Nationalität:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {escort.nationalities && escort.nationalities.length > 0 ? escort.nationalities.join(', ') : 'keine Angabe'}
+                      {escort.nationalities && escort.nationalities.length > 0 ? escort.nationalities.join(', ') : 'Keine Angabe'}
                     </span>
                   </div>
 
-                  {/* Körper - only show "keine Angabe" if ALL sub-attributes are empty */}
+                  {/* Körper - only show "Keine Angabe" if ALL sub-attributes are empty */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Körper:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
@@ -1016,38 +1016,38 @@ export default function ProfilePage() {
                             escort.weight ? `${escort.weight} kg` : null,
                             escort.bodyType
                           ].filter(Boolean).join(', ')
-                        : 'keine Angabe'}
+                        : 'Keine Angabe'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Oberweite:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {escort.cupSize ? `${escort.cupSize} Körbchen` : 'keine Angabe'}
+                      {escort.cupSize ? `${escort.cupSize} Körbchen` : 'Keine Angabe'}
                     </span>
                   </div>
 
-                  {/* Haare - only show "keine Angabe" if ALL sub-attributes are empty */}
+                  {/* Haare - only show "Keine Angabe" if ALL sub-attributes are empty */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Haare:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
                       {(escort.hairLength || escort.hairColor)
                         ? [escort.hairLength, escort.hairColor].filter(Boolean).join(', ')
-                        : 'keine Angabe'}
+                        : 'Keine Angabe'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Augenfarbe:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {escort.eyeColor || 'keine Angabe'}
+                      {escort.eyeColor || 'Keine Angabe'}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Sprachen:</span>
                     <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                      {escort.languages && escort.languages.length > 0 ? escort.languages.join(', ') : 'keine Angabe'}
+                      {escort.languages && escort.languages.length > 0 ? escort.languages.join(', ') : 'Keine Angabe'}
                     </span>
                   </div>
 

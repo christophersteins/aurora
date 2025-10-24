@@ -38,4 +38,10 @@ export class ChatController {
     const userId = req.user.id;
     return await this.chatService.sendMessage(conversationId, userId, content);
   }
+
+  @Get('unread-count')
+  async getUnreadCount(@Req() req) {
+    const userId = req.user.id;
+    return await this.chatService.getTotalUnreadCount(userId);
+  }
 }

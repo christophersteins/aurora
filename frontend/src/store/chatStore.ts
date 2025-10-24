@@ -5,6 +5,7 @@ interface ChatState {
   conversations: Conversation[];
   activeConversationId: string | null;
   messages: Record<string, Message[]>;
+  totalUnreadCount: number;
   isLoading: boolean;
   error: string | null;
 
@@ -16,15 +17,18 @@ interface ChatState {
   addMessage: (conversationId: string, message: Message) => void;
   updateMessage: (conversationId: string, messageId: string, updates: Partial<Message>) => void;
   markConversationAsRead: (conversationId: string) => void;
+  setTotalUnreadCount: (count: number) => void;
+  updateTotalUnreadCount: () => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   clearStore: () => void;
 }
 
-export const useChatStore = create<ChatState>((set) => ({
+export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   activeConversationId: null,
   messages: {},
+  totalUnreadCount: 0,
   isLoading: false,
   error: null,
 
@@ -94,11 +98,23 @@ export const useChatStore = create<ChatState>((set) => ({
 
   setError: (error) => set({ error }),
 
+  setTotalUnreadCount: (count) => set({ totalUnreadCount: count }),
+
+  updateTotalUnreadCount: () => {
+    const state = get();
+    const total = state.conversations.reduce(
+      (sum, conv) => sum + (conv.unreadCount || 0),
+      0
+    );
+    set({ totalUnreadCount: total });
+  },
+
   clearStore: () =>
     set({
       conversations: [],
       activeConversationId: null,
       messages: {},
+      totalUnreadCount: 0,
       isLoading: false,
       error: null,
     }),

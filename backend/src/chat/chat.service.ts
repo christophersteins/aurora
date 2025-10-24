@@ -153,4 +153,25 @@ export class ChatService {
 
     return conversationsWithMessages;
   }
+
+  async getTotalUnreadCount(userId: string): Promise<{ count: number }> {
+    const conversations = await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .where(':userId = ANY(conversation.participants)', { userId })
+      .getMany();
+
+    let totalUnread = 0;
+    for (const conv of conversations) {
+      const unreadCount = await this.messageRepository.count({
+        where: {
+          conversationId: conv.id,
+          isRead: false,
+          senderId: Not(userId),
+        },
+      });
+      totalUnread += unreadCount;
+    }
+
+    return { count: totalUnread };
+  }
 }

@@ -23,7 +23,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onNewConversation,
 }) => {
   return (
-    <div className="w-80 border-r border-default bg-page-secondary h-full overflow-y-auto flex flex-col">
+    <div className="w-80 border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
       <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center">
         <h1 className="text-xl font-bold text-heading">Chats</h1>
         <button
@@ -34,7 +34,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         </button>
       </div>
 
-      <div className="divide-y divide-default flex-1 overflow-y-auto">
+      <div className="divide-y divide-default flex-1 overflow-y-auto bg-page-primary">
         {conversations.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-muted mb-4">Keine Konversationen</p>
@@ -50,8 +50,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             <div
               key={conv.id}
               onClick={() => onSelectConversation(conv.id)}
-              className={`p-4 cursor-pointer hover:bg-page-primary transition ${
-                selectedId === conv.id ? 'bg-primary-light border-l-4 border-primary' : ''
+              className={`p-4 cursor-pointer hover:bg-page-secondary transition ${
+                selectedId === conv.id ? 'bg-page-secondary border-l-4 border-primary' : ''
               }`}
             >
               <div className="flex justify-between items-start">

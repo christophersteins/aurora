@@ -3,7 +3,8 @@
 import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
-import { useState } from 'react';
+import { useChatStore } from '@/store/chatStore';
+import { useState, useEffect } from 'react';
 import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -12,16 +13,44 @@ import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import LogoutModal from './LogoutModal';
+import { chatService } from '@/services/chatService';
 
 export default function Header() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, token, _hasHydrated } = useAuthStore();
+  const { totalUnreadCount, setTotalUnreadCount } = useChatStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const t = useTranslations('nav');
+
+  // Fetch unread count when user is authenticated
+  useEffect(() => {
+    // Only fetch if hydrated, authenticated and has token
+    if (_hasHydrated && isAuthenticated && token) {
+      const fetchUnreadCount = async () => {
+        try {
+          const count = await chatService.getUnreadCount();
+          setTotalUnreadCount(count);
+        } catch (error) {
+          console.error('Failed to fetch unread count:', error);
+          // Reset count on error (user might have logged out)
+          setTotalUnreadCount(0);
+        }
+      };
+
+      fetchUnreadCount();
+      // Poll every 30 seconds for updates
+      const interval = setInterval(fetchUnreadCount, 30000);
+
+      return () => clearInterval(interval);
+    } else if (!isAuthenticated) {
+      // Clear count when not authenticated
+      setTotalUnreadCount(0);
+    }
+  }, [_hasHydrated, isAuthenticated, token, setTotalUnreadCount]);
 
   const handleLogoutClick = () => {
     setMobileMenuOpen(false);
@@ -149,8 +178,11 @@ export default function Header() {
                     aria-label="Nachrichten"
                   >
                     <MessageCircle size={20} />
-                    {/* Badge für ungelesene Nachrichten (optional später) */}
-                    {/* <span className="absolute top-1 right-1 w-2 h-2 bg-[#8b5cf6] rounded-full"></span> */}
+                    {totalUnreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                      </span>
+                    )}
                   </Link>
 
                   <UserMenu />
@@ -290,10 +322,17 @@ export default function Header() {
                   <Link
                     href="/chat"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center justify-between px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
                   >
-                    <MessageCircle size={18} className="text-[#71767b]" />
-                    <span>Nachrichten</span>
+                    <div className="flex items-center space-x-3">
+                      <MessageCircle size={18} className="text-[#71767b]" />
+                      <span>Nachrichten</span>
+                    </div>
+                    {totalUnreadCount > 0 && (
+                      <span className="min-w-[20px] h-[20px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                      </span>
+                    )}
                   </Link>
 
                   <Link

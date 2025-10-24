@@ -291,7 +291,7 @@ export default function SettingsPage() {
 
       <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;

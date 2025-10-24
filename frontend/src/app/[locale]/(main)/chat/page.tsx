@@ -113,7 +113,7 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="flex h-screen">
+      <div className="flex h-screen bg-page-primary">
         <div className="flex w-full mx-auto" style={{ maxWidth: 'var(--max-content-width)' }}>
           <ConversationList
             conversations={conversations}

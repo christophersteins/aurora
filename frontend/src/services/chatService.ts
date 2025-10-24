@@ -1,21 +1,5 @@
-import axios from 'axios';
+import apiClient from '@/lib/api-client';
 import { Conversation, Message } from '@/types/chat.types';
-
-const API_URL = 'http://localhost:4000';
-
-// Axios-Instanz mit Auth-Token
-const apiClient = axios.create({
-  baseURL: API_URL,
-});
-
-// Interceptor for auth token
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export const chatService = {
   // Alle Conversations abrufen
@@ -41,5 +25,11 @@ export const chatService = {
   // Conversation als gelesen markieren
   markAsRead: async (conversationId: string): Promise<void> => {
     await apiClient.post(`/chat/conversations/${conversationId}/read`);
+  },
+
+  // Get total unread message count
+  getUnreadCount: async (): Promise<number> => {
+    const response = await apiClient.get<{ count: number }>('/chat/unread-count');
+    return response.data.count;
   },
 };

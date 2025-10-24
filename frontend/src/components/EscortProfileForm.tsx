@@ -8,7 +8,7 @@ import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
 import ToggleSwitch from './ToggleSwitch';
-import { ArrowLeft, User, Sparkles, Image, Video, Briefcase, Calendar, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
+import { ArrowLeft, User, Sparkles, Image, Video, Briefcase, Clock, MapPinned, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
   NATIONALITIES,
@@ -94,7 +94,8 @@ export default function EscortProfileForm() {
     { id: 'fotos', label: 'Fotos', icon: Image },
     { id: 'videos', label: 'Videos', icon: Video },
     { id: 'service', label: 'Service', icon: Briefcase },
-    { id: 'verfuegbarkeit', label: 'Verfügbarkeit', icon: Calendar },
+    { id: 'zeiten', label: 'Zeiten', icon: Clock },
+    { id: 'treffpunkte', label: 'Treffpunkte', icon: MapPinned },
     { id: 'preise', label: 'Preise', icon: Euro },
     { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
     { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
@@ -463,7 +464,7 @@ export default function EscortProfileForm() {
 
       <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-16 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;
@@ -982,15 +983,26 @@ export default function EscortProfileForm() {
               </div>
             </div>
 
-            {/* Verfügbarkeit Section (Arbeitszeiten + Arbeitsort) */}
+            {/* Zeiten Section */}
             <div
-              id="verfuegbarkeit"
+              id="zeiten"
               className={`scroll-mt-8 ${
-                activeSection === 'verfuegbarkeit' ? 'block animate-slide-in-right' : 'hidden'
+                activeSection === 'zeiten' ? 'block animate-slide-in-right' : 'hidden'
               } lg:block lg:mb-12`}
             >
-              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verfügbarkeit</h2>
-              <p className="text-muted text-sm">Verfügbarkeits-Felder (Arbeitszeiten & Arbeitsort) werden hier hinzugefügt.</p>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Zeiten</h2>
+              <p className="text-muted text-sm">Zeiten-Felder (Arbeitszeiten) werden hier hinzugefügt.</p>
+            </div>
+
+            {/* Treffpunkte Section */}
+            <div
+              id="treffpunkte"
+              className={`scroll-mt-8 ${
+                activeSection === 'treffpunkte' ? 'block animate-slide-in-right' : 'hidden'
+              } lg:block lg:mb-12`}
+            >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Treffpunkte</h2>
+              <p className="text-muted text-sm">Treffpunkte-Felder (Arbeitsort, Incall/Outcall) werden hier hinzugefügt.</p>
             </div>
 
             {/* Preise Section */}
