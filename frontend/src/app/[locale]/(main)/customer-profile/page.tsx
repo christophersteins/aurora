@@ -2,19 +2,21 @@
 
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from '@/i18n/routing';
-import { useEffect, useState } from 'react';
-import { User, Mail, Camera, Save, X } from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { User, Mail, ArrowLeft } from 'lucide-react';
 import apiClient from '@/lib/api-client';
 import ProfileAvatar from '@/components/ProfileAvatar';
+import { profilePictureService } from '@/services/profilePictureService';
 
 export default function CustomerProfilePage() {
   const { isAuthenticated, user, _hasHydrated, setUser } = useAuthStore();
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const profilePictureInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -22,6 +24,25 @@ export default function CustomerProfilePage() {
     lastName: '',
     email: ''
   });
+
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(
+    user?.profilePicture ? profilePictureService.getProfilePictureUrl(user.profilePicture) : null
+  );
+  const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+
+  // Mobile navigation state - null means menu is shown, string means section is shown
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  // Desktop sidebar navigation state - tracks active section on desktop
+  const [activeSidebarSection, setActiveSidebarSection] = useState<string>('persoenliche-daten');
+
+  // Define sections array
+  const sections = [
+    { id: 'persoenliche-daten', label: 'Persönliche Daten', icon: User },
+    { id: 'kontakt', label: 'Kontaktinformationen', icon: Mail },
+  ];
 
   useEffect(() => {
     if (!_hasHydrated) {
@@ -44,41 +65,45 @@ export default function CustomerProfilePage() {
     }
   }, [isAuthenticated, _hasHydrated, router, user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (showProfilePictureModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
 
-  const handleSave = async () => {
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showProfilePictureModal]);
+
+  // Auto-save function with debouncing
+  const autoSave = useCallback(async (dataToSave: any) => {
     setIsSaving(true);
     setErrorMessage('');
-    setSuccessMessage('');
 
     try {
-      // Update profile via API
-      const response = await apiClient.patch('/users/profile', {
-        username: formData.username,
-        firstName: formData.firstName,
-        lastName: formData.lastName
+      // Filter out empty strings and undefined values
+      const cleanedData: any = {};
+
+      Object.entries(dataToSave).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          cleanedData[key] = value;
+        }
       });
+
+      const response = await apiClient.patch('/users/profile', cleanedData);
 
       // Update local user state
       if (user) {
         setUser({
           ...user,
-          username: formData.username,
-          firstName: formData.firstName,
-          lastName: formData.lastName
+          ...cleanedData
         });
       }
 
-      setSuccessMessage('Profil erfolgreich aktualisiert!');
-      setIsEditing(false);
-
-      // Clear success message after 3 seconds
+      setSuccessMessage('Profil erfolgreich gespeichert!');
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -87,20 +112,74 @@ export default function CustomerProfilePage() {
     } finally {
       setIsSaving(false);
     }
+  }, [user, setUser]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const updatedData = {
+      ...formData,
+      [name]: value
+    };
+    setFormData(updatedData);
+
+    // Debounce auto-save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      autoSave(updatedData);
+    }, 1000);
   };
 
-  const handleCancel = () => {
-    // Reset form data to user data
-    if (user) {
-      setFormData({
-        username: user.username || '',
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || ''
-      });
+  const handleTabClick = (sectionId: string) => {
+    setActiveSidebarSection(sectionId);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const yOffset = -100;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
-    setIsEditing(false);
-    setErrorMessage('');
+  };
+
+  const handleProfilePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setProfilePicture(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfilePicturePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload immediately
+    setUploadingPicture(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await apiClient.post('/users/profile-picture', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (user) {
+        setUser({
+          ...user,
+          profilePicture: response.data.profilePicture,
+        });
+      }
+
+      setShowProfilePictureModal(false);
+      setSuccessMessage('Profilbild erfolgreich hochgeladen!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error: any) {
+      setErrorMessage(error.response?.data?.message || 'Fehler beim Hochladen des Profilbilds');
+    } finally {
+      setUploadingPicture(false);
+    }
   };
 
   if (!_hasHydrated || isChecking) {
@@ -116,218 +195,308 @@ export default function CustomerProfilePage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-heading mb-2">Mein Profil</h1>
-          <p className="text-muted">Verwalte deine persönlichen Informationen</p>
+    <div className="min-h-screen">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+        {/* Überschrift mit Button - Desktop Layout */}
+        <div className="hidden lg:flex lg:items-center lg:justify-between mb-6">
+          <h1 className="text-3xl font-bold text-heading">Profil bearbeiten</h1>
         </div>
 
-        {/* Success/Error Messages */}
-        {successMessage && (
-          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-500">
-            {successMessage}
+        {/* Überschrift - Mobile/Tablet */}
+        <h1 className="text-3xl font-bold text-heading mb-6 lg:hidden">Profil bearbeiten</h1>
+
+      {/* Profile Picture Section - Mobile/Tablet only, shown above menu */}
+      <div className="mb-6 lg:hidden">
+        <div>
+          <div className="flex items-center gap-4 mb-4">
+            <div
+              className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
+              onClick={() => setShowProfilePictureModal(true)}
+            >
+              <ProfileAvatar
+                profilePicture={user?.profilePicture}
+                role={user?.role}
+                username={user?.username}
+                size="lg"
+              />
+            </div>
+            <div className="flex-1">
+              <p className="text-heading text-lg font-semibold">
+                {user?.username || user?.email}
+              </p>
+              <button
+                onClick={() => setShowProfilePictureModal(true)}
+                className="text-sm text-action-primary hover:text-action-primary-hover transition-colors mt-1 cursor-pointer"
+              >
+                Profilbild ändern
+              </button>
+            </div>
           </div>
-        )}
+        </div>
+      </div>
 
-        {errorMessage && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500">
-            {errorMessage}
+      {/* Mobile/Tablet Navigation - shown only when no section is active */}
+      {activeSection === null && (
+        <div className="lg:hidden mb-6 animate-slide-in-left">
+          <div className="border border-[#2f3336] shadow-md bg-page-primary rounded-lg overflow-hidden">
+            <nav>
+              {sections.map((section, index) => {
+                const isLast = index === sections.length - 1;
+                const Icon = section.icon;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
+                      !isLast ? 'border-b border-[#2f3336]' : ''
+                    }`}
+                    style={{ borderRadius: 0 }}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-left">{section.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Picture */}
-          <div className="lg:col-span-1">
-            <div className="bg-page-secondary border border-default rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-heading mb-6">Profilbild</h2>
+      {/* Back Button - Mobile/Tablet only, shown when a section is active */}
+      {activeSection !== null && (
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => setActiveSection(null)}
+            className="flex items-center gap-2 text-sm font-medium transition-all text-action-primary hover:text-action-primary-hover cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Zurück</span>
+          </button>
+        </div>
+      )}
 
-              {/* Profile Picture */}
-              <div className="flex flex-col items-center">
-                <div className="relative group">
-                  <div className="w-40 h-40 rounded-full bg-gradient-to-r from-primary via-secondary to-primary p-1">
-                    <div className="w-full h-full rounded-full bg-page-primary flex items-center justify-center overflow-hidden">
-                      <ProfileAvatar
-                        profilePicture={user?.profilePicture}
-                        role={user?.role}
-                        username={user?.username}
-                        size="xl"
-                        className="!w-full !h-full"
+      <div className="lg:flex lg:gap-6">
+        {/* Sidebar Navigation - Desktop only - Sticky Position */}
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+          <nav>
+            {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSidebarSection === section.id;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => handleTabClick(section.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
+                    isActive
+                      ? 'text-action-primary'
+                      : 'text-body'
+                  }`}
+                  style={{
+                    borderRadius: 0
+                  }}
+                >
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`} />
+                  <span className={`text-left transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`}>{section.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <div className={`flex-1 ${activeSection === null ? 'hidden lg:block' : 'block lg:block'} ${activeSection !== null ? 'animate-slide-in-right lg:animate-none' : ''}`}>
+          <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:shadow-md lg:rounded-lg' : 'p-6'}`}>
+            {/* Saving indicator - only shown while saving */}
+            {isSaving && (
+              <div className="flex items-center justify-end mb-6">
+                <span className="flex items-center gap-2 text-sm text-muted">
+                  <span className="w-4 h-4 border-2 border-muted border-t-transparent rounded-full animate-spin"></span>
+                  Speichert...
+                </span>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {successMessage && (
+              <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-500">
+                {successMessage}
+              </div>
+            )}
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500">
+                {errorMessage}
+              </div>
+            )}
+
+            {/* Profile Picture Section - Desktop only */}
+            <div
+              id="profilbild"
+              className="mb-8 scroll-mt-8 hidden lg:block"
+            >
+              <div className="flex items-center gap-4">
+                <div
+                  className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
+                  onClick={() => setShowProfilePictureModal(true)}
+                >
+                  <ProfileAvatar
+                    profilePicture={user?.profilePicture}
+                    role={user?.role}
+                    username={user?.username}
+                    size="lg"
+                  />
+                </div>
+                <div>
+                  <p className="text-heading text-base font-medium mb-1">
+                    {user?.username || user?.email}
+                  </p>
+                  <button
+                    onClick={() => setShowProfilePictureModal(true)}
+                    className="text-sm text-action-primary hover:text-action-primary-hover transition-colors cursor-pointer"
+                  >
+                    Profilbild ändern
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Persönliche Daten Section */}
+            {(activeSection === 'persoenliche-daten' || activeSection === null) && (
+              <div id="persoenliche-daten" className="scroll-mt-8 mb-12">
+                <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Persönliche Daten</h2>
+
+                <div className="space-y-4">
+                  {/* Username */}
+                  <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                    <label htmlFor="username" className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 text-muted">
+                      Benutzername
+                    </label>
+                    <div className="lg:flex-1">
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                        placeholder="Dein Benutzername"
                       />
+                      <p className="text-sm text-muted mt-1">
+                        Dein öffentlicher Benutzername auf der Plattform
+                      </p>
                     </div>
                   </div>
 
-                  {/* Upload Button Overlay */}
-                  <button className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                    <Camera className="w-8 h-8 text-white" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-muted mt-4 text-center">
-                  Klicke auf das Bild, um es zu ändern
-                </p>
-              </div>
-
-              {/* Account Info */}
-              <div className="mt-8 pt-6 border-t border-default space-y-3">
-                <div>
-                  <p className="text-sm text-muted mb-1">Account-Typ</p>
-                  <p className="text-body font-medium">Kunde</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted mb-1">Mitglied seit</p>
-                  <p className="text-body font-medium">
-                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('de-DE') : '-'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Profile Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-page-secondary border border-default rounded-xl p-6 md:p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-heading">Persönliche Informationen</h2>
-                {!isEditing && (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="btn-base btn-primary px-4 py-2 text-sm cursor-pointer"
-                  >
-                    Bearbeiten
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                {/* Username */}
-                <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-body mb-2">
-                    Benutzername
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-3 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder="Dein Benutzername"
-                  />
-                  <p className="text-sm text-muted mt-1">
-                    Dein öffentlicher Benutzername auf der Plattform
-                  </p>
-                </div>
-
-                {/* First Name */}
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-body mb-2">
-                    Vorname
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-3 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder="Vorname"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-body mb-2">
-                    Nachname
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className="w-full px-4 py-3 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    placeholder="Nachname"
-                  />
-                </div>
-
-                {/* Email (Read-only) */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-body mb-2">
-                    E-Mail
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" />
+                  {/* First Name */}
+                  <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                    <label htmlFor="firstName" className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 text-muted">
+                      Vorname
+                    </label>
                     <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      disabled
-                      className="w-full pl-11 pr-4 py-3 border border-default rounded-lg bg-page-primary text-body opacity-60 cursor-not-allowed"
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                      placeholder="Vorname"
                     />
                   </div>
-                  <p className="text-sm text-muted mt-1">
-                    E-Mail-Adresse kann nicht geändert werden
-                  </p>
-                </div>
 
-                {/* Action Buttons */}
-                {isEditing && (
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      onClick={handleCancel}
-                      disabled={isSaving}
-                      className="flex-1 btn-base btn-secondary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <X className="w-4 h-4 mr-2 inline" />
-                      Abbrechen
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      className="flex-1 btn-base btn-primary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSaving ? (
-                        <>
-                          <div className="w-4 h-4 mr-2 inline-block border-2 border-button-primary border-t-transparent rounded-full animate-spin" />
-                          Speichern...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2 inline" />
-                          Speichern
-                        </>
-                      )}
-                    </button>
+                  {/* Last Name */}
+                  <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                    <label htmlFor="lastName" className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 text-muted">
+                      Nachname
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
+                      placeholder="Nachname"
+                    />
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Additional Sections */}
-            <div className="mt-6 bg-page-secondary border border-default rounded-xl p-6 md:p-8">
-              <h2 className="text-xl font-semibold text-heading mb-4">Sicherheit</h2>
-              <div className="space-y-4">
-                <button className="w-full md:w-auto btn-base btn-secondary cursor-pointer">
-                  Passwort ändern
-                </button>
-                <div className="pt-4 border-t border-default">
-                  <p className="text-sm text-muted mb-3">
-                    Möchtest du deinen Account löschen? Diese Aktion kann nicht rückgängig gemacht werden.
-                  </p>
-                  <button className="btn-base bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 cursor-pointer">
-                    Account löschen
-                  </button>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Kontaktinformationen Section */}
+            {(activeSection === 'kontakt' || activeSection === null) && (
+              <div id="kontakt" className="scroll-mt-8 mb-12">
+                <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Kontaktinformationen</h2>
+
+                <div className="space-y-4">
+                  {/* Email (Read-only) */}
+                  <div className="mb-4 lg:flex lg:items-center lg:gap-1">
+                    <label htmlFor="email" className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 text-muted">
+                      E-Mail
+                    </label>
+                    <div className="lg:flex-1">
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" />
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          value={formData.email}
+                          disabled
+                          className="w-full pl-11 pr-4 py-3 rounded-lg border bg-page-primary text-body border-default opacity-60 cursor-not-allowed"
+                        />
+                      </div>
+                      <p className="text-sm text-muted mt-1">
+                        E-Mail-Adresse kann nicht geändert werden
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Profile Picture Upload Modal */}
+      {showProfilePictureModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+          onClick={() => setShowProfilePictureModal(false)}
+        >
+          <div
+            className="bg-page-primary border border-default rounded-lg p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-heading mb-4">Profilbild ändern</h3>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => profilePictureInputRef.current?.click()}
+                className="w-full btn-base btn-primary"
+                disabled={uploadingPicture}
+              >
+                {uploadingPicture ? 'Lädt hoch...' : 'Foto hochladen'}
+              </button>
+
+              <button
+                onClick={() => setShowProfilePictureModal(false)}
+                className="w-full btn-base btn-secondary"
+              >
+                Abbrechen
+              </button>
+            </div>
+
+            <input
+              ref={profilePictureInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleProfilePictureChange}
+              className="hidden"
+            />
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
