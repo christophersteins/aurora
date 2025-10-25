@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -418,17 +418,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             className="flex-1 px-4 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
           />
 
-          {/* Send Button */}
-          <button
-            onClick={handleSendMessage}
-            disabled={!isConnected || isLoading || !inputValue.trim()}
-            className="px-6 py-3 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 flex items-center gap-2"
-          >
-            <span>Senden</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
+          {/* Send Button - Only visible when there's text */}
+          {inputValue.trim() && (
+            <button
+              onClick={handleSendMessage}
+              disabled={!isConnected || isLoading}
+              className="btn-primary p-2.5 rounded-full"
+              title="Senden"
+            >
+              <Send className="w-5 h-5 rotate-45" />
+            </button>
+          )}
         </div>
 
         {/* Emoji Picker */}

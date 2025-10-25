@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { SquarePen } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -55,12 +56,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
         <button
           onClick={onNewConversation}
-          className="p-2 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 hover:shadow-lg hover:shadow-primary/20 hover:scale-110 active:scale-95"
+          className="p-2 link-primary"
           title="Neue Nachricht"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <SquarePen className="w-5 h-5" />
         </button>
       </div>
 
@@ -89,7 +88,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 onClick={() => onSelectConversation(conv.id)}
                 className={`px-4 py-3 cursor-pointer transition-all duration-200 relative hover:bg-page-secondary ${
                   selectedId === conv.id
-                    ? 'bg-page-secondary border-r-4 border-primary'
+                    ? 'bg-page-secondary border-r-2 border-primary'
                     : ''
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
