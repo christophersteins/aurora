@@ -246,6 +246,9 @@ export default function SettingsPage() {
 
   return (
     <div>
+      {/* Überschrift */}
+      <h1 className="text-3xl font-bold text-heading mb-6">{t('title')}</h1>
+
       {/* Mobile/Tablet Navigation - shown only when no section is active */}
       {activeSection === null && (
         <div className={`lg:hidden mb-6 ${!isMounting ? 'animate-slide-in-left' : ''}`}>
@@ -288,9 +291,6 @@ export default function SettingsPage() {
           </button>
         </div>
       )}
-
-      {/* Überschrift - Desktop only */}
-      <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">{t('title')}</h1>
 
       <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}

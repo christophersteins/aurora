@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState, useRef, useEffect } from 'react';
-import { User, Settings, LogOut, ChevronDown, Bookmark } from 'lucide-react';
+import { User, Settings, LogOut, ChevronDown, Bookmark, IdCard } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LogoutModal from './LogoutModal';
 
@@ -77,34 +77,10 @@ export default function UserMenu() {
       {/* User Menu Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-full hover:text-[#8b5cf6] transition-colors cursor-pointer"
+        className="flex items-center p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition cursor-pointer"
         aria-label="User menu"
       >
-        {/* Profile Picture or Initial */}
-        {profilePicUrl ? (
-          <img
-            src={profilePicUrl}
-            alt={displayName}
-            className="w-8 h-8 rounded-full object-cover border border-[#2f3336]"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] flex items-center justify-center">
-            <span className="text-[#0f1419] font-bold text-sm">
-              {userInitial}
-            </span>
-          </div>
-        )}
-
-        {/* Username */}
-        <span className="text-[#e7e9ea] font-medium hidden sm:block max-w-[100px] truncate hover:text-[#8b5cf6] transition-colors">
-          {displayName}
-        </span>
-
-        {/* Dropdown Icon */}
-        <ChevronDown
-          size={16}
-          className={`text-[#71767b] transition-transform ${isOpen ? 'rotate-180' : ''}`}
-        />
+        <User size={20} />
       </button>
 
       {/* Dropdown Menu */}
@@ -117,7 +93,7 @@ export default function UserMenu() {
               onClick={() => setIsOpen(false)}
               className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
             >
-              <User size={18} className="text-[#71767b]" />
+              <IdCard size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('myProfile')}</span>
             </Link>
 

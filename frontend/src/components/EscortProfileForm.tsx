@@ -350,10 +350,24 @@ export default function EscortProfileForm() {
 
   return (
     <div>
+      {/* Überschrift mit Button - Desktop Layout */}
+      <div className="hidden lg:flex lg:items-center lg:justify-between mb-6">
+        <h1 className="text-3xl font-bold text-heading">Profil bearbeiten</h1>
+        <button
+          onClick={() => window.location.href = `/profile/${user?.username}`}
+          className="btn-base btn-secondary"
+        >
+          Profil ansehen
+        </button>
+      </div>
+
+      {/* Überschrift - Mobile/Tablet */}
+      <h1 className="text-3xl font-bold text-heading mb-6 lg:hidden">Profil bearbeiten</h1>
+
       {/* Profile Picture Section - Mobile/Tablet only, shown above menu */}
       <div className="mb-6 lg:hidden">
         <div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div
               className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
               onClick={() => setShowProfilePictureModal(true)}
@@ -384,6 +398,13 @@ export default function EscortProfileForm() {
               </button>
             </div>
           </div>
+          {/* Button unter Profilbild - Mobile/Tablet */}
+          <button
+            onClick={() => window.location.href = `/profile/${user?.username}`}
+            className="btn-base btn-secondary w-full"
+          >
+            Profil ansehen
+          </button>
         </div>
       </div>
 
@@ -426,9 +447,6 @@ export default function EscortProfileForm() {
           </button>
         </div>
       )}
-
-      {/* Überschrift - Desktop only */}
-      <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">Profil bearbeiten</h1>
 
       <div className="lg:flex lg:gap-6">
         {/* Sidebar Navigation - Desktop only - Sticky Position */}
