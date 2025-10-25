@@ -3,6 +3,7 @@ export interface User {
   email: string;
   username?: string;
   profilePicture?: string;
+  role?: string;
 }
 
 export interface Message {
@@ -15,11 +16,14 @@ export interface Message {
 
 export interface Conversation {
   id: string;
-  user1: User;
-  user2: User;
-  messages: Message[];
-  createdAt: string;
+  otherUserId: string;
+  otherUserName: string;
+  otherUserProfilePicture?: string | null;
+  otherUserRole?: string;
+  otherUserIsOnline?: boolean;
+  otherUserLastSeen?: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  unreadCount: number;
   updatedAt: string;
-  lastMessage?: Message;
-  unreadCount?: number;
 }

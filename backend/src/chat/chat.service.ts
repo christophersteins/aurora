@@ -38,6 +38,7 @@ export class ChatService {
     // Get other user's information
     let otherUserName = `User ${otherUserId}`;
     let otherUserProfilePicture: string | undefined;
+    let otherUserRole: string | undefined;
     let otherUserIsOnline = false;
     let otherUserLastSeen: Date | undefined;
 
@@ -46,6 +47,7 @@ export class ChatService {
       if (otherUser) {
         otherUserName = otherUser.username || otherUser.email || `User ${otherUserId}`;
         otherUserProfilePicture = otherUser.profilePicture;
+        otherUserRole = otherUser.role;
         otherUserIsOnline = otherUser.isOnline || false;
         otherUserLastSeen = otherUser.lastSeen;
       }
@@ -58,6 +60,7 @@ export class ChatService {
       otherUserId,
       otherUserName,
       otherUserProfilePicture,
+      otherUserRole,
       otherUserIsOnline,
       otherUserLastSeen,
       participants: conversation.participants,
@@ -151,6 +154,7 @@ export class ChatService {
         // Get the other user's information
         let otherUserName = `User ${otherUserId}`;
         let otherUserProfilePicture: string | undefined;
+        let otherUserRole: string | undefined;
         let otherUserIsOnline = false;
         let otherUserLastSeen: Date | undefined;
 
@@ -160,6 +164,7 @@ export class ChatService {
             if (otherUser) {
               otherUserName = otherUser.username || otherUser.email || `User ${otherUserId}`;
               otherUserProfilePicture = otherUser.profilePicture;
+              otherUserRole = otherUser.role;
               otherUserIsOnline = otherUser.isOnline || false;
               otherUserLastSeen = otherUser.lastSeen;
             }
@@ -173,6 +178,7 @@ export class ChatService {
           otherUserId,
           otherUserName,
           otherUserProfilePicture,
+          otherUserRole,
           otherUserIsOnline,
           otherUserLastSeen,
           lastMessage: lastMessage?.content || null,

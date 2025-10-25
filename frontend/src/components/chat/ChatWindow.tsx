@@ -8,6 +8,8 @@ import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { Image, Smile, MoreVertical, Send } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
+import ProfileAvatar from '@/components/ProfileAvatar';
+import { Conversation } from '@/types/chat.types';
 
 interface Message {
   id: string;
@@ -36,14 +38,6 @@ interface IncomingMessage {
   senderId: string;
   content: string;
   timestamp: string;
-}
-
-interface Conversation {
-  id: string;
-  otherUserName: string;
-  otherUserProfilePicture?: string;
-  otherUserIsOnline?: boolean;
-  otherUserLastSeen?: string;
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
@@ -283,19 +277,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         <div className="flex items-center gap-3">
           {/* Profilbild */}
           <div className="relative flex-shrink-0">
-            {conversation?.otherUserProfilePicture ? (
-              <img
-                src={conversation.otherUserProfilePicture}
-                alt={conversation.otherUserName}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-page-secondary border border-default flex items-center justify-center">
-                <span className="text-heading text-lg font-semibold">
-                  {conversation?.otherUserName?.charAt(0).toUpperCase() || '?'}
-                </span>
-              </div>
-            )}
+            <ProfileAvatar
+              profilePicture={conversation?.otherUserProfilePicture}
+              role={conversation?.otherUserRole}
+              username={conversation?.otherUserName}
+              size="md"
+            />
             {/* Online-Indikator */}
             {conversation?.otherUserIsOnline && (
               <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success border-2 border-page-primary rounded-full"></span>

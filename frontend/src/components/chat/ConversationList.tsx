@@ -2,13 +2,8 @@
 
 import React, { useState } from 'react';
 import { SquarePen, Search } from 'lucide-react';
-
-interface Conversation {
-  id: string;
-  otherUserName: string;
-  lastMessage?: string;
-  unreadCount: number;
-}
+import ProfileAvatar from '@/components/ProfileAvatar';
+import { Conversation } from '@/types/chat.types';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -123,9 +118,13 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
-                    <div className={`w-12 h-12 rounded-full ${getAvatarColor(conv.otherUserName)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                      {getInitials(conv.otherUserName)}
-                    </div>
+                    <ProfileAvatar
+                      profilePicture={conv.otherUserProfilePicture}
+                      role={conv.otherUserRole}
+                      username={conv.otherUserName}
+                      size="md"
+                      className="shadow-md"
+                    />
                     {/* Online indicator - you can add logic for this later */}
                     <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success rounded-full border-2 border-page-primary"></div>
                   </div>

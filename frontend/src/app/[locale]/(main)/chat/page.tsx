@@ -7,13 +7,6 @@ import { NewConversationModal } from '@/components/chat/NewConversationModal';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 
-interface Conversation {
-  id: string;
-  otherUserName: string;
-  lastMessage?: string;
-  unreadCount: number;
-}
-
 export default function ChatPage() {
   const { user } = useAuthStore();
   const { conversations, setConversations, setLoading } = useChatStore();

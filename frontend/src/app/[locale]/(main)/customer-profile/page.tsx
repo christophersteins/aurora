@@ -5,6 +5,7 @@ import { useRouter } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { User, Mail, Camera, Save, X } from 'lucide-react';
 import apiClient from '@/lib/api-client';
+import ProfileAvatar from '@/components/ProfileAvatar';
 
 export default function CustomerProfilePage() {
   const { isAuthenticated, user, _hasHydrated, setUser } = useAuthStore();
@@ -147,15 +148,13 @@ export default function CustomerProfilePage() {
                 <div className="relative group">
                   <div className="w-40 h-40 rounded-full bg-gradient-to-r from-primary via-secondary to-primary p-1">
                     <div className="w-full h-full rounded-full bg-page-primary flex items-center justify-center overflow-hidden">
-                      {user?.profilePicture ? (
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${user.profilePicture}`}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-20 h-20 text-muted" />
-                      )}
+                      <ProfileAvatar
+                        profilePicture={user?.profilePicture}
+                        role={user?.role}
+                        username={user?.username}
+                        size="xl"
+                        className="!w-full !h-full"
+                      />
                     </div>
                   </div>
 

@@ -42,8 +42,8 @@ export default function ProfileAvatar({
   // If user is a customer without profile picture, show FaUserSecret icon
   if (role === 'customer') {
     return (
-      <div className={`${sizeClass} rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] flex items-center justify-center ${className}`}>
-        <FaUserSecret className="text-[#0f1419]" style={{ fontSize: '60%' }} />
+      <div className={`${sizeClass} rounded-full bg-page-secondary flex items-center justify-center ${className}`}>
+        <FaUserSecret className="text-primary" style={{ fontSize: '95%' }} />
       </div>
     );
   }
