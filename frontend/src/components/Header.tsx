@@ -110,31 +110,31 @@ export default function Header() {
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
                   href="/escorts"
-                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                  className="link-secondary"
                 >
                   {t('members')}
                 </Link>
                 <Link
                   href="/clubs"
-                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                  className="link-secondary"
                 >
                   {t('clubsAndCo')}
                 </Link>
                 <Link
                   href="/videos"
-                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                  className="link-secondary"
                 >
                   {t('videos')}
                 </Link>
                 <Link
                   href="/premium"
-                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                  className="link-secondary"
                 >
                   {t('premium')}
                 </Link>
                 <Link
                   href="/faq"
-                  className="text-[#e7e9ea] hover:text-[#8b5cf6] font-medium transition"
+                  className="link-secondary"
                 >
                   {t('faq')}
                 </Link>
@@ -163,7 +163,7 @@ export default function Header() {
                 <>
                   {/* Notifications Icon */}
                   <button
-                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative cursor-pointer"
+                    className="p-2 link-secondary relative cursor-pointer"
                     aria-label="Benachrichtigungen"
                   >
                     <Bell size={20} />
@@ -174,7 +174,7 @@ export default function Header() {
                   {/* Messages Icon */}
                   <Link
                     href="/chat"
-                    className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition relative"
+                    className="p-2 link-secondary relative"
                     aria-label="Nachrichten"
                   >
                     <MessageCircle size={20} />
@@ -241,35 +241,35 @@ export default function Header() {
               <Link
                 href="/escorts"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('members')}
               </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('clubsAndCo')}
               </Link>
               <Link
                 href="/videos"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('videos')}
               </Link>
               <Link
                 href="/premium"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('premium')}
               </Link>
               <Link
                 href="/faq"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('faq')}
               </Link>
@@ -304,7 +304,7 @@ export default function Header() {
                   {/* Notifications Link */}
                   <button
                     onClick={closeMobileMenu}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium cursor-pointer"
+                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary cursor-pointer"
                   >
                     <Bell size={18} className="text-[#71767b]" />
                     <span>Benachrichtigungen</span>
@@ -314,7 +314,7 @@ export default function Header() {
                   <Link
                     href="/chat"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center justify-between px-4 py-3 link-secondary"
                   >
                     <div className="flex items-center space-x-3">
                       <MessageCircle size={18} className="text-[#71767b]" />
@@ -330,7 +330,7 @@ export default function Header() {
                   <Link
                     href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 link-secondary"
                   >
                     <User size={18} className="text-[#71767b]" />
                     <span>{t('myProfile')}</span>
@@ -338,14 +338,14 @@ export default function Header() {
                   <Link
                     href="/settings"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="flex items-center space-x-3 px-4 py-3 link-secondary"
                   >
                     <Settings size={18} className="text-[#71767b]" />
                     <span>{t('settings')}</span>
                   </Link>
                   <button
                     onClick={handleLogoutClick}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:text-[#8b5cf6] rounded-lg transition font-medium"
+                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary"
                   >
                     <LogOut size={18} className="text-[#71767b]" />
                     <span>{t('logout')}</span>

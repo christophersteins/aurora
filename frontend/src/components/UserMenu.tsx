@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useState, useRef, useEffect } from 'react';
-import { User, Settings, LogOut, ChevronDown, Bookmark, IdCard } from 'lucide-react';
+import { User, Settings, LogOut, ChevronDown, Bookmark, IdCard, CalendarCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LogoutModal from './LogoutModal';
 
@@ -91,10 +91,20 @@ export default function UserMenu() {
             <Link
               href={user.role === 'escort' ? '/escort-profile' : '/customer-profile'}
               onClick={() => setIsOpen(false)}
-              className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
+              className="flex items-center space-x-3 px-4 py-3 link-secondary"
             >
               <IdCard size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('myProfile')}</span>
+            </Link>
+
+            {/* Dates - für alle Rollen */}
+            <Link
+              href="/dates"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center space-x-3 px-4 py-3 link-secondary"
+            >
+              <CalendarCheck size={18} className="text-[#71767b]" />
+              <span className="font-medium">{t('dates')}</span>
             </Link>
 
             {/* Merkliste - nur für Kunden */}
@@ -102,7 +112,7 @@ export default function UserMenu() {
               <Link
                 href="/merkliste"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 link-secondary"
               >
                 <Bookmark size={18} className="text-[#71767b]" />
                 <span className="font-medium">{t('bookmarks')}</span>
@@ -112,7 +122,7 @@ export default function UserMenu() {
             <Link
               href="/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors"
+              className="flex items-center space-x-3 px-4 py-3 link-secondary"
             >
               <Settings size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('settings')}</span>
@@ -120,7 +130,7 @@ export default function UserMenu() {
 
             <button
               onClick={handleLogoutClick}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-[#e7e9ea] hover:bg-[#2f3336] transition-colors cursor-pointer"
+              className="w-full flex items-center space-x-3 px-4 py-3 link-secondary cursor-pointer"
             >
               <LogOut size={18} className="text-[#71767b]" />
               <span className="font-medium">{t('logout')}</span>
