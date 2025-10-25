@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
@@ -49,10 +49,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const optionsMenuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Load conversation details to get other user's name
   useEffect(() => {
@@ -195,6 +200,84 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     };
   }, [showOptionsMenu]);
 
+  // Search functionality
+  const matchingMessages = messages.filter(msg =>
+    searchTerm.trim() && msg.content.toLowerCase().includes(searchTerm.toLowerCase().trim())
+  );
+
+  const handleSearchToggle = () => {
+    setSearchOpen(!searchOpen);
+    if (!searchOpen) {
+      // Opening search
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    } else {
+      // Closing search
+      setSearchTerm('');
+      setCurrentMatchIndex(0);
+    }
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentMatchIndex(0);
+  };
+
+  const handleClearSearchInput = () => {
+    setSearchTerm('');
+    setCurrentMatchIndex(0);
+    searchInputRef.current?.focus();
+  };
+
+  const handleNextMatch = () => {
+    if (matchingMessages.length === 0) return;
+    const nextIndex = (currentMatchIndex + 1) % matchingMessages.length;
+    setCurrentMatchIndex(nextIndex);
+    scrollToMatch(nextIndex);
+  };
+
+  const handlePreviousMatch = () => {
+    if (matchingMessages.length === 0) return;
+    const prevIndex = currentMatchIndex === 0 ? matchingMessages.length - 1 : currentMatchIndex - 1;
+    setCurrentMatchIndex(prevIndex);
+    scrollToMatch(prevIndex);
+  };
+
+  const scrollToMatch = (index: number) => {
+    const message = matchingMessages[index];
+    if (message) {
+      const element = messageRefs.current.get(message.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  // Auto-scroll to first match when search term changes
+  useEffect(() => {
+    if (matchingMessages.length > 0 && searchTerm) {
+      scrollToMatch(0);
+    }
+  }, [searchTerm]);
+
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight.trim()) return text;
+
+    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    return (
+      <>
+        {parts.map((part, index) =>
+          part.toLowerCase() === highlight.toLowerCase() ? (
+            <mark key={index} className="bg-yellow-400 text-black rounded px-0.5">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </>
+    );
+  };
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || !conversationId || !socket) return;
 
@@ -271,69 +354,144 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   };
 
   return (
-    <div className="grid h-full bg-page-primary w-full" style={{ gridTemplateRows: 'auto 1fr auto' }}>
-      {/* Header mit Profilbild und Status - Feste Höhe */}
-      <div className="p-4 border-b border-default bg-page-primary">
-        <div className="flex items-center gap-3">
-          {/* Profilbild */}
-          <div className="relative flex-shrink-0">
-            <ProfileAvatar
-              profilePicture={conversation?.otherUserProfilePicture}
-              role={conversation?.otherUserRole}
-              username={conversation?.otherUserName}
-              size="md"
-            />
-            {/* Online-Indikator */}
-            {conversation?.otherUserIsOnline && (
-              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success border-2 border-page-primary rounded-full"></span>
-            )}
-          </div>
+    <div className="grid h-full bg-page-primary w-full border-r border-default" style={{ gridTemplateRows: 'auto 1fr auto' }}>
+      {/* Header + Search Bar Container */}
+      <div>
+        {/* Header mit Profilbild und Status */}
+        <div className="p-4 border-b border-default bg-page-primary">
+          <div className="flex items-center gap-3">
+            {/* Profilbild */}
+            <div className="relative flex-shrink-0">
+              <ProfileAvatar
+                profilePicture={conversation?.otherUserProfilePicture}
+                role={conversation?.otherUserRole}
+                username={conversation?.otherUserName}
+                size="md"
+              />
+              {/* Online-Indikator */}
+              {conversation?.otherUserIsOnline && (
+                <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success border-2 border-page-primary rounded-full"></span>
+              )}
+            </div>
 
-          {/* Name und Status */}
-          <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-lg text-heading truncate">
-              {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
-            </h2>
-            <p className="text-xs text-muted">
-              {getOnlineStatus()}
-            </p>
-          </div>
+            {/* Name und Status */}
+            <div className="flex-1 min-w-0">
+              <h2 className="font-bold text-lg text-heading truncate">
+                {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
+              </h2>
+              <p className="text-xs text-muted">
+                {getOnlineStatus()}
+              </p>
+            </div>
 
-          {/* Options Menu */}
-          <div className="relative" ref={optionsMenuRef}>
+            {/* Search Button */}
             <button
-              onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+              onClick={handleSearchToggle}
               className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
-              title="Optionen"
+              title="In Chat suchen"
             >
-              <MoreVertical className="w-5 h-5" />
+              <Search className="w-5 h-5" />
             </button>
 
-            {/* Dropdown Menu */}
-            {showOptionsMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
-                <button
-                  onClick={handleReportUser}
-                  className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <span>Benutzer melden</span>
-                </button>
-                <button
-                  onClick={handleBlockUser}
-                  className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                  </svg>
-                  <span>Benutzer blockieren</span>
-                </button>
-              </div>
-            )}
+            {/* Options Menu */}
+            <div className="relative" ref={optionsMenuRef}>
+              <button
+                onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+                title="Optionen"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showOptionsMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
+                  <button
+                    onClick={handleReportUser}
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Benutzer melden</span>
+                  </button>
+                  <button
+                    onClick={handleBlockUser}
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    <span>Benutzer blockieren</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Search Bar */}
+        {searchOpen && (
+          <div className="px-4 py-3 border-b border-default bg-page-primary">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Nachrichten durchsuchen..."
+                  className="w-full pl-10 pr-10 py-2 bg-page-primary border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={handleClearSearchInput}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-page-secondary transition-colors cursor-pointer"
+                    aria-label="Suche löschen"
+                  >
+                    <X className="w-4 h-4 text-muted hover:text-heading transition-colors" />
+                  </button>
+                )}
+              </div>
+
+              {/* Match counter and navigation */}
+              {searchTerm && (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm text-muted whitespace-nowrap px-2">
+                    {matchingMessages.length > 0
+                      ? `${currentMatchIndex + 1} von ${matchingMessages.length}`
+                      : 'Keine Treffer'}
+                  </span>
+                  <button
+                    onClick={handlePreviousMatch}
+                    disabled={matchingMessages.length === 0}
+                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Vorheriger Treffer"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleNextMatch}
+                    disabled={matchingMessages.length === 0}
+                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Nächster Treffer"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Done button */}
+              <button
+                onClick={handleSearchToggle}
+                className="px-4 py-2 text-sm font-medium text-primary hover:text-primary-hover transition-colors cursor-pointer"
+              >
+                Fertig
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Messages Area - Nimmt den verbleibenden Platz ein */}
@@ -360,6 +518,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             {messages.map((msg) => (
               <div
                 key={msg.id}
+                ref={(el) => {
+                  if (el) {
+                    messageRefs.current.set(msg.id, el);
+                  } else {
+                    messageRefs.current.delete(msg.id);
+                  }
+                }}
                 className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'} animate-fade-in`}
               >
                 <div
@@ -369,7 +534,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                       : 'bg-page-secondary text-body rounded-bl-md border border-default'
                   }`}
                 >
-                  <p className="break-words">{msg.content}</p>
+                  <p className="break-words">
+                    {searchTerm ? highlightText(msg.content, searchTerm) : msg.content}
+                  </p>
                   <span className="text-xs opacity-70 block mt-1">
                     {msg.timestamp.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </span>
