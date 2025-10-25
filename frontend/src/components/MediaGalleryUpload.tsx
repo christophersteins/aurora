@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, X, Image as ImageIcon, Film, Loader2, Trash2 } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Film, Loader2, Trash2, Plus } from 'lucide-react';
 import { galleryService, GalleryPhoto } from '@/services/galleryService';
 
 interface MediaGalleryUploadProps {
@@ -18,6 +18,12 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
   const [isLoadingGallery, setIsLoadingGallery] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [previewFsk18Flags, setPreviewFsk18Flags] = useState<boolean[]>([]);
+  const [previewViewerOpen, setPreviewViewerOpen] = useState(false);
+  const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
 
@@ -26,6 +32,66 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
     loadGallery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Keyboard navigation and body scroll prevention
+  useEffect(() => {
+    if (!viewerOpen) return;
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // If delete confirmation is open, only handle ESC
+      if (showDeleteConfirm) {
+        if (e.key === 'Escape') {
+          handleCancelDelete();
+        }
+        return;
+      }
+
+      // Normal viewer keyboard navigation
+      if (e.key === 'Escape') {
+        handleCloseViewer();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevPhoto();
+      } else if (e.key === 'ArrowRight') {
+        handleNextPhoto();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [viewerOpen, photos.length, showDeleteConfirm]);
+
+  // Preview viewer keyboard navigation and body scroll prevention
+  useEffect(() => {
+    if (!previewViewerOpen) return;
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Preview viewer keyboard navigation
+      if (e.key === 'Escape') {
+        handleClosePreviewViewer();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevPreview();
+      } else if (e.key === 'ArrowRight') {
+        handleNextPreview();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [previewViewerOpen, previewUrls.length]);
 
   const loadGallery = async () => {
     try {
@@ -90,6 +156,9 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
       return [...prev, ...validFiles];
     });
 
+    // Initialize FSK18 flags for new files (default: false)
+    setPreviewFsk18Flags(prev => [...prev, ...validFiles.map(() => false)]);
+
     // Create preview URLs
     validFiles.forEach(file => {
       const reader = new FileReader();
@@ -108,6 +177,7 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    setPreviewFsk18Flags(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -159,7 +229,7 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
         });
       }, 200);
 
-      await galleryService.uploadPhotos(selectedFiles);
+      await galleryService.uploadPhotos(selectedFiles, previewFsk18Flags);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -167,6 +237,7 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
       // Clear selection
       setSelectedFiles([]);
       setPreviewUrls([]);
+      setPreviewFsk18Flags([]);
 
       // Reload gallery
       await loadGallery();
@@ -192,6 +263,112 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
     } catch (err) {
       setError('Fehler beim Löschen des Fotos.');
       console.error('Delete error:', err);
+    }
+  };
+
+  const handleToggleFsk18 = async (photoId: string, isFsk18: boolean) => {
+    try {
+      await galleryService.updatePhotoFlags(photoId, isFsk18);
+      await loadGallery();
+    } catch (err) {
+      setError('Fehler beim Aktualisieren der FSK18-Markierung.');
+      console.error('Toggle FSK18 error:', err);
+    }
+  };
+
+  const handleOpenViewer = (index: number) => {
+    setSelectedPhotoIndex(index);
+    setViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setViewerOpen(false);
+  };
+
+  const handlePrevPhoto = () => {
+    setSelectedPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+  };
+
+  const handleNextPhoto = () => {
+    setSelectedPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleRequestDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    const currentPhoto = photos[selectedPhotoIndex];
+    if (!currentPhoto) return;
+
+    setShowDeleteConfirm(false);
+
+    try {
+      await galleryService.deletePhoto(currentPhoto.id);
+
+      // Close viewer if this was the last photo
+      if (photos.length === 1) {
+        setViewerOpen(false);
+      } else {
+        // Adjust selected index if needed
+        if (selectedPhotoIndex >= photos.length - 1) {
+          setSelectedPhotoIndex(Math.max(0, photos.length - 2));
+        }
+      }
+
+      await loadGallery();
+    } catch (err) {
+      setError('Fehler beim Löschen des Fotos.');
+      console.error('Delete error:', err);
+    }
+  };
+
+  const handleToggleCurrentFsk18 = async () => {
+    const currentPhoto = photos[selectedPhotoIndex];
+    if (!currentPhoto) return;
+    await handleToggleFsk18(currentPhoto.id, !currentPhoto.isFsk18);
+  };
+
+  // Preview Viewer Handlers
+  const handleOpenPreviewViewer = (index: number) => {
+    setSelectedPreviewIndex(index);
+    setPreviewViewerOpen(true);
+  };
+
+  const handleClosePreviewViewer = () => {
+    setPreviewViewerOpen(false);
+  };
+
+  const handlePrevPreview = () => {
+    setSelectedPreviewIndex((prev) => (prev === 0 ? previewUrls.length - 1 : prev - 1));
+  };
+
+  const handleNextPreview = () => {
+    setSelectedPreviewIndex((prev) => (prev === previewUrls.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleTogglePreviewFsk18 = () => {
+    setPreviewFsk18Flags(prev => {
+      const newFlags = [...prev];
+      newFlags[selectedPreviewIndex] = !newFlags[selectedPreviewIndex];
+      return newFlags;
+    });
+  };
+
+  const handleRemoveCurrentPreview = () => {
+    removeFile(selectedPreviewIndex);
+    // Close viewer if this was the last file
+    if (previewUrls.length === 1) {
+      setPreviewViewerOpen(false);
+    } else {
+      // Adjust selected index if needed
+      if (selectedPreviewIndex >= previewUrls.length - 1) {
+        setSelectedPreviewIndex(Math.max(0, previewUrls.length - 2));
+      }
     }
   };
 
@@ -255,11 +432,13 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
               {previewUrls.map((url, index) => {
                 const file = selectedFiles[index];
                 const isVideo = file.type.startsWith('video/');
+                const isFsk18 = previewFsk18Flags[index];
 
                 return (
                   <div
                     key={index}
-                    className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group"
+                    className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group cursor-pointer"
+                    onClick={() => handleOpenPreviewViewer(index)}
                   >
                     {isVideo ? (
                       <div className="w-full h-full flex items-center justify-center relative">
@@ -280,9 +459,21 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
                       />
                     )}
 
+                    {/* FSK18 Badge */}
+                    {isFsk18 && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="px-2 py-1 rounded text-xs font-semibold bg-red-500 text-white">
+                          18+
+                        </span>
+                      </div>
+                    )}
+
                     <button
-                      onClick={() => removeFile(index)}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black bg-opacity-70 hover:bg-opacity-90 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(index);
+                      }}
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black bg-opacity-70 hover:bg-opacity-90 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10"
                     >
                       <X className="w-5 h-5 text-white" />
                     </button>
@@ -302,7 +493,7 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
                 onClick={() => fileInputRef.current?.click()}
                 className="flex-1 px-4 py-3 rounded-lg border border-default text-body hover-bg-page-secondary transition-all cursor-pointer inline-flex items-center justify-center gap-2"
               >
-                <Upload className="w-5 h-5" />
+                <Plus className="w-5 h-5" />
                 Weitere Dateien hinzufügen
               </button>
 
@@ -362,20 +553,21 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {photos.map((photo) => {
+            {photos.map((photo, index) => {
               const url = photo.photoUrl.toLowerCase();
               const isVideo = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/.test(url);
 
               return (
                 <div
                   key={photo.id}
-                  className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group"
+                  className="relative aspect-square rounded-lg overflow-hidden bg-page-secondary border border-default group cursor-pointer"
+                  onClick={() => handleOpenViewer(index)}
                 >
+                  {/* Media */}
                   {isVideo ? (
                     <video
                       src={galleryService.getPhotoUrl(photo.photoUrl)}
                       className="w-full h-full object-cover"
-                      controls
                     />
                   ) : (
                     <img
@@ -385,19 +577,343 @@ export default function MediaGalleryUpload({ onUploadComplete, mediaType }: Medi
                     />
                   )}
 
-                  <button
-                    onClick={() => handleDeletePhoto(photo.id)}
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-error hover:bg-error-hover flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
-                    title={isVideo ? "Video löschen" : "Foto löschen"}
-                  >
-                    <Trash2 className="w-4 h-4 text-white" />
-                  </button>
+                  {/* Status Badges - Top Left */}
+                  {photo.isFsk18 && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <span className="px-2 py-1 rounded text-xs font-semibold bg-red-500 text-white">
+                        18+
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* Media Viewer Modal */}
+      {viewerOpen && photos.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 mobile-menu-backdrop"
+          onClick={handleCloseViewer}
+        >
+          {/* Close Button */}
+          <button
+            onClick={handleCloseViewer}
+            className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110 cursor-pointer z-50"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+            }}
+          >
+            ✕
+          </button>
+
+          {/* Main Content Area */}
+          <div className="relative w-full h-full flex items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const currentPhoto = photos[selectedPhotoIndex];
+              const url = currentPhoto.photoUrl.toLowerCase();
+              const isVideo = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/.test(url);
+              const photoUrl = galleryService.getPhotoUrl(currentPhoto.photoUrl);
+
+              return (
+                <>
+                  {/* Media Display */}
+                  <div className="flex-1 flex items-center justify-center max-h-[calc(100vh-200px)]">
+                    {isVideo ? (
+                      <video
+                        src={photoUrl}
+                        className="max-w-full max-h-full"
+                        controls
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <img
+                        src={photoUrl}
+                        alt={`Media ${selectedPhotoIndex + 1}`}
+                        className="max-w-full max-h-full object-contain"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  {photos.length > 1 && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handlePrevPhoto(); }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.3)'
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleNextPhoto(); }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.3)'
+                        }}
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
+
+                  {/* Delete Button - Top Left */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRequestDelete();
+                    }}
+                    className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer z-50 group"
+                    style={{
+                      background: 'rgba(220, 38, 38, 0.7)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}
+                    title={isVideo ? "Video löschen" : "Foto löschen"}
+                  >
+                    <Trash2 className="w-5 h-5 text-white" />
+                  </button>
+
+                  {/* Counter - Above Control Panel */}
+                  <div className="absolute bottom-24 left-0 right-0 text-center">
+                    <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
+                      {selectedPhotoIndex + 1} / {photos.length}
+                    </span>
+                  </div>
+
+                  {/* Bottom Control Panel */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 bg-page-primary px-4 sm:px-6 py-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* FSK18 Toggle Switch */}
+                    <div className="flex items-center justify-center gap-4">
+                      <span className="text-text-primary font-medium text-sm">FSK18</span>
+                      <button
+                        onClick={handleToggleCurrentFsk18}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors cursor-pointer ${
+                          currentPhoto.isFsk18 ? 'bg-red-500' : 'bg-gray-600'
+                        }`}
+                        role="switch"
+                        aria-checked={currentPhoto.isFsk18}
+                      >
+                        <span
+                          className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
+                            currentPhoto.isFsk18 ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`text-sm font-medium ${currentPhoto.isFsk18 ? 'text-red-400' : 'text-text-secondary'}`}>
+                        {currentPhoto.isFsk18 ? 'Aktiv' : 'Inaktiv'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && photos.length > 0 && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={handleCancelDelete}
+        >
+          <div
+            className="bg-page-primary border border-default rounded-xl p-6 max-w-md mx-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              animation: 'fadeIn 0.2s ease-out'
+            }}
+          >
+            {(() => {
+              const currentPhoto = photos[selectedPhotoIndex];
+              const url = currentPhoto.photoUrl.toLowerCase();
+              const isVideo = /\.(mp4|mov|avi|webm|mkv|flv)(\?.*)?$/.test(url);
+
+              return (
+                <>
+                  {/* Icon */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
+                      <Trash2 className="w-8 h-8 text-error" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-text-primary text-center mb-2">
+                    {isVideo ? 'Video löschen?' : 'Foto löschen?'}
+                  </h3>
+
+                  {/* Message */}
+                  <p className="text-sm text-text-secondary text-center mb-6">
+                    Möchtest du dieses {isVideo ? 'Video' : 'Foto'} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+                  </p>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancelDelete}
+                      className="flex-1 btn-base btn-secondary cursor-pointer"
+                    >
+                      Abbrechen
+                    </button>
+                    <button
+                      onClick={handleConfirmDelete}
+                      className="flex-1 btn-base bg-error hover:bg-error-hover text-white cursor-pointer"
+                    >
+                      Löschen
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* Preview Viewer Modal */}
+      {previewViewerOpen && previewUrls.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 mobile-menu-backdrop"
+          onClick={handleClosePreviewViewer}
+        >
+          {/* Close Button */}
+          <button
+            onClick={handleClosePreviewViewer}
+            className="absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all hover:scale-110 cursor-pointer z-50"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+            }}
+          >
+            ✕
+          </button>
+
+          {/* Main Content Area */}
+          <div className="relative w-full h-full flex items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const previewUrl = previewUrls[selectedPreviewIndex];
+              const file = selectedFiles[selectedPreviewIndex];
+              const isVideo = file.type.startsWith('video/');
+              const isFsk18 = previewFsk18Flags[selectedPreviewIndex];
+
+              return (
+                <>
+                  {/* Media Display */}
+                  <div className="flex-1 flex items-center justify-center max-h-[calc(100vh-200px)]">
+                    {isVideo ? (
+                      <video
+                        src={previewUrl}
+                        className="max-w-full max-h-full"
+                        controls
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <img
+                        src={previewUrl}
+                        alt={`Preview ${selectedPreviewIndex + 1}`}
+                        className="max-w-full max-h-full object-contain"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  {previewUrls.length > 1 && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handlePrevPreview(); }}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.3)'
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleNextPreview(); }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-3xl transition-all hover:scale-110 cursor-pointer"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.3)'
+                        }}
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
+
+                  {/* Delete Button - Top Left */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveCurrentPreview();
+                    }}
+                    className="absolute top-4 left-4 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer z-50 group"
+                    style={{
+                      background: 'rgba(220, 38, 38, 0.7)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}
+                    title={isVideo ? "Video entfernen" : "Foto entfernen"}
+                  >
+                    <Trash2 className="w-5 h-5 text-white" />
+                  </button>
+
+                  {/* Counter - Above Control Panel */}
+                  <div className="absolute bottom-24 left-0 right-0 text-center">
+                    <span className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
+                      {selectedPreviewIndex + 1} / {previewUrls.length}
+                    </span>
+                  </div>
+
+                  {/* Bottom Control Panel */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 bg-page-primary px-4 sm:px-6 py-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* FSK18 Toggle Switch */}
+                    <div className="flex items-center justify-center gap-4">
+                      <span className="text-text-primary font-medium text-sm">FSK18</span>
+                      <button
+                        onClick={handleTogglePreviewFsk18}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors cursor-pointer ${
+                          isFsk18 ? 'bg-red-500' : 'bg-gray-600'
+                        }`}
+                        role="switch"
+                        aria-checked={isFsk18}
+                      >
+                        <span
+                          className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
+                            isFsk18 ? 'translate-x-7' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`text-sm font-medium ${isFsk18 ? 'text-red-400' : 'text-text-secondary'}`}>
+                        {isFsk18 ? 'Aktiv' : 'Inaktiv'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -234,13 +234,19 @@ export default function ProfilePage() {
     return videoExtensions.test(url);
   };
 
-  // Generate photos array: profile picture first, then gallery photos (filtered by media tab)
+  // Generate photos array with metadata: profile picture first, then gallery photos (filtered by media tab)
   const photos = (() => {
-    const allPhotos: string[] = [];
+    const allPhotos: Array<{
+      url: string;
+      isFsk18: boolean;
+    }> = [];
 
     // Add profile picture first if it exists (only in fotos tab)
     if (mediaTab === 'fotos' && escort?.profilePicture) {
-      allPhotos.push(profilePictureService.getProfilePictureUrl(escort.profilePicture));
+      allPhotos.push({
+        url: profilePictureService.getProfilePictureUrl(escort.profilePicture),
+        isFsk18: false,
+      });
     }
 
     // Add gallery photos, filtered by media type
@@ -250,9 +256,15 @@ export default function ProfilePage() {
 
       // Add to array based on active tab
       if (mediaTab === 'fotos' && !isVideo) {
-        allPhotos.push(photoUrl);
+        allPhotos.push({
+          url: photoUrl,
+          isFsk18: photo.isFsk18,
+        });
       } else if (mediaTab === 'videos' && isVideo) {
-        allPhotos.push(photoUrl);
+        allPhotos.push({
+          url: photoUrl,
+          isFsk18: photo.isFsk18,
+        });
       }
     });
 
@@ -624,47 +636,106 @@ export default function ProfilePage() {
                 >
                 {photos.length > 0 ? (
                   <>
-                    {/* Background: Blurred version of current image (only show on desktop OR on mobile for landscape images, and not for videos) */}
-                    {!isVideoUrl(photos[selectedImageIndex]) && (!isCurrentImagePortrait || !isMobile) && (
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          backgroundImage: `url(${photos[selectedImageIndex]})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          filter: 'blur(60px)',
-                          transform: 'scale(1.15)',
-                          opacity: 0.7
-                        }}
-                      />
-                    )}
+                    {/* Determine if current media is restricted */}
+                    {(() => {
+                      const currentPhoto = photos[selectedImageIndex];
+                      const isRestricted = !user && currentPhoto.isFsk18;
+                      const currentUrl = currentPhoto.url;
 
-                    {/* Foreground: Sharp image or video */}
-                    {isVideoUrl(photos[selectedImageIndex]) ? (
-                      <video
-                        src={photos[selectedImageIndex]}
-                        className="relative w-full h-full cursor-pointer z-10"
-                        style={{
-                          objectFit: 'contain'
-                        }}
-                        controls
-                        onClick={() => setIsFullscreen(true)}
-                      />
-                    ) : (
-                      <img
-                        src={photos[selectedImageIndex]}
-                        alt={`Foto ${selectedImageIndex + 1}`}
-                        className="relative w-full h-full cursor-pointer z-10"
-                        style={{
-                          objectFit: isCurrentImagePortrait && isMobile ? 'cover' : 'contain'
-                        }}
-                        onLoad={(e) => {
-                          const img = e.currentTarget;
-                          setIsCurrentImagePortrait(img.naturalHeight > img.naturalWidth);
-                        }}
-                        onClick={() => setIsFullscreen(true)}
-                      />
-                    )}
+                      return (
+                        <>
+                          {/* Background: Blurred version of current image (only show on desktop OR on mobile for landscape images, and not for videos) */}
+                          {!isVideoUrl(currentUrl) && (!isCurrentImagePortrait || !isMobile) && (
+                            <div
+                              className="absolute inset-0"
+                              style={{
+                                backgroundImage: `url(${currentUrl})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                filter: 'blur(60px)',
+                                transform: 'scale(1.15)',
+                                opacity: 0.7
+                              }}
+                            />
+                          )}
+
+                          {/* Foreground: Sharp image or video */}
+                          {isVideoUrl(currentUrl) ? (
+                            <div className="relative w-full h-full z-10">
+                              <video
+                                src={currentUrl}
+                                className="w-full h-full cursor-pointer"
+                                style={{
+                                  objectFit: 'contain',
+                                  filter: isRestricted ? 'blur(20px)' : 'none',
+                                }}
+                                controls={!isRestricted}
+                                onClick={() => !isRestricted && setIsFullscreen(true)}
+                              />
+                              {isRestricted && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                  <div className="bg-black/80 backdrop-blur-sm rounded-lg p-6 max-w-sm mx-4 text-center">
+                                    <svg className="w-12 h-12 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <h3 className="text-lg font-semibold text-white mb-2">
+                                      FSK18 Inhalt
+                                    </h3>
+                                    <p className="text-sm text-gray-300 mb-4">
+                                      Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
+                                    </p>
+                                    <button
+                                      onClick={() => router.push('/login')}
+                                      className="btn-base btn-primary w-full cursor-pointer"
+                                    >
+                                      Jetzt anmelden
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="relative w-full h-full z-10">
+                              <img
+                                src={currentUrl}
+                                alt={`Foto ${selectedImageIndex + 1}`}
+                                className="w-full h-full cursor-pointer"
+                                style={{
+                                  objectFit: isCurrentImagePortrait && isMobile ? 'cover' : 'contain',
+                                  filter: isRestricted ? 'blur(20px)' : 'none',
+                                }}
+                                onLoad={(e) => {
+                                  const img = e.currentTarget;
+                                  setIsCurrentImagePortrait(img.naturalHeight > img.naturalWidth);
+                                }}
+                                onClick={() => !isRestricted && setIsFullscreen(true)}
+                              />
+                              {isRestricted && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-default">
+                                  <div className="bg-black/80 backdrop-blur-sm rounded-lg p-6 max-w-sm mx-4 text-center">
+                                    <svg className="w-12 h-12 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    <h3 className="text-lg font-semibold text-white mb-2">
+                                      FSK18 Inhalt
+                                    </h3>
+                                    <p className="text-sm text-gray-300 mb-4">
+                                      Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
+                                    </p>
+                                    <button
+                                      onClick={() => router.push('/login')}
+                                      className="btn-base btn-primary w-full cursor-pointer"
+                                    >
+                                      Jetzt anmelden
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                     
                     {/* Navigation Arrows */}
                     {photos.length > 1 && (
@@ -795,39 +866,51 @@ export default function ProfilePage() {
               {/* Thumbnail Gallery */}
               {photos.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-2 px-4">
-                  {photos.map((photo, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer border-depth relative"
-                      style={{
-                        border: selectedImageIndex === index
-                          ? '2px solid var(--color-primary)'
-                          : '2px solid var(--border)',
-                        opacity: selectedImageIndex === index ? 1 : 0.6
-                      }}
-                    >
-                      {isVideoUrl(photo) ? (
-                        <>
-                          <video
-                            src={photo}
+                  {photos.map((photo, index) => {
+                    const isRestricted = !user && photo.isFsk18;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all cursor-pointer border-depth relative"
+                        style={{
+                          border: selectedImageIndex === index
+                            ? '2px solid var(--color-primary)'
+                            : '2px solid var(--border)',
+                          opacity: selectedImageIndex === index ? 1 : 0.6
+                        }}
+                      >
+                        {isVideoUrl(photo.url) ? (
+                          <>
+                            <video
+                              src={photo.url}
+                              className="w-full h-full object-cover"
+                              style={{ filter: isRestricted ? 'blur(10px)' : 'none' }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
+                              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            </div>
+                          </>
+                        ) : (
+                          <img
+                            src={photo.url}
+                            alt={`Thumbnail ${index + 1}`}
                             className="w-full h-full object-cover"
+                            style={{ filter: isRestricted ? 'blur(10px)' : 'none' }}
                           />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 pointer-events-none">
-                            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z"/>
+                        )}
+                        {isRestricted && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                           </div>
-                        </>
-                      ) : (
-                        <img
-                          src={photo}
-                          alt={`Thumbnail ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </button>
-                  ))}
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
               </div>
@@ -1263,33 +1346,97 @@ export default function ProfilePage() {
 
             {/* Image or Video */}
             <div className="relative w-full h-full flex items-center justify-center mx-4">
-              {isVideoUrl(photos[selectedImageIndex]) ? (
-                <video
-                  src={photos[selectedImageIndex]}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain'
-                  }}
-                  controls
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <img
-                  src={photos[selectedImageIndex]}
-                  alt={`Foto ${selectedImageIndex + 1}`}
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    width: 'auto',
-                    height: 'auto',
-                    objectFit: 'contain'
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              )}
+              {(() => {
+                const currentPhoto = photos[selectedImageIndex];
+                const isRestricted = !user && currentPhoto.isFsk18;
+                const currentUrl = currentPhoto.url;
+
+                return (
+                  <>
+                    {isVideoUrl(currentUrl) ? (
+                      <div className="relative">
+                        <video
+                          src={currentUrl}
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            filter: isRestricted ? 'blur(30px)' : 'none',
+                          }}
+                          controls={!isRestricted}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        {isRestricted && (
+                          <div className="absolute inset-0 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                            <div className="bg-black/80 backdrop-blur-sm rounded-lg p-8 max-w-md mx-4 text-center">
+                              <svg className="w-16 h-16 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              <h3 className="text-xl font-bold text-white mb-3">
+                                FSK18 Inhalt
+                              </h3>
+                              <p className="text-sm text-gray-300 mb-6">
+                                Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
+                              </p>
+                              <button
+                                onClick={() => {
+                                  setIsFullscreen(false);
+                                  router.push('/login');
+                                }}
+                                className="btn-base btn-primary w-full cursor-pointer"
+                              >
+                                Jetzt anmelden
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <img
+                          src={currentUrl}
+                          alt={`Foto ${selectedImageIndex + 1}`}
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            filter: isRestricted ? 'blur(30px)' : 'none',
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        {isRestricted && (
+                          <div className="absolute inset-0 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                            <div className="bg-black/80 backdrop-blur-sm rounded-lg p-8 max-w-md mx-4 text-center">
+                              <svg className="w-16 h-16 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              <h3 className="text-xl font-bold text-white mb-3">
+                                FSK18 Inhalt
+                              </h3>
+                              <p className="text-sm text-gray-300 mb-6">
+                                Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
+                              </p>
+                              <button
+                                onClick={() => {
+                                  setIsFullscreen(false);
+                                  router.push('/login');
+                                }}
+                                className="btn-base btn-primary w-full cursor-pointer"
+                              >
+                                Jetzt anmelden
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Navigation */}
               {photos.length > 1 && (

@@ -18,6 +18,7 @@ export class GalleryPhotosService {
   async uploadPhoto(
     userId: string,
     filename: string,
+    isFsk18?: boolean,
   ): Promise<GalleryPhoto> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -34,6 +35,7 @@ export class GalleryPhotosService {
       photoUrl,
       order: photoCount,
       user,
+      isFsk18: isFsk18 || false,
     });
 
     return this.galleryPhotoRepository.save(galleryPhoto);
@@ -80,5 +82,26 @@ export class GalleryPhotosService {
         { order: item.order },
       );
     }
+  }
+
+  async updatePhotoFlags(
+    photoId: string,
+    userId: string,
+    isFsk18?: boolean,
+  ): Promise<GalleryPhoto> {
+    const photo = await this.galleryPhotoRepository.findOne({
+      where: { id: photoId, user: { id: userId } },
+      relations: ['user'],
+    });
+
+    if (!photo) {
+      throw new NotFoundException('Photo not found');
+    }
+
+    if (isFsk18 !== undefined) {
+      photo.isFsk18 = isFsk18;
+    }
+
+    return this.galleryPhotoRepository.save(photo);
   }
 }

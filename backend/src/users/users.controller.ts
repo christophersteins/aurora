@@ -215,6 +215,7 @@ export class UsersController {
   async uploadGalleryPhotos(
     @Request() req,
     @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: { fsk18Flags?: string },
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files uploaded');
@@ -223,10 +224,25 @@ export class UsersController {
     const userId = req.user.id;
     const uploadedPhotos: GalleryPhoto[] = [];
 
-    for (const file of files) {
+    // Parse FSK18 flags from request body
+    let fsk18FlagsArray: boolean[] = [];
+    if (body.fsk18Flags) {
+      try {
+        fsk18FlagsArray = JSON.parse(body.fsk18Flags);
+      } catch (e) {
+        // If parsing fails, use empty array (all files will default to false)
+        fsk18FlagsArray = [];
+      }
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const isFsk18 = fsk18FlagsArray[i] || false;
+
       const photo = await this.galleryPhotosService.uploadPhoto(
         userId,
         file.filename,
+        isFsk18,
       );
       uploadedPhotos.push(photo);
     }
@@ -266,6 +282,25 @@ export class UsersController {
     const userId = req.user.id;
     await this.galleryPhotosService.reorderPhotos(userId, body.photoOrders);
     return { message: 'Photos reordered successfully' };
+  }
+
+  @Patch('gallery-photos/:photoId/flags')
+  @UseGuards(JwtAuthGuard)
+  async updateGalleryPhotoFlags(
+    @Request() req,
+    @Param('photoId') photoId: string,
+    @Body() body: { isFsk18?: boolean },
+  ) {
+    const userId = req.user.id;
+    const updatedPhoto = await this.galleryPhotosService.updatePhotoFlags(
+      photoId,
+      userId,
+      body.isFsk18,
+    );
+    return {
+      message: 'Photo flags updated successfully',
+      photo: updatedPhoto,
+    };
   }
 
   @Get('username-check/availability')

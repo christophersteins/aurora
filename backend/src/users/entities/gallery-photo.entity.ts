@@ -18,6 +18,9 @@ export class GalleryPhoto {
   @Column({ default: 0 })
   order: number; // For sorting photos
 
+  @Column({ default: false })
+  isFsk18: boolean; // Whether this media is FSK18 (adult content)
+
   @ManyToOne(() => User, (user) => user.galleryPhotos, { onDelete: 'CASCADE' })
   user: User;
 
