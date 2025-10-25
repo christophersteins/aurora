@@ -370,6 +370,18 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async updateChatSettings(userId: string, readReceipts: boolean): Promise<User> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.readReceipts = readReceipts;
+
+    return this.usersRepository.save(user);
+  }
+
   async canChangeUsername(userId: string): Promise<{ canChange: boolean; daysRemaining?: number }> {
     const user = await this.findById(userId);
 

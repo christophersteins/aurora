@@ -766,29 +766,31 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Photo Counter and Fullscreen Button Container */}
-              <div className="flex items-center justify-between px-4 py-2">
-                {/* Empty left space for alignment */}
-                <div className="w-5"></div>
+              {/* Photo Counter and Fullscreen Button Container - Only show if photos exist */}
+              {photos.length > 0 && (
+                <div className="flex items-center justify-between px-4 py-2">
+                  {/* Empty left space for alignment */}
+                  <div className="w-5"></div>
 
-                {/* Center: Photo Counter */}
-                <div className="text-sm font-medium" style={{ color: 'var(--text-regular)' }}>
-                  {selectedImageIndex + 1} / {photos.length}
+                  {/* Center: Photo Counter */}
+                  <div className="text-sm font-medium" style={{ color: 'var(--text-regular)' }}>
+                    {selectedImageIndex + 1} / {photos.length}
+                  </div>
+
+                  {/* Right side: Fullscreen */}
+                  <button
+                    onClick={() => setIsFullscreen(true)}
+                    className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                    style={{ color: 'var(--color-primary)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                  </button>
                 </div>
-
-                {/* Right side: Fullscreen */}
-                <button
-                  onClick={() => setIsFullscreen(true)}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-                  style={{ color: 'var(--color-primary)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-                  </svg>
-                </button>
-              </div>
+              )}
 
               {/* Thumbnail Gallery */}
               {photos.length > 1 && (

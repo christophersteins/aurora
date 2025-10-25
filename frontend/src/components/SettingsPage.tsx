@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { ArrowLeft, User, Lock, Shield, Bell, Star, Accessibility, Globe, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, User, Lock, Shield, Bell, Star, Accessibility, Globe, AlertCircle, Check, MessageCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -31,6 +31,7 @@ export default function SettingsPage() {
     { id: 'sicherheit', label: t('sections.security'), icon: Lock },
     { id: 'datenschutz', label: t('sections.privacy'), icon: Shield },
     { id: 'mitteilungen', label: t('sections.notifications'), icon: Bell },
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
     { id: 'premium', label: t('sections.premium'), icon: Star },
     { id: 'barrierefreiheit', label: t('sections.accessibility'), icon: Accessibility },
     { id: 'sprache', label: t('sections.language'), icon: Globe },
@@ -58,6 +59,39 @@ export default function SettingsPage() {
   const [daysUntilUsernameChange, setDaysUntilUsernameChange] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // Chat settings state
+  const [readReceipts, setReadReceipts] = useState(true);
+
+  // Load read receipts setting from user
+  useEffect(() => {
+    if (user) {
+      setReadReceipts(user.readReceipts ?? true);
+    }
+  }, [user]);
+
+  // Update read receipts setting
+  const handleReadReceiptsChange = async (value: boolean) => {
+    setReadReceipts(value);
+
+    if (!token) return;
+
+    try {
+      await axios.patch(
+        'http://localhost:4000/users/settings/chat',
+        { readReceipts: value },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error updating chat settings:', error);
+      // Revert on error
+      setReadReceipts(!value);
+    }
+  };
 
   // Load saved section from localStorage on mount
   useEffect(() => {
@@ -548,6 +582,44 @@ export default function SettingsPage() {
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Mitteilungen</h2>
               <p className="text-muted">Mitteilungseinstellungen werden hier angezeigt.</p>
+            </div>
+
+            {/* Chat Section */}
+            <div
+              id="chat"
+              className={`mb-12 ${
+                activeSection === 'chat'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'chat'
+                  ? 'block'
+                  : 'hidden'
+              }`}
+            >
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Chat</h2>
+
+              <div className="space-y-6">
+                {/* Read Receipts Toggle */}
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-base font-medium text-body mb-1">Lesebestätigungen</h3>
+                    <p className="text-sm text-muted">
+                      Zeige anderen an, wenn du ihre Nachrichten gelesen hast
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleReadReceiptsChange(!readReceipts)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      readReceipts ? 'bg-success' : 'bg-gray-600'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        readReceipts ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Premium Section */}

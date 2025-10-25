@@ -35,6 +35,7 @@ export interface User {
   description?: string;
   isOnline?: boolean;
   lastSeen?: string;
+  readReceipts?: boolean;
   // Preise
   price30Min?: number;
   price1Hour?: number;

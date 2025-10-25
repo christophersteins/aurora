@@ -50,6 +50,9 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   lastSeen: Date;
 
+  @Column({ type: 'boolean', default: true })
+  readReceipts: boolean;
+
   // Benutzerrolle - optional da Default-Wert vorhanden
   @Column({
     type: 'enum',

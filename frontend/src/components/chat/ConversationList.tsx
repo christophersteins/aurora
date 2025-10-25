@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { SquarePen } from 'lucide-react';
+import React, { useState } from 'react';
+import { SquarePen, Search, Settings } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -49,18 +49,48 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onSelectConversation,
   onNewConversation,
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter conversations based on search term
+  const filteredConversations = conversations.filter(conv =>
+    conv.otherUserName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-page-primary/95">
         <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
-        <button
-          onClick={onNewConversation}
-          className="p-2 link-primary"
-          title="Neue Nachricht"
-        >
-          <SquarePen className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {/* Settings functionality will be implemented later */}}
+            className="p-2 link-primary"
+            title="Einstellungen"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+          <button
+            onClick={onNewConversation}
+            className="p-2 link-primary"
+            title="Neue Nachricht"
+          >
+            <SquarePen className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Search Field */}
+      <div className="px-4 py-3 border-b border-default bg-page-primary sticky top-[73px] z-10 backdrop-blur-sm bg-page-primary/95">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Chats durchsuchen..."
+            className="w-full pl-10 pr-4 py-2 bg-transparent border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+          />
+        </div>
       </div>
 
       {/* Conversation List */}
@@ -80,9 +110,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               Erste Konversation starten
             </button>
           </div>
+        ) : filteredConversations.length === 0 ? (
+          <div className="p-8 text-center">
+            <Search className="w-12 h-12 mx-auto mb-3 text-muted opacity-50" />
+            <p className="text-muted">Keine Chats gefunden</p>
+            <p className="text-muted text-sm mt-2">Versuche einen anderen Suchbegriff</p>
+          </div>
         ) : (
           <div>
-            {conversations.map((conv, index) => (
+            {filteredConversations.map((conv, index) => (
               <div
                 key={conv.id}
                 onClick={() => onSelectConversation(conv.id)}

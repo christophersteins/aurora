@@ -323,6 +323,17 @@ export class UsersController {
     return { message: 'Password updated successfully' };
   }
 
+  @Patch('settings/chat')
+  @UseGuards(JwtAuthGuard)
+  async updateChatSettings(
+    @Request() req,
+    @Body() body: { readReceipts: boolean },
+  ) {
+    const userId = req.user.id;
+    await this.usersService.updateChatSettings(userId, body.readReceipts);
+    return { message: 'Chat settings updated successfully' };
+  }
+
   // Bookmark / Merkliste Endpoints
   @Post('bookmarks/:escortId')
   @UseGuards(JwtAuthGuard)
