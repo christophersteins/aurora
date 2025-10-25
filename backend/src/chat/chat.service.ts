@@ -180,7 +180,7 @@ export class ChatService {
       .where(':userId = ANY(conversation.participants)', { userId })
       .getMany();
 
-    let totalUnread = 0;
+    let conversationsWithUnread = 0;
     for (const conv of conversations) {
       const unreadCount = await this.messageRepository.count({
         where: {
@@ -189,9 +189,12 @@ export class ChatService {
           senderId: Not(userId),
         },
       });
-      totalUnread += unreadCount;
+      // Count conversations with at least one unread message
+      if (unreadCount > 0) {
+        conversationsWithUnread++;
+      }
     }
 
-    return { count: totalUnread };
+    return { count: conversationsWithUnread };
   }
 }
