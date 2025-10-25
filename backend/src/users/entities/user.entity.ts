@@ -44,6 +44,12 @@ export class User {
   @Column({ nullable: true })
   profilePicture: string;
 
+  @Column({ type: 'boolean', default: false })
+  isOnline: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastSeen: Date;
+
   // Benutzerrolle - optional da Default-Wert vorhanden
   @Column({
     type: 'enum',

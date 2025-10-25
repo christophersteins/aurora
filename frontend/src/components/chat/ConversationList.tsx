@@ -87,10 +87,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               <div
                 key={conv.id}
                 onClick={() => onSelectConversation(conv.id)}
-                className={`px-4 py-3 cursor-pointer transition-all duration-200 relative border-b border-default ${
+                className={`px-4 py-3 cursor-pointer transition-all duration-200 relative hover:bg-page-secondary ${
                   selectedId === conv.id
-                    ? 'bg-page-secondary'
-                    : 'hover:bg-page-secondary/50'
+                    ? 'bg-page-secondary border-r-4 border-primary'
+                    : ''
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >

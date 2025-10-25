@@ -81,17 +81,27 @@ export class UsersController {
     );
   }
 
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async searchUsers(@Query('query') query: string) {
+    if (!query || query.trim().length < 2) {
+      return [];
+    }
+
+    return this.usersService.searchByUsername(query.trim());
+  }
+
   @Get('username/:username')
   async getEscortByUsername(@Param('username') username: string) {
     const user = await this.usersService.findByUsername(username.toLowerCase());
-    
+
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    
+
     // Entferne das Passwort aus der Response
     const { password, ...userWithoutPassword } = user;
-    
+
     return userWithoutPassword;
   }
 

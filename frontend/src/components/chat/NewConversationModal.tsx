@@ -1,6 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profilePicture?: string;
+  role?: string;
+}
 
 interface NewConversationModalProps {
   isOpen: boolean;
@@ -13,15 +23,95 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
   onClose,
   onCreateConversation,
 }) => {
-  const [userId, setUserId] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (resultsRef.current && !resultsRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery('');
+      setSearchResults([]);
+      setSelectedUser(null);
+      setShowResults(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const storedAuth = localStorage.getItem('aurora-auth-storage');
+        let token = '';
+        if (storedAuth) {
+          try {
+            const parsedAuth = JSON.parse(storedAuth);
+            token = parsedAuth.state?.token || '';
+          } catch (e) {
+            console.error('Error parsing auth:', e);
+          }
+        }
+
+        const response = await fetch(`http://localhost:4000/users/search?query=${encodeURIComponent(searchQuery)}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const users = await response.json();
+          setSearchResults(users);
+          setShowResults(true);
+        }
+      } catch (error) {
+        console.error('Error searching users:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  }, [searchQuery]);
 
   if (!isOpen) return null;
 
   const handleSubmit = () => {
-    if (!userId.trim()) return;
-    onCreateConversation(userId.trim());
-    setUserId('');
+    if (!selectedUser) return;
+    onCreateConversation(selectedUser.id);
+    setSearchQuery('');
+    setSearchResults([]);
+    setSelectedUser(null);
     onClose();
+  };
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user);
+    setSearchQuery(user.username);
+    setShowResults(false);
   };
 
   return (
@@ -39,22 +129,75 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
           </button>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 relative" ref={resultsRef}>
           <label className="block text-sm font-medium text-body mb-2">
-            Benutzer-ID
+            Benutzername
           </label>
           <input
             type="text"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSelectedUser(null);
+            }}
             onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-            placeholder="z.B. user-789"
+            onFocus={() => searchResults.length > 0 && setShowResults(true)}
+            placeholder="Benutzername suchen..."
             className="w-full px-4 py-3 border border-default rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-page-primary text-body placeholder:text-muted transition-all"
             autoFocus
           />
           <p className="text-xs text-muted mt-2 ml-4">
-            Gib die User-ID des Chat-Partners ein
+            Suche nach Benutzernamen (min. 2 Zeichen)
           </p>
+
+          {/* Search Results Dropdown */}
+          {showResults && searchResults.length > 0 && (
+            <div className="absolute z-10 w-full mt-2 bg-page-primary border border-default rounded-2xl shadow-lg max-h-64 overflow-y-auto">
+              {searchResults.map((user) => (
+                <button
+                  key={user.id}
+                  onClick={() => handleSelectUser(user)}
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-page-secondary transition-all text-left"
+                >
+                  {/* Avatar */}
+                  {user.profilePicture ? (
+                    <img
+                      src={user.profilePicture}
+                      alt={user.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                      <span className="text-primary font-semibold">
+                        {user.username.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  {/* User Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-heading truncate">
+                      {user.username}
+                    </p>
+                    {(user.firstName || user.lastName) && (
+                      <p className="text-sm text-muted truncate">
+                        {user.firstName} {user.lastName}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Loading indicator */}
+          {isSearching && (
+            <div className="absolute right-4 top-11 text-muted">
+              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 justify-end">
@@ -66,7 +209,7 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!userId.trim()}
+            disabled={!selectedUser}
             className="px-6 py-2.5 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 flex items-center gap-2"
           >
             <span>Starten</span>

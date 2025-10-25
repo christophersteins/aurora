@@ -90,7 +90,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
       {/* Back button for mobile */}
       <div className="flex items-center gap-3 px-4 py-3 border-b md:hidden" style={{ background: 'var(--background-primary)', borderColor: 'var(--border)' }}>
         <button

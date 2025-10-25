@@ -761,4 +761,23 @@ export class UsersService {
     }
     return age;
   }
+
+  async searchByUsername(query: string): Promise<Partial<User>[]> {
+    const users = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.username) LIKE LOWER(:query)', { query: `%${query}%` })
+      .select([
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.firstName',
+        'user.lastName',
+        'user.profilePicture',
+        'user.role',
+      ])
+      .limit(10)
+      .getMany();
+
+    return users;
+  }
 }

@@ -37,10 +37,17 @@ export class ChatService {
 
     // Get other user's information
     let otherUserName = `User ${otherUserId}`;
+    let otherUserProfilePicture: string | undefined;
+    let otherUserIsOnline = false;
+    let otherUserLastSeen: Date | undefined;
+
     try {
       const otherUser = await this.usersService.findById(otherUserId);
       if (otherUser) {
         otherUserName = otherUser.username || otherUser.email || `User ${otherUserId}`;
+        otherUserProfilePicture = otherUser.profilePicture;
+        otherUserIsOnline = otherUser.isOnline || false;
+        otherUserLastSeen = otherUser.lastSeen;
       }
     } catch (error) {
       console.error('Error fetching user info:', error);
@@ -50,6 +57,9 @@ export class ChatService {
       id: conversation.id,
       otherUserId,
       otherUserName,
+      otherUserProfilePicture,
+      otherUserIsOnline,
+      otherUserLastSeen,
       participants: conversation.participants,
       createdAt: conversation.createdAt,
       updatedAt: conversation.updatedAt,
@@ -128,11 +138,18 @@ export class ChatService {
 
         // Get the other user's information
         let otherUserName = `User ${otherUserId}`;
+        let otherUserProfilePicture: string | undefined;
+        let otherUserIsOnline = false;
+        let otherUserLastSeen: Date | undefined;
+
         if (otherUserId) {
           try {
             const otherUser = await this.usersService.findById(otherUserId);
             if (otherUser) {
               otherUserName = otherUser.username || otherUser.email || `User ${otherUserId}`;
+              otherUserProfilePicture = otherUser.profilePicture;
+              otherUserIsOnline = otherUser.isOnline || false;
+              otherUserLastSeen = otherUser.lastSeen;
             }
           } catch (error) {
             console.error('Error fetching user info:', error);
@@ -143,6 +160,9 @@ export class ChatService {
           id: conv.id,
           otherUserId,
           otherUserName,
+          otherUserProfilePicture,
+          otherUserIsOnline,
+          otherUserLastSeen,
           lastMessage: lastMessage?.content || null,
           lastMessageTime: lastMessage?.createdAt || conv.updatedAt,
           unreadCount,

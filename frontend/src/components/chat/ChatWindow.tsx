@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '@/contexts/SocketContext';
+import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import { Image, Smile, MoreVertical } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -35,6 +39,9 @@ interface IncomingMessage {
 interface Conversation {
   id: string;
   otherUserName: string;
+  otherUserProfilePicture?: string;
+  otherUserIsOnline?: boolean;
+  otherUserLastSeen?: string;
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
@@ -43,7 +50,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const optionsMenuRef = useRef<HTMLDivElement>(null);
 
   // Load conversation details to get other user's name
   useEffect(() => {
@@ -135,6 +147,40 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showEmojiPicker]);
+
+  // Close options menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target as Node)) {
+        setShowOptionsMenu(false);
+      }
+    };
+
+    if (showOptionsMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOptionsMenu]);
+
   const handleSendMessage = () => {
     if (!inputValue.trim() || !conversationId || !socket) return;
 
@@ -148,6 +194,37 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     socket.emit('sendMessage', messageData);
 
     setInputValue('');
+    setShowEmojiPicker(false);
+  };
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setInputValue(prev => prev + emojiData.emoji);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      // TODO: Implement file upload logic
+      console.log('Dateien ausgewählt:', files);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleReportUser = () => {
+    // TODO: Implement user reporting logic
+    console.log('Benutzer melden:', conversation?.otherUserName);
+    setShowOptionsMenu(false);
+    // Here you would typically open a report modal or send a report request
+  };
+
+  const handleBlockUser = () => {
+    // TODO: Implement user blocking logic
+    console.log('Benutzer blockieren:', conversation?.otherUserName);
+    setShowOptionsMenu(false);
+    // Here you would typically show a confirmation dialog and then block the user
   };
 
   if (!conversationId) {
@@ -164,27 +241,96 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     );
   }
 
+  const getOnlineStatus = () => {
+    if (!conversation) return '';
+
+    if (conversation.otherUserIsOnline) {
+      return 'Online';
+    }
+
+    if (conversation.otherUserLastSeen) {
+      const lastSeenDate = new Date(conversation.otherUserLastSeen);
+      return `zuletzt online ${formatDistanceToNow(lastSeenDate, { addSuffix: true, locale: de })}`;
+    }
+
+    return 'Offline';
+  };
+
   return (
-    <div className="flex flex-col h-full bg-page-primary w-full">
-      {/* Header */}
-      <div className="p-4 border-b border-default bg-page-primary sticky top-0 z-10">
-        <h2 className="font-bold text-lg text-heading">
-          {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
-        </h2>
-        <span className={`text-xs px-3 py-1 rounded-full font-medium inline-block mt-2 ${
-          isConnected
-            ? 'bg-success/10 text-success'
-            : 'bg-error/10 text-error'
-        }`}>
-          <span className={`inline-block w-2 h-2 rounded-full mr-1.5 ${
-            isConnected ? 'bg-success' : 'bg-error'
-          }`}></span>
-          {isConnected ? 'Verbunden' : 'Getrennt'}
-        </span>
+    <div className="grid h-full bg-page-primary w-full" style={{ gridTemplateRows: 'auto 1fr auto' }}>
+      {/* Header mit Profilbild und Status - Feste Höhe */}
+      <div className="p-4 border-b border-default bg-page-primary">
+        <div className="flex items-center gap-3">
+          {/* Profilbild */}
+          <div className="relative flex-shrink-0">
+            {conversation?.otherUserProfilePicture ? (
+              <img
+                src={conversation.otherUserProfilePicture}
+                alt={conversation.otherUserName}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-page-secondary border border-default flex items-center justify-center">
+                <span className="text-heading text-lg font-semibold">
+                  {conversation?.otherUserName?.charAt(0).toUpperCase() || '?'}
+                </span>
+              </div>
+            )}
+            {/* Online-Indikator */}
+            {conversation?.otherUserIsOnline && (
+              <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success border-2 border-page-primary rounded-full"></span>
+            )}
+          </div>
+
+          {/* Name und Status */}
+          <div className="flex-1 min-w-0">
+            <h2 className="font-bold text-lg text-heading truncate">
+              {conversation ? conversation.otherUserName : 'Chat wird geladen...'}
+            </h2>
+            <p className="text-xs text-muted">
+              {getOnlineStatus()}
+            </p>
+          </div>
+
+          {/* Options Menu */}
+          <div className="relative" ref={optionsMenuRef}>
+            <button
+              onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+              title="Optionen"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {showOptionsMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
+                <button
+                  onClick={handleReportUser}
+                  className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Benutzer melden</span>
+                </button>
+                <button
+                  onClick={handleBlockUser}
+                  className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  <span>Benutzer blockieren</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide">
+      {/* Messages Area - Nimmt den verbleibenden Platz ein */}
+      <div className="overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide" style={{ minHeight: 0 }}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -229,8 +375,39 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-default bg-page-primary">
-        <div className="flex gap-3">
+      <div className="p-4 border-t border-default bg-page-primary relative">
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        <div className="flex gap-2 items-center">
+          {/* Attachment Button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={!isConnected || isLoading}
+            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Fotos oder Videos anhängen"
+          >
+            <Image className="w-5 h-5" />
+          </button>
+
+          {/* Emoji Button */}
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            disabled={!isConnected || isLoading}
+            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Emoji einfügen"
+          >
+            <Smile className="w-5 h-5" />
+          </button>
+
+          {/* Input Field */}
           <input
             type="text"
             value={inputValue}
@@ -240,6 +417,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             disabled={!isConnected || isLoading}
             className="flex-1 px-4 py-3 border border-default rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
           />
+
+          {/* Send Button */}
           <button
             onClick={handleSendMessage}
             disabled={!isConnected || isLoading || !inputValue.trim()}
@@ -251,6 +430,44 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             </svg>
           </button>
         </div>
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className="absolute bottom-20 left-4 z-50 shadow-lg">
+            <style jsx global>{`
+              .EmojiPickerReact {
+                background-color: var(--background-secondary) !important;
+                border: 1px solid var(--border) !important;
+              }
+              .EmojiPickerReact .epr-search-container input {
+                background-color: var(--background-primary) !important;
+                border: 1px solid var(--border) !important;
+                color: var(--text-body) !important;
+              }
+              .EmojiPickerReact .epr-category-nav button {
+                color: var(--text-muted) !important;
+              }
+              .EmojiPickerReact .epr-category-nav button.epr-cat-btn.epr-active {
+                color: var(--text-primary) !important;
+              }
+              .EmojiPickerReact .epr-emoji-category-label {
+                background-color: var(--background-secondary) !important;
+                color: var(--text-heading) !important;
+              }
+              .EmojiPickerReact .epr-emoji-img:hover,
+              .EmojiPickerReact button.epr-btn:hover {
+                background-color: transparent !important;
+              }
+            `}</style>
+            <EmojiPicker
+              onEmojiClick={handleEmojiClick}
+              width={350}
+              height={400}
+              searchPlaceholder="Emoji suchen..."
+              previewConfig={{ showPreview: false }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
