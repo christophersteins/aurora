@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { SquarePen, Search } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { SquarePen, Search, X } from 'lucide-react';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
 
@@ -45,11 +45,23 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onNewConversation,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter conversations based on search term
-  const filteredConversations = conversations.filter(conv =>
-    conv.otherUserName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredConversations = conversations.filter(conv => {
+    const search = searchTerm.toLowerCase().trim();
+    if (!search) return true;
+
+    const userName = (conv.otherUserName || '').toLowerCase();
+    const lastMsg = (conv.lastMessage || '').toLowerCase();
+
+    return userName.includes(search) || lastMsg.includes(search);
+  });
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    searchInputRef.current?.focus();
+  };
 
   return (
     <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
@@ -70,12 +82,22 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
           <input
+            ref={searchInputRef}
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Chats durchsuchen..."
-            className="w-full pl-10 pr-4 py-2 bg-transparent border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+            className="w-full pl-10 pr-10 py-2 bg-transparent border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
           />
+          {searchTerm.length > 0 && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-page-secondary transition-colors cursor-pointer"
+              aria-label="Suche löschen"
+            >
+              <X className="w-4 h-4 text-muted hover:text-heading transition-colors" />
+            </button>
+          )}
         </div>
       </div>
 

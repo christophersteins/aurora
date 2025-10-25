@@ -237,17 +237,17 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
                 { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
                 { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'So', fullDay: 'Sonntag', hours: 'Geschlossen', available: false },
+                { day: 'So', fullDay: 'Sonntag', hours: 'Keine Termine', available: false },
               ].map((day) => (
                 <div
                   key={day.day}
-                  className="relative p-4 rounded-xl border"
+                  className="relative p-4 rounded-lg border"
                   style={{
                     background: day.available
                       ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
                       : 'var(--background-secondary)',
                     borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
-                    borderWidth: day.available ? '1.5px' : '1px',
+                    borderWidth: '1px',
                   }}
                 >
                   <div className="flex items-center justify-between">
@@ -286,16 +286,16 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
             {/* Additional Info Cards */}
             <div className="space-y-3">
               <div
-                className="p-5 rounded-xl border"
+                className="p-5 rounded-lg border"
                 style={{
                   background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
                   borderColor: 'var(--color-primary)',
-                  borderWidth: '1.5px',
+                  borderWidth: '1px',
                 }}
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ background: 'var(--color-primary)' }}
                   >
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -314,7 +314,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </div>
 
               <div
-                className="p-5 rounded-xl border"
+                className="p-5 rounded-lg border"
                 style={{
                   background: 'var(--background-secondary)',
                   borderColor: 'var(--border)',
@@ -322,7 +322,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ background: 'var(--background-tertiary)' }}
                   >
                     <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -673,17 +673,17 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
                 { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
                 { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'So', fullDay: 'Sonntag', hours: 'Geschlossen', available: false },
+                { day: 'So', fullDay: 'Sonntag', hours: 'Keine Termine', available: false },
               ].map((day) => (
                 <div
                   key={day.day}
-                  className="relative p-4 rounded-xl border transition-all hover:scale-[1.02]"
+                  className="relative p-4 rounded-lg border"
                   style={{
                     background: day.available
                       ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
                       : 'var(--background-secondary)',
                     borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
-                    borderWidth: day.available ? '1.5px' : '1px',
+                    borderWidth: '1px',
                   }}
                 >
                   <div className="flex items-center justify-between">
@@ -722,16 +722,16 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
             {/* Additional Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div
-                className="p-5 rounded-xl border transition-all hover:scale-[1.02]"
+                className="p-5 rounded-lg border"
                 style={{
                   background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
                   borderColor: 'var(--color-primary)',
-                  borderWidth: '1.5px',
+                  borderWidth: '1px',
                 }}
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ background: 'var(--color-primary)' }}
                   >
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -750,7 +750,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               </div>
 
               <div
-                className="p-5 rounded-xl border transition-all hover:scale-[1.02]"
+                className="p-5 rounded-lg border"
                 style={{
                   background: 'var(--background-secondary)',
                   borderColor: 'var(--border)',
@@ -758,7 +758,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ background: 'var(--background-tertiary)' }}
                   >
                     <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
