@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SquarePen, Search, Settings } from 'lucide-react';
+import { SquarePen, Search } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -59,28 +59,19 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   return (
     <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-default bg-page-primary flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-page-primary/95">
+      <div className="p-4 bg-page-primary flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-page-primary/95">
         <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {/* Settings functionality will be implemented later */}}
-            className="p-2 link-primary"
-            title="Einstellungen"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
-          <button
-            onClick={onNewConversation}
-            className="p-2 link-primary"
-            title="Neue Nachricht"
-          >
-            <SquarePen className="w-5 h-5" />
-          </button>
-        </div>
+        <button
+          onClick={onNewConversation}
+          className="p-2 link-primary"
+          title="Neue Nachricht"
+        >
+          <SquarePen className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Search Field */}
-      <div className="px-4 py-3 border-b border-default bg-page-primary sticky top-[73px] z-10 backdrop-blur-sm bg-page-primary/95">
+      <div className="px-4 pt-2 pb-4 bg-page-primary sticky top-[73px] z-10 backdrop-blur-sm bg-page-primary/95">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
           <input
@@ -124,7 +115,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 onClick={() => onSelectConversation(conv.id)}
                 className={`px-4 py-3 cursor-pointer transition-all duration-200 relative hover:bg-page-secondary ${
                   selectedId === conv.id
-                    ? 'bg-page-secondary border-r-2 border-primary'
+                    ? 'bg-page-secondary border-l-2 border-primary'
                     : ''
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}

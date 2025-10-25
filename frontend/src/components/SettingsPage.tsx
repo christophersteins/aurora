@@ -74,6 +74,7 @@ export default function SettingsPage() {
   const handleReadReceiptsChange = async (value: boolean) => {
     setReadReceipts(value);
 
+    const token = localStorage.getItem('token');
     if (!token) return;
 
     try {

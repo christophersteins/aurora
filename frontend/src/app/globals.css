@@ -766,3 +766,55 @@ input[type="checkbox"]:focus {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================
+   SWITCH (TOGGLE) STYLES
+   ======================================== */
+
+/* Global switch styles - all switches use success color when active */
+.switch {
+  position: relative;
+  display: inline-flex;
+  height: 1.5rem; /* 24px */
+  width: 2.75rem; /* 44px */
+  align-items: center;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.switch.active {
+  background-color: var(--color-success);
+}
+
+.switch:not(.active) {
+  background-color: #4b5563; /* gray-600 */
+}
+
+.switch-handle {
+  display: inline-block;
+  height: 1rem; /* 16px */
+  width: 1rem; /* 16px */
+  border-radius: 9999px;
+  background-color: white;
+  transform: translateX(0.25rem);
+  transition: transform 0.2s ease-in-out;
+}
+
+.switch.active .switch-handle {
+  transform: translateX(1.5rem); /* Move right when active */
+}
+
+/* Alternative: Style any button that looks like a switch */
+button[class*="rounded-full"][class*="h-6"][class*="w-11"] {
+  cursor: pointer;
+}
+
+button[class*="rounded-full"][class*="h-6"][class*="w-11"][class*="bg-action-secondary"],
+button[class*="rounded-full"][class*="h-6"][class*="w-11"][class*="bg-success"] {
+  background-color: var(--color-success) !important;
+}
+
+button[class*="rounded-full"][class*="h-6"][class*="w-11"]:hover {
+  opacity: 0.9;
+}
