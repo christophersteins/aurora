@@ -101,7 +101,7 @@ export default function MultiSelectDropdown({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Suchen..."
-                className="w-full px-3 py-2 border border-default rounded focus:outline-none bg-page-primary text-body"
+                className="w-full px-3 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-body"
               />
             </div>
 

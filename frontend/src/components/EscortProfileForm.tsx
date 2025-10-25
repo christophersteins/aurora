@@ -101,31 +101,6 @@ export default function EscortProfileForm() {
     { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
   ];
 
-  // Scroll spy effect for desktop navigation
-  useEffect(() => {
-    // Only run on desktop
-    if (typeof window === 'undefined' || window.innerWidth < 1024) return;
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 150; // Offset for sticky header
-
-      // Find which section is currently in view
-      for (const section of sections) {
-        const element = document.getElementById(section.id);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSidebarSection(section.id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (showProfilePictureModal) {
@@ -369,15 +344,8 @@ export default function EscortProfileForm() {
     );
   }
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offsetTop = element.offsetTop - 100; // Offset for sticky header and padding
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth'
-      });
-    }
+  const handleTabClick = (sectionId: string) => {
+    setActiveSidebarSection(sectionId);
   };
 
   return (
@@ -462,9 +430,9 @@ export default function EscortProfileForm() {
       {/* Überschrift - Desktop only */}
       <h1 className="text-3xl font-bold text-heading mb-6 hidden lg:block">Profil bearbeiten</h1>
 
-      <div className="flex gap-0 lg:gap-6">
-        {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg">
+      <div className="lg:flex lg:gap-6">
+        {/* Sidebar Navigation - Desktop only - Sticky Position */}
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;
@@ -472,7 +440,7 @@ export default function EscortProfileForm() {
               return (
                 <button
                   key={section.id}
-                  onClick={() => scrollToSection(section.id)}
+                  onClick={() => handleTabClick(section.id)}
                   className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
                     isActive
                       ? 'text-action-primary'
@@ -547,9 +515,13 @@ export default function EscortProfileForm() {
             {/* Personal Data Section */}
             <div
               id="persoenliche-daten"
-              className={`scroll-mt-8 ${
-                activeSection === 'persoenliche-daten' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'persoenliche-daten'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'persoenliche-daten'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Persönliche Daten</h2>
 
@@ -668,9 +640,13 @@ export default function EscortProfileForm() {
             {/* Erscheinungsbild Section (combined: Körpermerkmale + Aussehen + Eigenschaften) */}
             <div
               id="erscheinungsbild"
-              className={`scroll-mt-8 ${
-                activeSection === 'erscheinungsbild' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'erscheinungsbild'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'erscheinungsbild'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Erscheinungsbild</h2>
 
@@ -900,9 +876,13 @@ export default function EscortProfileForm() {
             {/* Fotos Section */}
             <div
               id="fotos"
-              className={`scroll-mt-8 ${
-                activeSection === 'fotos' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'fotos'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'fotos'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Fotos</h2>
               <MediaGalleryUpload mediaType="image" />
@@ -911,9 +891,13 @@ export default function EscortProfileForm() {
             {/* Videos Section */}
             <div
               id="videos"
-              className={`scroll-mt-8 ${
-                activeSection === 'videos' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'videos'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'videos'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Videos</h2>
               <MediaGalleryUpload mediaType="video" />
@@ -922,9 +906,13 @@ export default function EscortProfileForm() {
             {/* Service Section */}
             <div
               id="service"
-              className={`scroll-mt-8 ${
-                activeSection === 'service' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'service'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'service'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Service</h2>
 
@@ -986,9 +974,13 @@ export default function EscortProfileForm() {
             {/* Zeiten Section */}
             <div
               id="zeiten"
-              className={`scroll-mt-8 ${
-                activeSection === 'zeiten' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'zeiten'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'zeiten'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Zeiten</h2>
               <p className="text-muted text-sm">Zeiten-Felder (Arbeitszeiten) werden hier hinzugefügt.</p>
@@ -997,9 +989,13 @@ export default function EscortProfileForm() {
             {/* Treffpunkte Section */}
             <div
               id="treffpunkte"
-              className={`scroll-mt-8 ${
-                activeSection === 'treffpunkte' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'treffpunkte'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'treffpunkte'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Treffpunkte</h2>
               <p className="text-muted text-sm">Treffpunkte-Felder (Arbeitsort, Incall/Outcall) werden hier hinzugefügt.</p>
@@ -1008,9 +1004,13 @@ export default function EscortProfileForm() {
             {/* Preise Section */}
             <div
               id="preise"
-              className={`scroll-mt-8 ${
-                activeSection === 'preise' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'preise'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'preise'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Preise</h2>
 
@@ -1252,9 +1252,13 @@ export default function EscortProfileForm() {
             {/* Description Section */}
             <div
               id="beschreibung"
-              className={`scroll-mt-8 ${
-                activeSection === 'beschreibung' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'beschreibung'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'beschreibung'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Beschreibung</h2>
 
@@ -1276,9 +1280,13 @@ export default function EscortProfileForm() {
             {/* Verifizierung Section */}
             <div
               id="verifizierung"
-              className={`scroll-mt-8 ${
-                activeSection === 'verifizierung' ? 'block animate-slide-in-right' : 'hidden'
-              } lg:block`}
+              className={`${
+                activeSection === 'verifizierung'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'verifizierung'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Verifizierung</h2>
               <p className="text-muted text-sm">Verifizierungs-Felder werden hier hinzugefügt.</p>

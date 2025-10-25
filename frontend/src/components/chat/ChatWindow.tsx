@@ -415,7 +415,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Nachricht eingeben..."
             disabled={!isConnected || isLoading}
-            className="flex-1 px-4 py-3 border border-default rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
+            className="flex-1 px-4 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
           />
 
           {/* Send Button */}

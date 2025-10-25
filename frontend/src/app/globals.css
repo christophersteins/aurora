@@ -415,12 +415,12 @@ h1, h2, h3, h4, h5, h6 {
    INPUT & FORM UTILITIES
    ======================================== */
 
-/* Base Input Styles - Rounded like buttons with same height */
+/* Base Input Styles - Modern subtle rounded corners */
 .input-base {
   width: 100%;
   padding: 0.75rem 1.5rem;
   border: 1px solid #d1d5db;
-  border-radius: 9999px;
+  border-radius: 0.5rem;
   background-color: #ffffff;
   color: #1f2937;
   transition: all 0.2s ease-in-out;
@@ -485,12 +485,12 @@ input[type="date"]:not(.date-input-custom)::-moz-calendar-picker-indicator:hover
   cursor: not-allowed;
 }
 
-/* Textarea - Rectangular with rounded corners (not fully round) */
+/* Textarea - Rectangular with modern subtle rounded corners */
 .textarea-base {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   background-color: #ffffff;
   color: #1f2937;
   transition: all 0.2s ease-in-out;

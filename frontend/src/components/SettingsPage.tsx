@@ -36,31 +36,6 @@ export default function SettingsPage() {
     { id: 'sprache', label: t('sections.language'), icon: Globe },
   ];
 
-  // Scroll spy effect for desktop navigation
-  useEffect(() => {
-    // Only run on desktop
-    if (typeof window === 'undefined' || window.innerWidth < 1024) return;
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 150; // Offset for sticky header
-
-      // Find which section is currently in view
-      for (const section of sections) {
-        const element = document.getElementById(section.id);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSidebarSection(section.id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Account settings state
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
@@ -230,15 +205,8 @@ export default function SettingsPage() {
     });
   };
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offsetTop = element.offsetTop - 100; // Offset for sticky header and padding
-      window.scrollTo({
-        top: offsetTop,
-        behavior: 'smooth'
-      });
-    }
+  const handleTabClick = (sectionId: string) => {
+    setActiveSidebarSection(sectionId);
   };
 
   return (
@@ -291,7 +259,7 @@ export default function SettingsPage() {
 
       <div className="flex gap-0 lg:gap-6">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg">
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;
@@ -299,7 +267,7 @@ export default function SettingsPage() {
               return (
                 <button
                   key={section.id}
-                  onClick={() => scrollToSection(section.id)}
+                  onClick={() => handleTabClick(section.id)}
                   className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
                     isActive
                       ? 'text-action-primary'
@@ -323,9 +291,13 @@ export default function SettingsPage() {
             {/* Konto Section */}
             <div
               id="konto"
-              className={`scroll-mt-8 ${
-                activeSection === 'konto' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'konto'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'konto'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('account.title')}</h2>
 
@@ -536,9 +508,13 @@ export default function SettingsPage() {
             {/* Sicherheit Section */}
             <div
               id="sicherheit"
-              className={`scroll-mt-8 ${
-                activeSection === 'sicherheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'sicherheit'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'sicherheit'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Sicherheit</h2>
               <p className="text-muted">Sicherheitseinstellungen werden hier angezeigt.</p>
@@ -547,9 +523,13 @@ export default function SettingsPage() {
             {/* Datenschutz Section */}
             <div
               id="datenschutz"
-              className={`scroll-mt-8 ${
-                activeSection === 'datenschutz' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'datenschutz'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'datenschutz'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Datenschutz</h2>
               <p className="text-muted">Datenschutzeinstellungen werden hier angezeigt.</p>
@@ -558,9 +538,13 @@ export default function SettingsPage() {
             {/* Mitteilungen Section */}
             <div
               id="mitteilungen"
-              className={`scroll-mt-8 ${
-                activeSection === 'mitteilungen' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'mitteilungen'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'mitteilungen'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Mitteilungen</h2>
               <p className="text-muted">Mitteilungseinstellungen werden hier angezeigt.</p>
@@ -569,9 +553,13 @@ export default function SettingsPage() {
             {/* Premium Section */}
             <div
               id="premium"
-              className={`scroll-mt-8 ${
-                activeSection === 'premium' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'premium'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'premium'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Premium</h2>
               <p className="text-muted">Premium-Einstellungen werden hier angezeigt.</p>
@@ -580,9 +568,13 @@ export default function SettingsPage() {
             {/* Barrierefreiheit Section */}
             <div
               id="barrierefreiheit"
-              className={`scroll-mt-8 ${
-                activeSection === 'barrierefreiheit' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block lg:mb-12`}
+              className={`mb-12 ${
+                activeSection === 'barrierefreiheit'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'barrierefreiheit'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Barrierefreiheit</h2>
               <p className="text-muted">Barrierefreiheitseinstellungen werden hier angezeigt.</p>
@@ -591,9 +583,13 @@ export default function SettingsPage() {
             {/* Sprache Section */}
             <div
               id="sprache"
-              className={`scroll-mt-8 ${
-                activeSection === 'sprache' ? `block ${!isMounting ? 'animate-slide-in-right' : ''}` : 'hidden'
-              } lg:block`}
+              className={`${
+                activeSection === 'sprache'
+                  ? 'block animate-slide-in-right'
+                  : activeSection === null && activeSidebarSection === 'sprache'
+                  ? 'block'
+                  : 'hidden'
+              }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">{t('language.title')}</h2>
               <p className="text-muted mb-6">{t('language.description')}</p>
