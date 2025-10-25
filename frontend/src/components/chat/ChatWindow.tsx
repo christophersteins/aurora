@@ -6,6 +6,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { Image, Smile, MoreVertical, Send } from 'lucide-react';
+import { chatService } from '@/services/chatService';
+import { useChatStore } from '@/store/chatStore';
 
 interface Message {
   id: string;
@@ -46,6 +48,7 @@ interface Conversation {
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
   const { socket, isConnected } = useSocket();
+  const { markConversationAsRead } = useChatStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -115,6 +118,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
       setIsLoading(false);
     });
   }, [socket, conversationId]);
+
+  // Mark conversation as read when opened
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const markAsRead = async () => {
+      try {
+        await chatService.markAsRead(conversationId);
+        markConversationAsRead(conversationId);
+        console.log('✓ Conversation marked as read:', conversationId);
+      } catch (error) {
+        console.error('Error marking conversation as read:', error);
+      }
+    };
+
+    markAsRead();
+  }, [conversationId, markConversationAsRead]);
 
   useEffect(() => {
     if (!socket || !conversationId) return;

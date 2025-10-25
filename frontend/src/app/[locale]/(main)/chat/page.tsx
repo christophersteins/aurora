@@ -5,6 +5,7 @@ import { ConversationList } from '@/components/chat/ConversationList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { NewConversationModal } from '@/components/chat/NewConversationModal';
 import { useAuthStore } from '@/store/authStore';
+import { useChatStore } from '@/store/chatStore';
 
 interface Conversation {
   id: string;
@@ -15,14 +16,15 @@ interface Conversation {
 
 export default function ChatPage() {
   const { user } = useAuthStore();
+  const { conversations, setConversations, setLoading } = useChatStore();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Konversationen aus Backend laden
   const fetchConversations = async () => {
     try {
+      setLoading(true);
       // Get JWT token from localStorage
       const storedAuth = localStorage.getItem('aurora-auth-storage');
       let token = '';
@@ -53,6 +55,7 @@ export default function ChatPage() {
       console.error('❌ Netzwerkfehler:', error);
     } finally {
       setIsLoading(false);
+      setLoading(false);
     }
   };
 

@@ -110,6 +110,18 @@ export class ChatService {
     await this.messageRepository.update(messageId, { isRead: true });
   }
 
+  async markConversationAsRead(conversationId: string, userId: string): Promise<void> {
+    // Mark all unread messages in the conversation that were sent by others as read
+    await this.messageRepository.update(
+      {
+        conversationId,
+        senderId: Not(userId),
+        isRead: false,
+      },
+      { isRead: true }
+    );
+  }
+
   async getUserConversationsWithLastMessage(userId: string): Promise<any[]> {
     const conversations = await this.conversationRepository
       .createQueryBuilder('conversation')

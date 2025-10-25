@@ -80,7 +80,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       },
     })),
 
-  markConversationAsRead: (conversationId) =>
+  markConversationAsRead: (conversationId) => {
     set((state) => ({
       conversations: state.conversations.map((conv) =>
         conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
@@ -92,7 +92,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
           isRead: true,
         })),
       },
-    })),
+    }));
+    // Update total unread count after marking as read
+    get().updateTotalUnreadCount();
+  },
 
   setLoading: (isLoading) => set({ isLoading }),
 

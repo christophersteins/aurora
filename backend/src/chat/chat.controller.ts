@@ -44,4 +44,14 @@ export class ChatController {
     const userId = req.user.id;
     return await this.chatService.getTotalUnreadCount(userId);
   }
+
+  @Post('conversations/:conversationId/read')
+  async markConversationAsRead(
+    @Req() req,
+    @Param('conversationId') conversationId: string,
+  ) {
+    const userId = req.user.id;
+    await this.chatService.markConversationAsRead(conversationId, userId);
+    return { success: true };
+  }
 }
