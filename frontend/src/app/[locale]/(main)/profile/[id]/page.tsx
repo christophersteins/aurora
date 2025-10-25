@@ -891,7 +891,7 @@ export default function ProfilePage() {
                           return (
                             <linearGradient key={i} id={`star-gradient-${i}`}>
                               <stop offset={`${fillPercentage}%`} stopColor="var(--color-primary)" />
-                              <stop offset={`${fillPercentage}%`} stopColor="var(--background-secondary)" />
+                              <stop offset={`${fillPercentage}%`} stopColor="var(--border)" />
                             </linearGradient>
                           );
                         })}
