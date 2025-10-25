@@ -229,23 +229,9 @@ export default function Header() {
             {isAuthenticated && user && (
               <div className="mb-6 pb-6 border-b border-[#2f3336]">
                 <div className="flex items-center justify-center">
-                  {user.profilePicture ? (
-                    <img
-                      src={
-                        user.profilePicture.startsWith('/')
-                          ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${user.profilePicture}`
-                          : user.profilePicture
-                      }
-                      alt="Profilbild"
-                      className="w-12 h-12 rounded-full object-cover border border-[#2f3336]"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] flex items-center justify-center">
-                      <span className="text-[#0f1419] font-bold text-lg">
-                        {(user.username?.[0] || user.email[0]).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] flex items-center justify-center">
+                    <User className="text-[#0f1419] text-xl" />
+                  </div>
                 </div>
               </div>
             )}

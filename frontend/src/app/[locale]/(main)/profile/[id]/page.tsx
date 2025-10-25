@@ -1011,24 +1011,20 @@ export default function ProfilePage() {
 
                 {/* Location and Distance */}
                 <div className="space-y-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
-                  {(locationText || distanceKm !== null) && (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {locationText && (
-                        <>
-                          <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            {locationText}
-                          </span>
-                        </>
-                      )}
-                      {distanceKm !== null && (
-                        <>
-                          <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            {distanceKm} km
-                          </span>
-                        </>
-                      )}
+                  {locationText && (
+                    <div className="flex items-center gap-2">
+                      <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {locationText}
+                      </span>
+                    </div>
+                  )}
+                  {distanceKm !== null && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {distanceKm} km von dir entfernt
+                      </span>
                     </div>
                   )}
 
@@ -1320,6 +1316,16 @@ export default function ProfilePage() {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Button zu allen Escorts */}
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => router.push('/escorts')}
+                className="btn-base btn-secondary"
+              >
+                Zu allen Escorts
+              </button>
             </div>
           </div>
         )}
