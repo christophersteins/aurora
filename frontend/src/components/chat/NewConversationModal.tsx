@@ -116,23 +116,20 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-page-secondary rounded-2xl p-6 w-full max-w-md border border-default shadow-2xl animate-fade-in">
+      <div className="bg-page-secondary rounded-xl p-6 w-full max-w-md border border-default shadow-2xl animate-fade-in">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-heading">Neue Konversation</h2>
+          <h2 className="text-xl font-bold text-heading">Neuer Chat</h2>
           <button
             onClick={onClose}
-            className="text-muted hover:text-heading transition-colors p-1 rounded-full hover:bg-page-primary"
+            className="text-muted hover:text-heading transition-colors p-1.5 rounded-full hover:bg-page-primary"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <div className="mb-6 relative" ref={resultsRef}>
-          <label className="block text-sm font-medium text-body mb-2">
-            Benutzername
-          </label>
           <input
             type="text"
             value={searchQuery}
@@ -143,21 +140,21 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
             onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
             onFocus={() => searchResults.length > 0 && setShowResults(true)}
             placeholder="Benutzername suchen..."
-            className="w-full px-4 py-3 border border-default rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-page-primary text-body placeholder:text-muted transition-all"
+            className="w-full px-4 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-page-primary text-body placeholder:text-muted transition-all"
             autoFocus
           />
-          <p className="text-xs text-muted mt-2 ml-4">
+          <p className="text-xs text-muted mt-2">
             Suche nach Benutzernamen (min. 2 Zeichen)
           </p>
 
           {/* Search Results Dropdown */}
           {showResults && searchResults.length > 0 && (
-            <div className="absolute z-10 w-full mt-2 bg-page-primary border border-default rounded-2xl shadow-lg max-h-64 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-2 bg-page-primary border border-default rounded-xl shadow-lg max-h-64 overflow-y-auto">
               {searchResults.map((user) => (
                 <button
                   key={user.id}
                   onClick={() => handleSelectUser(user)}
-                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-page-secondary transition-all text-left"
+                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-page-secondary transition-all text-left first:rounded-t-xl last:rounded-b-xl"
                 >
                   {/* Avatar */}
                   {user.profilePicture ? (
@@ -191,7 +188,7 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
 
           {/* Loading indicator */}
           {isSearching && (
-            <div className="absolute right-4 top-11 text-muted">
+            <div className="absolute right-4 top-3 text-muted">
               <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -203,14 +200,14 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-body hover:bg-page-primary rounded-full transition-all duration-200 font-medium"
+            className="btn-base btn-secondary"
           >
             Abbrechen
           </button>
           <button
             onClick={handleSubmit}
             disabled={!selectedUser}
-            className="px-6 py-2.5 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 flex items-center gap-2"
+            className="btn-base btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <span>Starten</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
