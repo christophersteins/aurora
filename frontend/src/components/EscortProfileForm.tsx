@@ -8,6 +8,7 @@ import { UpdateEscortProfileDto } from '@/types/auth.types';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
 import ToggleSwitch from './ToggleSwitch';
+import AvailabilityScheduler from './AvailabilityScheduler';
 import { ArrowLeft, User, Sparkles, Image, Video, Briefcase, Clock, MapPinned, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
@@ -60,6 +61,7 @@ export default function EscortProfileForm() {
     isSmoker: user?.isSmoker || false,
     services: user?.services || [],
     description: user?.description || '',
+    availability: user?.availability || {},
     price30Min: user?.price30Min || undefined,
     price1Hour: user?.price1Hour || undefined,
     price2Hours: user?.price2Hours || undefined,
@@ -161,6 +163,7 @@ export default function EscortProfileForm() {
         isSmoker: updatedUser.isSmoker || false,
         services: updatedUser.services || [],
         description: updatedUser.description || '',
+        availability: updatedUser.availability || {},
         price30Min: updatedUser.price30Min || undefined,
         price1Hour: updatedUser.price1Hour || undefined,
         price2Hours: updatedUser.price2Hours || undefined,
@@ -1001,7 +1004,14 @@ export default function EscortProfileForm() {
               }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Zeiten</h2>
-              <p className="text-muted text-sm">Zeiten-Felder (Arbeitszeiten) werden hier hinzugefügt.</p>
+              <AvailabilityScheduler
+                value={formData.availability || {}}
+                onChange={(value) => {
+                  const newData = { ...formData, availability: value };
+                  setFormData(newData);
+                  debouncedSave(newData);
+                }}
+              />
             </div>
 
             {/* Treffpunkte Section */}

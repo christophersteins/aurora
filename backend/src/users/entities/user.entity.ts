@@ -147,6 +147,9 @@ export class User {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'jsonb', nullable: true })
+  availability: any; // Verfügbarkeitszeiten pro Wochentag
+
   // === PREISE ===
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })

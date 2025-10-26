@@ -93,7 +93,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] sticky top-0 z-40">
+      <header className="bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-40">
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo + Desktop Navigation - Links */}

@@ -1,3 +1,18 @@
+export interface TimeSlot {
+  start: string;
+  end: string;
+}
+
+export interface AvailabilitySchedule {
+  monday?: TimeSlot[];
+  tuesday?: TimeSlot[];
+  wednesday?: TimeSlot[];
+  thursday?: TimeSlot[];
+  friday?: TimeSlot[];
+  saturday?: TimeSlot[];
+  sunday?: TimeSlot[];
+}
+
 export interface User {
   id: string;
   email: string;
@@ -33,6 +48,7 @@ export interface User {
   isSmoker?: boolean;
   services?: string[];
   description?: string;
+  availability?: AvailabilitySchedule;
   isOnline?: boolean;
   lastSeen?: string;
   readReceipts?: boolean;
@@ -96,6 +112,7 @@ export interface UpdateEscortProfileDto {
   isSmoker?: boolean;
   services?: string[];
   description?: string;
+  availability?: AvailabilitySchedule;
   // Preise
   price30Min?: number;
   price1Hour?: number;

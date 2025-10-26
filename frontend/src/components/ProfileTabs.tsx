@@ -2,14 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileText, MessageSquare } from 'lucide-react';
+import PricingDisplay from './PricingDisplay';
+import MeetingPointsDisplay from './MeetingPointsDisplay';
 
 interface ProfileTabsProps {
   escort?: {
     services?: string[];
+    price30Min?: number;
     price1Hour?: number;
     price2Hours?: number;
     price3Hours?: number;
+    price6Hours?: number;
+    price12Hours?: number;
+    price24Hours?: number;
     priceOvernight?: number;
+    priceWeekend?: number;
     description?: string;
   };
   initialTab?: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen';
@@ -106,7 +113,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         return (
           <>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Angebotene Services
+              Service
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
@@ -163,69 +170,16 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         return (
           <>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Preisübersicht
+              Preise
             </h3>
-
-            <div className="space-y-4">
-              {[
-                { duration: '30 Minuten', price: '150€' },
-                { duration: '1 Stunde', price: '250€', featured: true },
-                { duration: '2 Stunden', price: '450€' },
-                { duration: '3 Stunden', price: '600€' },
-                { duration: '6 Stunden', price: '1.000€' },
-                { duration: '12 Stunden', price: '1.800€' },
-                { duration: '24 Stunden', price: '3.000€' },
-                { duration: 'Übernachtung', price: '2.500€' },
-                { duration: 'Wochenende', price: '5.000€' },
-              ].map((item) => (
-                <div
-                  key={item.duration}
-                  className="flex items-center justify-between p-4 rounded-lg border transition-all hover:scale-[1.02]"
-                  style={{
-                    background: item.featured ? 'rgba(139, 92, 246, 0.1)' : 'var(--background-secondary)',
-                    borderColor: item.featured ? 'var(--color-primary)' : 'var(--border)',
-                    borderWidth: item.featured ? '2px' : '1px',
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: item.featured ? 'var(--color-primary)' : 'var(--background-tertiary)' }}
-                    >
-                      <Clock className="w-5 h-5" style={{ color: item.featured ? 'white' : 'var(--color-primary)' }} />
-                    </div>
-                    <div>
-                      <p className="font-medium" style={{ color: 'var(--text-heading)' }}>
-                        {item.duration}
-                      </p>
-                      {item.featured && (
-                        <p className="text-xs" style={{ color: 'var(--color-primary)' }}>
-                          Beliebt
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                      {item.price}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--background-secondary)' }}>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                ℹ️ Alle Preise verstehen sich inklusive aller Services. Sonderwünsche nach Absprache.
-              </p>
-            </div>
+            <PricingDisplay prices={escort} />
           </>
         );
       case 'zeiten':
         return (
           <>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Verfügbarkeit & Arbeitszeiten
+              Zeiten
             </h3>
 
             {/* Weekly Schedule Grid */}
@@ -282,64 +236,6 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 </div>
               ))}
             </div>
-
-            {/* Additional Info Cards */}
-            <div className="space-y-3">
-              <div
-                className="p-5 rounded-lg border"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
-                  borderColor: 'var(--color-primary)',
-                  borderWidth: '1px',
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-primary)' }}
-                  >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
-                      Spontane Termine
-                    </h4>
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                      Kurzfristige Buchungen innerhalb von 2-3 Stunden möglich
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="p-5 rounded-lg border"
-                style={{
-                  background: 'var(--background-secondary)',
-                  borderColor: 'var(--border)',
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--background-tertiary)' }}
-                  >
-                    <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
-                      Vorausbuchung
-                    </h4>
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                      Termine können bis zu 2 Wochen im Voraus gebucht werden
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </>
         );
       case 'treffpunkte':
@@ -349,72 +245,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Treffpunkte
             </h3>
 
-            <div className="space-y-6">
-              {/* Incall */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Incall - Bei mir
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Ich empfange Sie in einer diskreten, sauberen und gepflegten Wohnung in zentraler Lage.
-                    Parkplätze sind in der Nähe vorhanden.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Zentrale Lage, genaue Adresse nach Terminvereinbarung</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Outcall */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Outcall - Bei Ihnen
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Ich besuche Sie gerne in Ihrem Hotel oder Ihrer Wohnung. Outcall-Termine sind im gesamten Stadtgebiet möglich.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Mindestdauer: 2 Stunden</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Anfahrt im Stadtgebiet inklusive, außerhalb zzgl. 50€</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hotels */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Hotels & Dinner Dates
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Für Hotelbesuche und Dinner Dates stehe ich sehr gerne zur Verfügung.
-                    Ich begleite Sie auch zu gesellschaftlichen Anlässen und Events.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-primary)' }}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Bitte bei der Buchung angeben</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <MeetingPointsDisplay />
           </>
         );
       case 'ueber-mich':
@@ -544,7 +375,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         {/* Service Section */}
           <div id="service" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Angebotene Services
+              Service
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
@@ -600,68 +431,15 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
         {/* Preise Section */}
           <div id="preise" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Preisübersicht
+              Preise
             </h3>
-
-            <div className="space-y-4">
-              {[
-                { duration: '30 Minuten', price: '150€' },
-                { duration: '1 Stunde', price: '250€', featured: true },
-                { duration: '2 Stunden', price: '450€' },
-                { duration: '3 Stunden', price: '600€' },
-                { duration: '6 Stunden', price: '1.000€' },
-                { duration: '12 Stunden', price: '1.800€' },
-                { duration: '24 Stunden', price: '3.000€' },
-                { duration: 'Übernachtung', price: '2.500€' },
-                { duration: 'Wochenende', price: '5.000€' },
-              ].map((item) => (
-                <div
-                  key={item.duration}
-                  className="flex items-center justify-between p-4 rounded-lg border transition-all hover:scale-[1.02]"
-                  style={{
-                    background: item.featured ? 'rgba(139, 92, 246, 0.1)' : 'var(--background-secondary)',
-                    borderColor: item.featured ? 'var(--color-primary)' : 'var(--border)',
-                    borderWidth: item.featured ? '2px' : '1px',
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: item.featured ? 'var(--color-primary)' : 'var(--background-tertiary)' }}
-                    >
-                      <Clock className="w-5 h-5" style={{ color: item.featured ? 'white' : 'var(--color-primary)' }} />
-                    </div>
-                    <div>
-                      <p className="font-medium" style={{ color: 'var(--text-heading)' }}>
-                        {item.duration}
-                      </p>
-                      {item.featured && (
-                        <p className="text-xs" style={{ color: 'var(--color-primary)' }}>
-                          Beliebt
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                      {item.price}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--background-secondary)' }}>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                ℹ️ Alle Preise verstehen sich inklusive aller Services. Sonderwünsche nach Absprache.
-              </p>
-            </div>
+            <PricingDisplay prices={escort} />
           </div>
 
         {/* Zeiten Section */}
           <div id="zeiten" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
-              Verfügbarkeit & Arbeitszeiten
+              Zeiten
             </h3>
 
             {/* Weekly Schedule Grid */}
@@ -718,64 +496,6 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 </div>
               ))}
             </div>
-
-            {/* Additional Info Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                className="p-5 rounded-lg border"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)',
-                  borderColor: 'var(--color-primary)',
-                  borderWidth: '1px',
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-primary)' }}
-                  >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
-                      Spontane Termine
-                    </h4>
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                      Kurzfristige Buchungen innerhalb von 2-3 Stunden möglich
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="p-5 rounded-lg border"
-                style={{
-                  background: 'var(--background-secondary)',
-                  borderColor: 'var(--border)',
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--background-tertiary)' }}
-                  >
-                    <svg className="w-6 h-6" style={{ color: 'var(--color-primary)' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold mb-1.5" style={{ color: 'var(--text-heading)' }}>
-                      Vorausbuchung
-                    </h4>
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                      Termine können bis zu 2 Wochen im Voraus gebucht werden
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
         {/* Treffpunkte Section */}
@@ -784,72 +504,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Treffpunkte
             </h3>
 
-            <div className="space-y-6">
-              {/* Incall */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Incall - Bei mir
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Ich empfange Sie in einer diskreten, sauberen und gepflegten Wohnung in zentraler Lage.
-                    Parkplätze sind in der Nähe vorhanden.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Zentrale Lage, genaue Adresse nach Terminvereinbarung</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Outcall */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Outcall - Bei Ihnen
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Ich besuche Sie gerne in Ihrem Hotel oder Ihrer Wohnung. Outcall-Termine sind im gesamten Stadtgebiet möglich.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Mindestdauer: 2 Stunden</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Anfahrt im Stadtgebiet inklusive, außerhalb zzgl. 50€</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hotels */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-heading)' }}>
-                  Hotels & Dinner Dates
-                </h4>
-                <div className="p-4 rounded-lg border" style={{ background: 'var(--background-secondary)', borderColor: 'var(--border)' }}>
-                  <p className="text-sm mb-3" style={{ color: 'var(--text-regular)' }}>
-                    Für Hotelbesuche und Dinner Dates stehe ich sehr gerne zur Verfügung.
-                    Ich begleite Sie auch zu gesellschaftlichen Anlässen und Events.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-primary)' }}>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Bitte bei der Buchung angeben</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <MeetingPointsDisplay />
           </div>
 
         {/* Über mich Section */}
