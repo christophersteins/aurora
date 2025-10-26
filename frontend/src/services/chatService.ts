@@ -27,6 +27,22 @@ export const chatService = {
     await apiClient.post(`/chat/conversations/${conversationId}/read`);
   },
 
+  // Conversation als ungelesen markieren
+  markAsUnread: async (conversationId: string): Promise<void> => {
+    await apiClient.post(`/chat/conversations/${conversationId}/unread`);
+  },
+
+  // Chat anheften/loslösen
+  togglePin: async (conversationId: string): Promise<{ isPinned: boolean }> => {
+    const response = await apiClient.post(`/chat/conversations/${conversationId}/pin`);
+    return response.data;
+  },
+
+  // Chat löschen
+  deleteConversation: async (conversationId: string): Promise<void> => {
+    await apiClient.delete(`/chat/conversations/${conversationId}`);
+  },
+
   // Get total unread message count
   getUnreadCount: async (): Promise<number> => {
     const response = await apiClient.get<{ count: number }>('/chat/unread-count');

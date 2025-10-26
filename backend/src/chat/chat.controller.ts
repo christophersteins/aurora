@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Param, UseGuards, Delete } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -52,6 +52,35 @@ export class ChatController {
   ) {
     const userId = req.user.id;
     await this.chatService.markConversationAsRead(conversationId, userId);
+    return { success: true };
+  }
+
+  @Post('conversations/:conversationId/unread')
+  async markConversationAsUnread(
+    @Req() req,
+    @Param('conversationId') conversationId: string,
+  ) {
+    const userId = req.user.id;
+    await this.chatService.markConversationAsUnread(conversationId, userId);
+    return { success: true };
+  }
+
+  @Post('conversations/:conversationId/pin')
+  async togglePinConversation(
+    @Req() req,
+    @Param('conversationId') conversationId: string,
+  ) {
+    const userId = req.user.id;
+    return await this.chatService.togglePinConversation(conversationId, userId);
+  }
+
+  @Delete('conversations/:conversationId')
+  async deleteConversation(
+    @Req() req,
+    @Param('conversationId') conversationId: string,
+  ) {
+    const userId = req.user.id;
+    await this.chatService.deleteConversation(conversationId, userId);
     return { success: true };
   }
 }

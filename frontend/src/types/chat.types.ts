@@ -25,5 +25,6 @@ export interface Conversation {
   lastMessage?: string;
   lastMessageTime?: string;
   unreadCount: number;
+  isPinned?: boolean;
   updatedAt: string;
 }

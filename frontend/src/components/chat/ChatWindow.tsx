@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Star } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2 } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
@@ -53,7 +53,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
@@ -92,6 +92,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           const currentConv = conversations.find((c: Conversation) => c.id === conversationId);
           if (currentConv) {
             setConversation(currentConv);
+            setIsPinned(currentConv.isPinned || false);
           }
         }
       } catch (error) {
@@ -313,6 +314,32 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     }
   };
 
+  const handleMarkAsUnread = async () => {
+    if (!conversationId) return;
+
+    try {
+      await chatService.markAsUnread(conversationId);
+      console.log('Chat als ungelesen markiert:', conversationId);
+      setShowOptionsMenu(false);
+      // Optional: Update UI to reflect unread status
+    } catch (error) {
+      console.error('Fehler beim Markieren als ungelesen:', error);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (!conversationId) return;
+
+    try {
+      const result = await chatService.togglePin(conversationId);
+      setIsPinned(result.isPinned);
+      console.log('Chat anheften geändert:', result.isPinned);
+      setShowOptionsMenu(false);
+    } catch (error) {
+      console.error('Fehler beim Anheften:', error);
+    }
+  };
+
   const handleReportUser = () => {
     // TODO: Implement user reporting logic
     console.log('Benutzer melden:', conversation?.otherUserName);
@@ -327,10 +354,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     // Here you would typically show a confirmation dialog and then block the user
   };
 
-  const handleToggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    // TODO: Implement API call to save favorite status
-    console.log('Favoriten-Status geändert:', !isFavorite);
+  const handleDeleteConversation = async () => {
+    if (!conversationId) return;
+
+    const confirmed = window.confirm('Möchtest du diesen Chat wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.');
+    if (!confirmed) return;
+
+    try {
+      await chatService.deleteConversation(conversationId);
+      console.log('Chat gelöscht:', conversationId);
+      setShowOptionsMenu(false);
+      // Redirect to chat overview or clear selection
+      window.location.href = '/chat';
+    } catch (error) {
+      console.error('Fehler beim Löschen des Chats:', error);
+      alert('Fehler beim Löschen des Chats');
+    }
   };
 
   if (!conversationId) {
@@ -406,17 +445,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Favorite Button */}
-            <button
-              onClick={handleToggleFavorite}
-              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
-              title={isFavorite ? "Als Favorit entfernen" : "Als Favorit markieren"}
-            >
-              <Star
-                className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`}
-              />
-            </button>
-
             {/* Options Menu */}
             <div className="relative" ref={optionsMenuRef}>
               <button
@@ -429,7 +457,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
               {/* Dropdown Menu */}
               {showOptionsMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
+                <div className="absolute right-0 mt-2 w-64 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
+                  <button
+                    onClick={handleMarkAsUnread}
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+                  >
+                    <MailOpen className="w-5 h-5" />
+                    <span>Als ungelesen markieren</span>
+                  </button>
+                  <button
+                    onClick={handleTogglePin}
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+                  >
+                    <Pin className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
+                    <span>{isPinned ? 'Chat loslösen' : 'Chat anheften'}</span>
+                  </button>
+                  <div className="border-t border-default my-1"></div>
                   <button
                     onClick={handleReportUser}
                     className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
@@ -441,12 +484,20 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                   </button>
                   <button
                     onClick={handleBlockUser}
-                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error cursor-pointer"
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
                     <span>Benutzer blockieren</span>
+                  </button>
+                  <div className="border-t border-default my-1"></div>
+                  <button
+                    onClick={handleDeleteConversation}
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error cursor-pointer"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    <span>Chat löschen</span>
                   </button>
                 </div>
               )}

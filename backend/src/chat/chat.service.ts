@@ -173,6 +173,8 @@ export class ChatService {
           }
         }
 
+        const isPinned = (conv.pinnedBy || []).includes(userId);
+
         return {
           id: conv.id,
           otherUserId,
@@ -184,6 +186,7 @@ export class ChatService {
           lastMessage: lastMessage?.content || null,
           lastMessageTime: lastMessage?.createdAt || conv.updatedAt,
           unreadCount,
+          isPinned,
           updatedAt: conv.updatedAt,
         };
       })
@@ -214,5 +217,66 @@ export class ChatService {
     }
 
     return { count: conversationsWithUnread };
+  }
+
+  async markConversationAsUnread(conversationId: string, userId: string): Promise<void> {
+    // Mark the most recent message from the other user as unread
+    const lastMessageFromOther = await this.messageRepository.findOne({
+      where: {
+        conversationId,
+        senderId: Not(userId),
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (lastMessageFromOther) {
+      await this.messageRepository.update(lastMessageFromOther.id, { isRead: false });
+    }
+  }
+
+  async togglePinConversation(conversationId: string, userId: string): Promise<{ isPinned: boolean }> {
+    const conversation = await this.conversationRepository.findOne({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+
+    const pinnedBy = conversation.pinnedBy || [];
+    const isPinned = pinnedBy.includes(userId);
+
+    if (isPinned) {
+      // Unpin: remove userId from pinnedBy array
+      conversation.pinnedBy = pinnedBy.filter(id => id !== userId);
+    } else {
+      // Pin: add userId to pinnedBy array
+      conversation.pinnedBy = [...pinnedBy, userId];
+    }
+
+    await this.conversationRepository.save(conversation);
+
+    return { isPinned: !isPinned };
+  }
+
+  async deleteConversation(conversationId: string, userId: string): Promise<void> {
+    const conversation = await this.conversationRepository.findOne({
+      where: { id: conversationId },
+    });
+
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+
+    // Verify user is a participant
+    if (!conversation.participants.includes(userId)) {
+      throw new Error('User is not a participant in this conversation');
+    }
+
+    // Delete all messages in the conversation
+    await this.messageRepository.delete({ conversationId });
+
+    // Delete the conversation
+    await this.conversationRepository.delete(conversationId);
   }
 }

@@ -8,6 +8,9 @@ export class Conversation {
   @Column('text', { array: true })
   participants: string[];
 
+  @Column('text', { array: true, default: '{}' })
+  pinnedBy: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 
