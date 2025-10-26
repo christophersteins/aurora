@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Star } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
@@ -52,6 +52,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -324,6 +325,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     // Here you would typically show a confirmation dialog and then block the user
   };
 
+  const handleToggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    // TODO: Implement API call to save favorite status
+    console.log('Favoriten-Status geändert:', !isFavorite);
+  };
+
   if (!conversationId) {
     return (
       <div className="flex items-center justify-center h-full bg-page-primary">
@@ -391,6 +398,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
               title="In Chat suchen"
             >
               <Search className="w-5 h-5" />
+            </button>
+
+            {/* Favorite Button */}
+            <button
+              onClick={handleToggleFavorite}
+              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+              title={isFavorite ? "Als Favorit entfernen" : "Als Favorit markieren"}
+            >
+              <Star
+                className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`}
+              />
             </button>
 
             {/* Options Menu */}
@@ -571,26 +589,28 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             <Image className="w-5 h-5" />
           </button>
 
-          {/* Emoji Button */}
-          <button
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            disabled={!isConnected || isLoading}
-            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Emoji einfügen"
-          >
-            <Smile className="w-5 h-5" />
-          </button>
+          {/* Input Field with Emoji Button inside */}
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Nachricht eingeben..."
+              disabled={!isConnected || isLoading}
+              className="w-full pl-4 pr-11 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
+            />
 
-          {/* Input Field */}
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Nachricht eingeben..."
-            disabled={!isConnected || isLoading}
-            className="flex-1 px-4 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
-          />
+            {/* Emoji Button - positioned inside input field on the right */}
+            <button
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              disabled={!isConnected || isLoading}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted hover:text-primary hover:bg-page-primary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Emoji einfügen"
+            >
+              <Smile className="w-5 h-5" />
+            </button>
+          </div>
 
           {/* Send Button - Only visible when there's text */}
           {inputValue.trim() && (

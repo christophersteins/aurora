@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { SquarePen, Search, X } from 'lucide-react';
+import { SquarePen, Search, X, Star } from 'lucide-react';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
 
@@ -38,6 +38,8 @@ const getAvatarColor = (name: string): string => {
   return colors[index];
 };
 
+type TabType = 'all' | 'unread' | 'favorites';
+
 export const ConversationList: React.FC<ConversationListProps> = ({
   conversations,
   selectedId,
@@ -45,17 +47,30 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onNewConversation,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Filter conversations based on search term
+  // Filter conversations based on search term and active tab
   const filteredConversations = conversations.filter(conv => {
+    // First apply search filter
     const search = searchTerm.toLowerCase().trim();
-    if (!search) return true;
+    if (search) {
+      const userName = (conv.otherUserName || '').toLowerCase();
+      const lastMsg = (conv.lastMessage || '').toLowerCase();
+      if (!userName.includes(search) && !lastMsg.includes(search)) {
+        return false;
+      }
+    }
 
-    const userName = (conv.otherUserName || '').toLowerCase();
-    const lastMsg = (conv.lastMessage || '').toLowerCase();
+    // Then apply tab filter
+    if (activeTab === 'unread') {
+      return conv.unreadCount > 0;
+    } else if (activeTab === 'favorites') {
+      return favoriteIds.has(conv.id);
+    }
 
-    return userName.includes(search) || lastMsg.includes(search);
+    return true; // 'all' tab
   });
 
   const handleClearSearch = () => {
@@ -63,41 +78,101 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     searchInputRef.current?.focus();
   };
 
+  const toggleFavorite = (convId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting conversation
+    setFavoriteIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(convId)) {
+        newSet.delete(convId);
+      } else {
+        newSet.add(convId);
+      }
+      return newSet;
+    });
+    // TODO: Implement API call to save favorite status
+  };
+
+  // Count conversations per tab
+  const unreadCount = conversations.filter(conv => conv.unreadCount > 0).length;
+  const favoritesCount = conversations.filter(conv => favoriteIds.has(conv.id)).length;
+
   return (
     <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
-      {/* Header */}
-      <div className="p-4 bg-page-primary flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-page-primary/95">
-        <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
-        <button
-          onClick={onNewConversation}
-          className="link-primary"
-          title="Neue Nachricht"
-        >
-          <SquarePen className="w-5 h-5" />
-        </button>
-      </div>
+      {/* Sticky Header Container - combines Header, Search, and Tabs */}
+      <div className="sticky top-0 z-10 bg-page-primary backdrop-blur-sm bg-page-primary/95 border-b border-default">
+        {/* Header */}
+        <div className="px-4 pt-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
+          <button
+            onClick={onNewConversation}
+            className="link-primary"
+            title="Neue Nachricht"
+          >
+            <SquarePen className="w-5 h-5" />
+          </button>
+        </div>
 
-      {/* Search Field */}
-      <div className="px-4 pt-2 pb-4 bg-page-primary sticky top-[73px] z-10 backdrop-blur-sm bg-page-primary/95">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Chats durchsuchen..."
-            className="w-full pl-10 pr-10 py-2 bg-transparent border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-          />
-          {searchTerm.length > 0 && (
+        {/* Search Field */}
+        <div className="px-4 py-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Chats durchsuchen..."
+              className="w-full pl-10 pr-10 py-2 bg-transparent border border-default rounded-lg text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+            />
+            {searchTerm.length > 0 && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-page-secondary transition-colors cursor-pointer"
+                aria-label="Suche löschen"
+              >
+                <X className="w-4 h-4 text-muted hover:text-heading transition-colors" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="px-4 pb-3">
+          <div className="flex gap-2">
             <button
-              onClick={handleClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-page-secondary transition-colors cursor-pointer"
-              aria-label="Suche löschen"
+              onClick={() => setActiveTab('all')}
+              className={`btn-base ${
+                activeTab === 'all'
+                  ? 'btn-primary'
+                  : 'btn-secondary'
+              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              style={activeTab !== 'all' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
             >
-              <X className="w-4 h-4 text-muted hover:text-heading transition-colors" />
+              Alle
             </button>
-          )}
+            <button
+              onClick={() => setActiveTab('unread')}
+              className={`btn-base ${
+                activeTab === 'unread'
+                  ? 'btn-primary'
+                  : 'btn-secondary'
+              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              style={activeTab !== 'unread' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
+            >
+              Ungelesen
+            </button>
+            <button
+              onClick={() => setActiveTab('favorites')}
+              className={`btn-base ${
+                activeTab === 'favorites'
+                  ? 'btn-primary'
+                  : 'btn-secondary'
+              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              style={activeTab !== 'favorites' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
+            >
+              Favoriten
+            </button>
+          </div>
         </div>
       </div>
 
@@ -120,9 +195,27 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           </div>
         ) : filteredConversations.length === 0 ? (
           <div className="p-8 text-center">
-            <Search className="w-12 h-12 mx-auto mb-3 text-muted opacity-50" />
-            <p className="text-muted">Keine Chats gefunden</p>
-            <p className="text-muted text-sm mt-2">Versuche einen anderen Suchbegriff</p>
+            {searchTerm ? (
+              <>
+                <Search className="w-12 h-12 mx-auto mb-3 text-muted opacity-50" />
+                <p className="text-muted">Keine Chats gefunden</p>
+                <p className="text-muted text-sm mt-2">Versuche einen anderen Suchbegriff</p>
+              </>
+            ) : activeTab === 'unread' ? (
+              <>
+                <svg className="w-12 h-12 mx-auto mb-3 text-muted opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-muted">Keine ungelesenen Chats</p>
+                <p className="text-muted text-sm mt-2">Alle Nachrichten wurden gelesen</p>
+              </>
+            ) : activeTab === 'favorites' ? (
+              <>
+                <Star className="w-12 h-12 mx-auto mb-3 text-muted opacity-50" />
+                <p className="text-muted">Keine Favoriten</p>
+                <p className="text-muted text-sm mt-2">Markiere Chats mit dem Stern als Favoriten</p>
+              </>
+            ) : null}
           </div>
         ) : (
           <div>
@@ -132,7 +225,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 onClick={() => onSelectConversation(conv.id)}
                 className={`px-4 py-3 cursor-pointer transition-all duration-200 relative hover:bg-page-secondary ${
                   selectedId === conv.id
-                    ? 'bg-page-secondary border-l-2 border-primary'
+                    ? 'bg-page-secondary'
                     : ''
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
@@ -159,7 +252,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                       }`}>
                         {conv.otherUserName}
                       </h3>
-                      <span className="text-xs text-muted ml-2 flex-shrink-0">
+                      <span className="text-xs text-muted">
                         vor 5 Min
                       </span>
                     </div>
