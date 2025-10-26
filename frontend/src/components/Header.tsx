@@ -5,7 +5,7 @@ import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useState, useEffect } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Star, HelpCircle } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -135,8 +135,32 @@ export default function Header() {
               className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
             >
               <Home size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">Home</span>
+              <span className="text-xl font-medium">{t('home')}</span>
             </Link>
+
+            {isAuthenticated && (
+              <>
+                <button
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                >
+                  <Bell size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('notifications')}</span>
+                </button>
+                <Link
+                  href="/chat"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors relative"
+                >
+                  <MessageCircle size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('messages')}</span>
+                  {totalUnreadCount > 0 && (
+                    <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                    </span>
+                  )}
+                </Link>
+              </>
+            )}
+
             <Link
               href="/escorts"
               className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
@@ -162,37 +186,12 @@ export default function Header() {
               href="/premium"
               className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
             >
-              <Star size={26} className="flex-shrink-0" />
+              <Sparkles size={26} className="flex-shrink-0" />
               <span className="text-xl font-medium">{t('premium')}</span>
-            </Link>
-            <Link
-              href="/faq"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
-            >
-              <HelpCircle size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('faq')}</span>
             </Link>
 
             {isAuthenticated && (
               <>
-                <Link
-                  href="/chat"
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors relative"
-                >
-                  <MessageCircle size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">Nachrichten</span>
-                  {totalUnreadCount > 0 && (
-                    <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                      {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-                    </span>
-                  )}
-                </Link>
-                <button
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
-                >
-                  <Bell size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">Benachrichtigungen</span>
-                </button>
                 <Link
                   href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
                   className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
@@ -281,6 +280,13 @@ export default function Header() {
             {/* Navigation Links */}
             <nav className="space-y-1">
               <Link
+                href="/"
+                onClick={closeMobileMenu}
+                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+              >
+                {t('home')}
+              </Link>
+              <Link
                 href="/escorts"
                 onClick={closeMobileMenu}
                 className="block px-4 py-3 link-secondary rounded-lg font-medium"
@@ -307,13 +313,6 @@ export default function Header() {
                 className="block px-4 py-3 link-secondary rounded-lg font-medium"
               >
                 {t('premium')}
-              </Link>
-              <Link
-                href="/faq"
-                onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
-              >
-                {t('faq')}
               </Link>
             </nav>
 
@@ -349,7 +348,7 @@ export default function Header() {
                     className="w-full flex items-center space-x-3 px-4 py-3 link-secondary cursor-pointer"
                   >
                     <Bell size={18} className="text-[#71767b]" />
-                    <span>Benachrichtigungen</span>
+                    <span>{t('notifications')}</span>
                   </button>
 
                   {/* Messages Link */}
@@ -360,7 +359,7 @@ export default function Header() {
                   >
                     <div className="flex items-center space-x-3">
                       <MessageCircle size={18} className="text-[#71767b]" />
-                      <span>Nachrichten</span>
+                      <span>{t('messages')}</span>
                     </div>
                     {totalUnreadCount > 0 && (
                       <span className="min-w-[20px] h-[20px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">

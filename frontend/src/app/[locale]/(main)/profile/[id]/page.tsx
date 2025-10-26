@@ -490,77 +490,94 @@ export default function ProfilePage() {
   const age = calculateAge(escort.birthDate);
 
   return (
-    <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-        {/* Navigation Bar */}
-        <div className="flex items-center justify-between mb-4">
-          {/* Back Button */}
-          <button
-            onClick={handleBackClick}
-            className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-            style={{ color: 'var(--color-primary)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Zurück</span>
-          </button>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-6">
-            {/* Bookmark - Only visible for customers */}
-            {user && user.role === 'customer' && (
+    <>
+      {/* Fixed Header */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50
+      }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+          <div className="lg:ml-[280px]" style={{
+            background: 'var(--background-primary)',
+            border: '3px solid blue'
+          }}>
+            <div className="flex items-center justify-between py-4">
+              {/* Back Button */}
               <button
-                onClick={handleBookmarkClick}
-                disabled={bookmarkLoading}
-                className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ color: 'var(--color-primary)' }}
-                onMouseEnter={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-                onMouseLeave={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--color-primary)')}
+                onClick={handleBackClick}
+                className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                style={{ color: 'var(--text-heading)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
               >
-                <Bookmark
-                  className="w-5 h-5"
-                  fill={isBookmarked ? 'currentColor' : 'none'}
-                />
-                <span className="hidden sm:inline">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
+                <ArrowLeft className="w-5 h-5" />
+                <span>Zurück</span>
               </button>
-            )}
 
-            {/* Share */}
-            <button
-              onClick={handleShareClick}
-              className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-              style={{ color: 'var(--color-primary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-            >
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-              </svg>
-              <span className="hidden sm:inline">Teilen</span>
-            </button>
+              {/* Action Buttons */}
+              <div className="flex items-center gap-6">
+                {/* Bookmark - Only visible for customers */}
+                {user && user.role === 'customer' && (
+                  <button
+                    onClick={handleBookmarkClick}
+                    disabled={bookmarkLoading}
+                    className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ color: 'var(--text-heading)' }}
+                    onMouseEnter={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                    onMouseLeave={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading)')}
+                  >
+                    <Bookmark
+                      className="w-5 h-5"
+                      fill={isBookmarked ? 'currentColor' : 'none'}
+                    />
+                    <span className="hidden sm:inline">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
+                  </button>
+                )}
 
-            {/* Report */}
-            <button
-              className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-              style={{ color: 'var(--color-primary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-            >
-              <Flag className="w-5 h-5" />
-              <span className="hidden sm:inline">Melden</span>
-            </button>
+                {/* Share */}
+                <button
+                  onClick={handleShareClick}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                  </svg>
+                  <span className="hidden sm:inline">Teilen</span>
+                </button>
+
+                {/* Report */}
+                <button
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
+                >
+                  <Flag className="w-5 h-5" />
+                  <span className="hidden sm:inline">Melden</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      </header>
+
+      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
 
         {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch" style={{ paddingTop: '60px' }}>
           {/* Photo Gallery - 2/3 width */}
           <div className="lg:col-span-2 flex flex-col">
             <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
@@ -1637,7 +1654,8 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 }
