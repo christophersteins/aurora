@@ -5,7 +5,7 @@ import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useState, useEffect } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Star, HelpCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -93,107 +93,22 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-40">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      {/* Mobile Header - Top */}
+      <header className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-40">
+        <div className="mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-16">
-            {/* Logo + Desktop Navigation - Links */}
-            <div className="flex items-center space-x-12">
-              {/* Logo */}
-              <Link href="/" className="flex items-center">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
-                  <span className="text-[#0f1419] font-bold text-xl">A</span>
-                </div>
-                <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
-              </Link>
-
-              {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link
-                  href="/escorts"
-                  className="link-secondary"
-                >
-                  {t('members')}
-                </Link>
-                <Link
-                  href="/clubs"
-                  className="link-secondary"
-                >
-                  {t('clubsAndCo')}
-                </Link>
-                <Link
-                  href="/videos"
-                  className="link-secondary"
-                >
-                  {t('videos')}
-                </Link>
-                <Link
-                  href="/premium"
-                  className="link-secondary"
-                >
-                  {t('premium')}
-                </Link>
-                <Link
-                  href="/faq"
-                  className="link-secondary"
-                >
-                  {t('faq')}
-                </Link>
-              </nav>
-            </div>
-
-            {/* Desktop Buttons - Rechts */}
-            <div className="hidden md:flex items-center space-x-3">
-              {!isAuthenticated ? (
-                <>
-                  <LanguageSwitcher />
-                  <button
-                    onClick={openLoginModal}
-                    className="btn-base btn-secondary !py-2 !px-4 text-sm"
-                  >
-                    {t('login')}
-                  </button>
-                  <button
-                    onClick={openRegisterModal}
-                    className="btn-base btn-primary !py-2 !px-4 text-sm"
-                  >
-                    {t('register')}
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* Notifications Icon */}
-                  <button
-                    className="p-2 link-secondary relative cursor-pointer"
-                    aria-label="Benachrichtigungen"
-                  >
-                    <Bell size={20} />
-                    {/* Badge für ungelesene Benachrichtigungen (optional später) */}
-                    {/* <span className="absolute top-1 right-1 w-2 h-2 bg-[#8b5cf6] rounded-full"></span> */}
-                  </button>
-
-                  {/* Messages Icon */}
-                  <Link
-                    href="/chat"
-                    className="p-2 link-secondary relative"
-                    aria-label="Nachrichten"
-                  >
-                    <MessageCircle size={20} />
-                    {totalUnreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  <UserMenu />
-                </>
-              )}
-            </div>
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
+                <span className="text-[#0f1419] font-bold text-xl">A</span>
+              </div>
+              <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
+            </Link>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer"
+              className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer"
               aria-label="Menu"
             >
               {mobileMenuOpen ? <X size={24} /> : <AlignJustify size={24} />}
@@ -201,6 +116,133 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      {/* Desktop Sidebar - Left */}
+      <aside className="hidden lg:flex fixed top-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-r border-[#2f3336] z-40 flex-col" style={{ left: 'var(--sidebar-offset, 0px)', border: '3px solid green' }}>
+        <div className="flex-1 flex flex-col py-4 px-3">
+          {/* Logo */}
+          <Link href="/" className="flex items-center px-4 mb-8">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
+              <span className="text-[#0f1419] font-bold text-xl">A</span>
+            </div>
+            <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
+          </Link>
+
+          {/* Navigation */}
+          <nav className="flex-1 space-y-1">
+            <Link
+              href="/"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <Home size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">Home</span>
+            </Link>
+            <Link
+              href="/escorts"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <Users size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">{t('members')}</span>
+            </Link>
+            <Link
+              href="/clubs"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <Building2 size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">{t('clubsAndCo')}</span>
+            </Link>
+            <Link
+              href="/videos"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <Video size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">{t('videos')}</span>
+            </Link>
+            <Link
+              href="/premium"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <Star size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">{t('premium')}</span>
+            </Link>
+            <Link
+              href="/faq"
+              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+            >
+              <HelpCircle size={26} className="flex-shrink-0" />
+              <span className="text-xl font-medium">{t('faq')}</span>
+            </Link>
+
+            {isAuthenticated && (
+              <>
+                <Link
+                  href="/chat"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors relative"
+                >
+                  <MessageCircle size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">Nachrichten</span>
+                  {totalUnreadCount > 0 && (
+                    <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                    </span>
+                  )}
+                </Link>
+                <button
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                >
+                  <Bell size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">Benachrichtigungen</span>
+                </button>
+                <Link
+                  href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+                >
+                  <User size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('myProfile')}</span>
+                </Link>
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+                >
+                  <Settings size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('settings')}</span>
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {/* Bottom Section */}
+          <div className="mt-auto pt-4 border-t border-[#2f3336] space-y-2">
+            {!isAuthenticated ? (
+              <>
+                <button
+                  onClick={openLoginModal}
+                  className="w-full btn-base btn-secondary !py-3 text-base cursor-pointer"
+                >
+                  {t('login')}
+                </button>
+                <button
+                  onClick={openRegisterModal}
+                  className="w-full btn-base btn-primary !py-3 text-base cursor-pointer"
+                >
+                  {t('register')}
+                </button>
+                <LanguageSwitcher />
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleLogoutClick}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                >
+                  <LogOut size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('logout')}</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </aside>
 
       {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (

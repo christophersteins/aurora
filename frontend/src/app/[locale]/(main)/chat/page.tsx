@@ -101,7 +101,7 @@ export default function ChatPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-page-primary">
+      <div className="flex h-[calc(100vh-64px)] lg:h-screen items-center justify-center bg-page-primary">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted text-lg">Lade Konversationen...</p>
@@ -112,7 +112,7 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="flex bg-page-primary overflow-hidden justify-center" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="flex bg-page-primary overflow-hidden justify-center h-[calc(100vh-64px)] lg:h-screen">
         <div className="flex w-full mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
           {/* Conversation List - Hidden on mobile when chat is selected */}
           <div className={`${selectedConversationId ? 'hidden md:block' : 'block'} w-full md:w-80 flex-shrink-0`}>

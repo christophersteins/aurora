@@ -176,6 +176,10 @@ export default function MembersPage() {
   // Mobile sort dropdown state
   const [showMobileSortDropdown, setShowMobileSortDropdown] = useState(false);
 
+  // Track if toolbar is stuck/fixed
+  const [isToolbarStuck, setIsToolbarStuck] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
   // Track initial mount to prevent saving on first render
   const isInitialMount = useRef(true);
 
@@ -397,6 +401,33 @@ export default function MembersPage() {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Detect when toolbar becomes stuck/fixed
+  useEffect(() => {
+    if (!toolbarRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsToolbarStuck(!entry.isIntersecting);
+      },
+      { threshold: [1], rootMargin: '-1px 0px 0px 0px' }
+    );
+
+    const sentinelEl = document.createElement('div');
+    sentinelEl.style.position = 'absolute';
+    sentinelEl.style.top = '0';
+    sentinelEl.style.height = '1px';
+    sentinelEl.style.width = '100%';
+    sentinelEl.style.pointerEvents = 'none';
+
+    toolbarRef.current.parentElement?.insertBefore(sentinelEl, toolbarRef.current);
+    observer.observe(sentinelEl);
+
+    return () => {
+      observer.disconnect();
+      sentinelEl.remove();
+    };
   }, []);
 
   // Fetch location suggestions from Nominatim
@@ -875,8 +906,13 @@ export default function MembersPage() {
           <h1 className="text-4xl text-heading">{t('title')}</h1>
         </div>
 
-        {/* Toolbar */}
-        <div className="mb-6">
+        {/* Toolbar - Sticky on scroll */}
+        <div
+          ref={toolbarRef}
+          className={`mb-6 sticky top-0 z-30 bg-[#000000]/80 backdrop-blur-md transition-all duration-300 px-4 py-4 -mx-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 ${
+            isToolbarStuck ? 'border-b border-default shadow-md' : ''
+          }`}
+        >
           {/* Mobile Layout (Smartphone) */}
           <div className="block lg:hidden space-y-4">
             {/* First Row: Location Search + Radius */}
