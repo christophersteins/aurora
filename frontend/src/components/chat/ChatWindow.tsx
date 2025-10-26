@@ -10,6 +10,7 @@ import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
+import { ProfilePreviewModal } from './ProfilePreviewModal';
 
 interface Message {
   id: string;
@@ -53,6 +54,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [searchTerm, setSearchTerm] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -368,7 +370,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         <div className="p-4 border-b border-default bg-page-primary">
           <div className="flex items-center gap-3">
             {/* Profilbild */}
-            <div className="relative flex-shrink-0">
+            <div
+              className="relative flex-shrink-0 cursor-pointer"
+              onClick={() => setIsProfileModalOpen(true)}
+              title="Profil anzeigen"
+            >
               <ProfileAvatar
                 profilePicture={conversation?.otherUserProfilePicture}
                 role={conversation?.otherUserRole}
@@ -394,7 +400,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             {/* Search Button */}
             <button
               onClick={handleSearchToggle}
-              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
               title="In Chat suchen"
             >
               <Search className="w-5 h-5" />
@@ -403,7 +409,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             {/* Favorite Button */}
             <button
               onClick={handleToggleFavorite}
-              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
               title={isFavorite ? "Als Favorit entfernen" : "Als Favorit markieren"}
             >
               <Star
@@ -415,7 +421,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             <div className="relative" ref={optionsMenuRef}>
               <button
                 onClick={() => setShowOptionsMenu(!showOptionsMenu)}
-                className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all"
+                className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
                 title="Optionen"
               >
                 <MoreVertical className="w-5 h-5" />
@@ -426,7 +432,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                 <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
                   <button
                     onClick={handleReportUser}
-                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body"
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -435,7 +441,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                   </button>
                   <button
                     onClick={handleBlockUser}
-                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error"
+                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error cursor-pointer"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -484,7 +490,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                   <button
                     onClick={handlePreviousMatch}
                     disabled={matchingMessages.length === 0}
-                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     title="Vorheriger Treffer"
                   >
                     <ChevronUp className="w-4 h-4" />
@@ -492,7 +498,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                   <button
                     onClick={handleNextMatch}
                     disabled={matchingMessages.length === 0}
-                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     title="Nächster Treffer"
                   >
                     <ChevronDown className="w-4 h-4" />
@@ -583,7 +589,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={!isConnected || isLoading}
-            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title="Fotos oder Videos anhängen"
           >
             <Image className="w-5 h-5" />
@@ -605,7 +611,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               disabled={!isConnected || isLoading}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted hover:text-primary hover:bg-page-primary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted hover:text-primary hover:bg-page-primary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               title="Emoji einfügen"
             >
               <Smile className="w-5 h-5" />
@@ -617,7 +623,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             <button
               onClick={handleSendMessage}
               disabled={!isConnected || isLoading}
-              className="btn-primary p-2.5 rounded-full"
+              className="btn-primary p-2.5 rounded-full cursor-pointer"
               title="Senden"
             >
               <Send className="w-5 h-5 rotate-45" />
@@ -627,7 +633,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
         {/* Emoji Picker */}
         {showEmojiPicker && (
-          <div ref={emojiPickerRef} className="absolute bottom-20 left-4 z-50 shadow-lg">
+          <div ref={emojiPickerRef} className="absolute bottom-20 right-4 z-50 shadow-lg">
             <style jsx global>{`
               .EmojiPickerReact {
                 background-color: var(--background-secondary) !important;
@@ -663,6 +669,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           </div>
         )}
       </div>
+
+      {/* Profile Preview Modal */}
+      {conversation && (
+        <ProfilePreviewModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          userId={conversation.otherUserId}
+          username={conversation.otherUserName}
+          profilePicture={conversation.otherUserProfilePicture}
+          role={conversation.otherUserRole}
+        />
+      )}
     </div>
   );
 };

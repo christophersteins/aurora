@@ -99,9 +99,59 @@ export class UsersService {
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    return this.usersRepository.findOne({ 
-      where: { username: username.toLowerCase() } 
+    return this.usersRepository.findOne({
+      where: { username: username.toLowerCase() }
     });
+  }
+
+  async findByUsernameWithLocation(username: string): Promise<Partial<User> | null> {
+    // Use query builder to properly serialize PostGIS geometry as GeoJSON
+    const result = await this.usersRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.email',
+        'user.username',
+        'user.firstName',
+        'user.lastName',
+        'user.profilePicture',
+        'user.role',
+        'user.birthDate',
+        'user.gender',
+        'user.nationalities',
+        'user.languages',
+        'user.type',
+        'user.height',
+        'user.weight',
+        'user.bodyType',
+        'user.cupSize',
+        'user.hairColor',
+        'user.hairLength',
+        'user.eyeColor',
+        'user.intimateHair',
+        'user.hasTattoos',
+        'user.hasPiercings',
+        'user.isSmoker',
+        'user.description',
+        'user.createdAt',
+        'user.updatedAt',
+      ])
+      .addSelect('ST_AsGeoJSON(user.location)::json', 'location')
+      .where('LOWER(user.username) = :username', { username: username.toLowerCase() })
+      .getRawAndEntities();
+
+    if (!result.entities || result.entities.length === 0) {
+      return null;
+    }
+
+    // Map the raw location data to the entity
+    const entity = result.entities[0];
+    const rawLocation = result.raw[0]?.location;
+    if (rawLocation) {
+      entity.location = rawLocation;
+    }
+
+    return entity;
   }
 
   async findById(id: string): Promise<User | null> {

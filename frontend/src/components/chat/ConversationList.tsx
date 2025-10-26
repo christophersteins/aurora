@@ -105,7 +105,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
           <button
             onClick={onNewConversation}
-            className="link-primary"
+            className="link-primary cursor-pointer"
             title="Neue Nachricht"
           >
             <SquarePen className="w-5 h-5" />
@@ -145,7 +145,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 activeTab === 'all'
                   ? 'btn-primary'
                   : 'btn-secondary'
-              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              } !font-normal !py-2 !px-4 !border-0 text-sm cursor-pointer`}
               style={activeTab !== 'all' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
             >
               Alle
@@ -156,7 +156,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 activeTab === 'unread'
                   ? 'btn-primary'
                   : 'btn-secondary'
-              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              } !font-normal !py-2 !px-4 !border-0 text-sm cursor-pointer`}
               style={activeTab !== 'unread' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
             >
               Ungelesen
@@ -167,7 +167,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 activeTab === 'favorites'
                   ? 'btn-primary'
                   : 'btn-secondary'
-              } !font-normal !py-2 !px-4 !border-0 text-sm`}
+              } !font-normal !py-2 !px-4 !border-0 text-sm cursor-pointer`}
               style={activeTab !== 'favorites' ? { backgroundColor: 'var(--background-secondary)', color: 'var(--text-secondary)' } : undefined}
             >
               Favoriten
@@ -188,7 +188,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
             </div>
             <button
               onClick={onNewConversation}
-              className="px-6 py-3 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-action-primary text-button-primary rounded-full hover:bg-action-primary-hover transition-all duration-200 font-semibold hover:shadow-lg hover:shadow-primary/20 hover:scale-105 active:scale-95 cursor-pointer"
             >
               Erste Konversation starten
             </button>

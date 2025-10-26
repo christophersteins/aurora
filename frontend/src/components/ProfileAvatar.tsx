@@ -4,7 +4,7 @@ interface ProfileAvatarProps {
   profilePicture?: string | null;
   role?: string;
   username?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
 }
 
@@ -20,6 +20,7 @@ export default function ProfileAvatar({
     md: 'w-12 h-12 text-xl',
     lg: 'w-16 h-16 text-2xl',
     xl: 'w-20 h-20 text-3xl',
+    '2xl': 'w-32 h-32 text-5xl',
   };
 
   const sizeClass = sizeClasses[size];

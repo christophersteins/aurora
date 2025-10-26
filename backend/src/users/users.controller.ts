@@ -93,16 +93,14 @@ export class UsersController {
 
   @Get('username/:username')
   async getEscortByUsername(@Param('username') username: string) {
-    const user = await this.usersService.findByUsername(username.toLowerCase());
+    // Use query builder to properly serialize PostGIS geometry as GeoJSON
+    const result = await this.usersService.findByUsernameWithLocation(username.toLowerCase());
 
-    if (!user) {
+    if (!result) {
       throw new BadRequestException('User not found');
     }
 
-    // Entferne das Passwort aus der Response
-    const { password, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+    return result;
   }
 
   @Patch('location')
