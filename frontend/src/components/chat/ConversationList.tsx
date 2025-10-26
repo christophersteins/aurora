@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { SquarePen, Search, X, Star } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { SquarePen, Search, X, Star, Pin, MailOpen, Trash2 } from 'lucide-react';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
+import { chatService } from '@/services/chatService';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -50,6 +51,18 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    conversationId: string | null;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    conversationId: null,
+  });
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Filter conversations based on search term and active tab
   const filteredConversations = conversations.filter(conv => {
@@ -90,6 +103,108 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       return newSet;
     });
     // TODO: Implement API call to save favorite status
+  };
+
+  // Handle right-click on conversation
+  const handleContextMenu = (e: React.MouseEvent, conversationId: string) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      conversationId,
+    });
+  };
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+      }
+    };
+
+    if (contextMenu.visible) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [contextMenu.visible]);
+
+  // Context menu handlers
+  const handleMarkAsUnread = async () => {
+    if (!contextMenu.conversationId) return;
+
+    try {
+      await chatService.markAsUnread(contextMenu.conversationId);
+      console.log('Chat als ungelesen markiert:', contextMenu.conversationId);
+      setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+      // Refresh conversations to update UI
+      window.location.reload();
+    } catch (error) {
+      console.error('Fehler beim Markieren als ungelesen:', error);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (!contextMenu.conversationId) return;
+
+    try {
+      await chatService.togglePin(contextMenu.conversationId);
+      console.log('Chat anheften geändert');
+      setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+      // Refresh conversations to update UI
+      window.location.reload();
+    } catch (error) {
+      console.error('Fehler beim Anheften:', error);
+    }
+  };
+
+  const handleReportUser = () => {
+    if (!contextMenu.conversationId) return;
+
+    const conversation = conversations.find(c => c.id === contextMenu.conversationId);
+    console.log('Benutzer melden:', conversation?.otherUserName);
+    setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+    // TODO: Implement user reporting logic
+  };
+
+  const handleBlockUser = () => {
+    if (!contextMenu.conversationId) return;
+
+    const conversation = conversations.find(c => c.id === contextMenu.conversationId);
+    console.log('Benutzer blockieren:', conversation?.otherUserName);
+    setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+    // TODO: Implement user blocking logic
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!contextMenu.conversationId) return;
+
+    const conversation = conversations.find(c => c.id === contextMenu.conversationId);
+    const confirmed = window.confirm(`Möchtest du den Chat mit ${conversation?.otherUserName} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`);
+    if (!confirmed) return;
+
+    try {
+      await chatService.deleteConversation(contextMenu.conversationId);
+      console.log('Chat gelöscht:', contextMenu.conversationId);
+      setContextMenu({ visible: false, x: 0, y: 0, conversationId: null });
+      // Refresh conversations to update UI
+      window.location.reload();
+    } catch (error) {
+      console.error('Fehler beim Löschen des Chats:', error);
+      alert('Fehler beim Löschen des Chats');
+    }
   };
 
   // Count conversations per tab
@@ -223,6 +338,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               <div
                 key={conv.id}
                 onClick={() => onSelectConversation(conv.id)}
+                onContextMenu={(e) => handleContextMenu(e, conv.id)}
                 className={`px-4 py-3 cursor-pointer transition-all duration-200 relative hover:bg-page-secondary ${
                   selectedId === conv.id
                     ? 'bg-page-secondary'
@@ -281,6 +397,60 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           </div>
         )}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div
+          ref={contextMenuRef}
+          className="fixed w-64 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-50"
+          style={{
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+          }}
+        >
+          <button
+            onClick={handleMarkAsUnread}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <MailOpen className="w-5 h-5" />
+            <span>Als ungelesen markieren</span>
+          </button>
+          <button
+            onClick={handleTogglePin}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <Pin className={`w-5 h-5 ${conversations.find(c => c.id === contextMenu.conversationId)?.isPinned ? 'fill-current' : ''}`} />
+            <span>{conversations.find(c => c.id === contextMenu.conversationId)?.isPinned ? 'Chat loslösen' : 'Chat anheften'}</span>
+          </button>
+          <div className="border-t border-default my-1"></div>
+          <button
+            onClick={handleReportUser}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>Benutzer melden</span>
+          </button>
+          <button
+            onClick={handleBlockUser}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <span>Benutzer blockieren</span>
+          </button>
+          <div className="border-t border-default my-1"></div>
+          <button
+            onClick={handleDeleteConversation}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error cursor-pointer"
+          >
+            <Trash2 className="w-5 h-5" />
+            <span>Chat löschen</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
