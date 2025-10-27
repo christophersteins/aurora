@@ -49,7 +49,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('all');
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
@@ -80,7 +79,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
     if (activeTab === 'unread') {
       return conv.unreadCount > 0;
     } else if (activeTab === 'favorites') {
-      return favoriteIds.has(conv.id);
+      return conv.isPinned === true;
     }
 
     return true; // 'all' tab
@@ -89,20 +88,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const handleClearSearch = () => {
     setSearchTerm('');
     searchInputRef.current?.focus();
-  };
-
-  const toggleFavorite = (convId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent selecting conversation
-    setFavoriteIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(convId)) {
-        newSet.delete(convId);
-      } else {
-        newSet.add(convId);
-      }
-      return newSet;
-    });
-    // TODO: Implement API call to save favorite status
   };
 
   // Handle right-click on conversation
@@ -209,7 +194,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
 
   // Count conversations per tab
   const unreadCount = conversations.filter(conv => conv.unreadCount > 0).length;
-  const favoritesCount = conversations.filter(conv => favoriteIds.has(conv.id)).length;
+  const favoritesCount = conversations.filter(conv => conv.isPinned === true).length;
 
   return (
     <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">

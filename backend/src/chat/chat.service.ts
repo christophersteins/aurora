@@ -89,6 +89,8 @@ export class ChatService {
     content?: string,
     mediaUrl?: string,
     mediaType?: string,
+    voiceUrl?: string,
+    duration?: number,
   ): Promise<Message> {
     const message = new Message();
     message.conversationId = conversationId;
@@ -96,6 +98,8 @@ export class ChatService {
     if (content) message.content = content;
     if (mediaUrl) message.mediaUrl = mediaUrl;
     if (mediaType) message.mediaType = mediaType;
+    if (voiceUrl) message.voiceUrl = voiceUrl;
+    if (duration) message.duration = duration;
 
     return await this.messageRepository.save(message);
   }

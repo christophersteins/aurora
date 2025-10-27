@@ -109,6 +109,72 @@ export class ChatController {
     return { success: true, messages };
   }
 
+  @Post('conversations/:conversationId/voice')
+  @UseInterceptors(
+    FilesInterceptor('file', 1, {
+      storage: diskStorage({
+        destination: './uploads/voice',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(webm|ogg|mpeg|mp3|wav|m4a)$/)) {
+          return cb(new Error('Only audio files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB limit
+      },
+    }),
+  )
+  async uploadVoice(
+    @Req() req,
+    @Param('conversationId') conversationId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body('duration') duration: string,
+  ) {
+    const userId = req.user.id;
+
+    if (!files || files.length === 0) {
+      return { success: false, message: 'No file uploaded' };
+    }
+
+    const file = files[0];
+    const voiceUrl = `/uploads/voice/${file.filename}`;
+    const durationInSeconds = parseInt(duration) || 0;
+
+    const message = await this.chatService.sendMessage(
+      conversationId,
+      userId,
+      undefined,
+      undefined,
+      undefined,
+      voiceUrl,
+      durationInSeconds,
+    );
+
+    // Broadcast message via WebSocket
+    const messagePayload = {
+      id: message.id,
+      conversationId: message.conversationId,
+      senderId: message.senderId,
+      content: message.content || '',
+      voiceUrl: message.voiceUrl,
+      duration: message.duration,
+      timestamp: message.createdAt,
+    };
+
+    this.chatGateway.server.emit(`message:${conversationId}`, messagePayload);
+
+    return { success: true, message };
+  }
+
   @Get('unread-count')
   async getUnreadCount(@Req() req) {
     const userId = req.user.id;

@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2 } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
@@ -18,6 +18,8 @@ interface Message {
   content: string;
   mediaUrl?: string;
   mediaType?: string;
+  voiceUrl?: string;
+  duration?: number;
   timestamp: Date;
 }
 
@@ -34,6 +36,8 @@ interface LoadMessagesResponse {
     content: string;
     mediaUrl?: string;
     mediaType?: string;
+    voiceUrl?: string;
+    duration?: number;
     createdAt: string;
   }>;
 }
@@ -44,6 +48,8 @@ interface IncomingMessage {
   content: string;
   mediaUrl?: string;
   mediaType?: string;
+  voiceUrl?: string;
+  duration?: number;
   timestamp: string;
 }
 
@@ -62,6 +68,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [isPinned, setIsPinned] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -378,6 +388,127 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     }
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await uploadVoiceMessage(audioBlob, recordingDuration);
+
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+
+        // Reset state
+        setAudioChunks([]);
+        setRecordingDuration(0);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setAudioChunks(chunks);
+
+      // Start timer
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        setRecordingDuration(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+
+      // Store interval ID for cleanup
+      (recorder as any).intervalId = interval;
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Fehler beim Zugriff auf das Mikrofon');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      // Clear interval
+      clearInterval((mediaRecorder as any).intervalId);
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      clearInterval((mediaRecorder as any).intervalId);
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setRecordingDuration(0);
+      setAudioChunks([]);
+
+      // Stop all tracks without uploading
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const uploadVoiceMessage = async (audioBlob: Blob, duration: number) => {
+    if (!conversationId) return;
+
+    setIsUploading(true);
+
+    // Get JWT token
+    const storedAuth = localStorage.getItem('aurora-auth-storage');
+    let token = '';
+    if (storedAuth) {
+      try {
+        const parsedAuth = JSON.parse(storedAuth);
+        token = parsedAuth.state?.token || '';
+      } catch (e) {
+        console.error('Error parsing auth:', e);
+        setIsUploading(false);
+        return;
+      }
+    }
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'voice.webm');
+    formData.append('duration', duration.toString());
+
+    try {
+      const response = await fetch(`http://localhost:4000/chat/conversations/${conversationId}/voice`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      console.log('✅ Voice message uploaded:', result);
+
+      // Message will be added via WebSocket broadcast from backend
+    } catch (error) {
+      console.error('Error uploading voice message:', error);
+      alert('Fehler beim Hochladen der Sprachnachricht');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleMarkAsUnread = async () => {
     if (!conversationId) return;
 
@@ -507,6 +638,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
               title="In Chat suchen"
             >
               <Search className="w-5 h-5" />
+            </button>
+
+            {/* Favorite/Pin Button */}
+            <button
+              onClick={handleTogglePin}
+              className={`p-2 rounded-full transition-all cursor-pointer ${
+                isPinned
+                  ? 'text-yellow-500 hover:text-yellow-600 hover:bg-page-secondary'
+                  : 'text-muted hover:text-heading hover:bg-page-secondary'
+              }`}
+              title={isPinned ? 'Favorit entfernen' : 'Als Favorit markieren'}
+            >
+              <Star className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
             </button>
 
             {/* Options Menu */}
@@ -693,6 +837,25 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                     </div>
                   )}
 
+                  {/* Voice Message */}
+                  {msg.voiceUrl && (
+                    <div className="flex items-center gap-2 min-w-[250px]">
+                      <audio
+                        src={`http://localhost:4000${msg.voiceUrl}`}
+                        controls
+                        className="w-full"
+                        style={{
+                          height: '40px'
+                        }}
+                      />
+                      {msg.duration && (
+                        <span className="text-xs opacity-70 whitespace-nowrap">
+                          {formatDuration(msg.duration)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Text Content */}
                   {msg.content && (
                     <p className="break-words">
@@ -732,52 +895,89 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           </div>
         )}
 
-        <div className="flex gap-2 items-center">
-          {/* Attachment Button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={!isConnected || isLoading || isUploading}
-            className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            title="Fotos oder Videos anhängen"
-          >
-            <Image className="w-5 h-5" />
-          </button>
-
-          {/* Input Field with Emoji Button inside */}
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Nachricht eingeben..."
-              disabled={!isConnected || isLoading}
-              className="w-full pl-4 pr-11 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
-            />
-
-            {/* Emoji Button - positioned inside input field on the right */}
+        {/* Recording Status */}
+        {isRecording && (
+          <div className="mb-2 flex items-center gap-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900">
+            <div className="flex items-center gap-2 flex-1">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                {formatDuration(recordingDuration)}
+              </span>
+            </div>
             <button
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              disabled={!isConnected || isLoading}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted hover:text-primary hover:bg-page-primary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title="Emoji einfügen"
+              onClick={cancelRecording}
+              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-all cursor-pointer"
+              title="Aufnahme abbrechen"
             >
-              <Smile className="w-5 h-5" />
+              <Trash className="w-5 h-5" />
+            </button>
+            <button
+              onClick={stopRecording}
+              className="p-2 bg-red-500 text-white hover:bg-red-600 rounded-full transition-all cursor-pointer"
+              title="Aufnahme beenden und senden"
+            >
+              <StopCircle className="w-5 h-5" />
             </button>
           </div>
+        )}
 
-          {/* Send Button - Only visible when there's text */}
-          {inputValue.trim() && (
+        {!isRecording && (
+          <div className="flex gap-2 items-center">
+            {/* Attachment Button */}
             <button
-              onClick={handleSendMessage}
-              disabled={!isConnected || isLoading}
-              className="btn-primary p-2.5 rounded-full cursor-pointer"
-              title="Senden"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!isConnected || isLoading || isUploading}
+              className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              title="Fotos oder Videos anhängen"
             >
-              <Send className="w-5 h-5 rotate-45" />
+              <Image className="w-5 h-5" />
             </button>
-          )}
-        </div>
+
+            {/* Input Field with Emoji Button inside */}
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Nachricht eingeben..."
+                disabled={!isConnected || isLoading}
+                className="w-full pl-4 pr-11 py-3 border border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed bg-page-secondary text-body placeholder:text-muted transition-all"
+              />
+
+              {/* Emoji Button - positioned inside input field on the right */}
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                disabled={!isConnected || isLoading}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-muted hover:text-primary hover:bg-page-primary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                title="Emoji einfügen"
+              >
+                <Smile className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Send Button or Mic Button - Toggle based on input */}
+            {inputValue.trim() ? (
+              <button
+                onClick={handleSendMessage}
+                disabled={!isConnected || isLoading}
+                className="btn-primary p-2.5 rounded-full cursor-pointer"
+                title="Senden"
+              >
+                <Send className="w-5 h-5 rotate-45" />
+              </button>
+            ) : (
+              <button
+                onClick={startRecording}
+                disabled={!isConnected || isLoading || isUploading}
+                className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                title="Sprachnachricht aufnehmen"
+              >
+                <Mic className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Emoji Picker */}
         {showEmojiPicker && (

@@ -20,6 +20,12 @@ export class Message {
   @Column({ type: 'varchar', nullable: true })
   mediaType?: string; // 'image' or 'video'
 
+  @Column({ type: 'varchar', nullable: true })
+  voiceUrl?: string;
+
+  @Column({ type: 'integer', nullable: true })
+  duration?: number; // Duration in seconds
+
   @CreateDateColumn()
   createdAt: Date;
 
