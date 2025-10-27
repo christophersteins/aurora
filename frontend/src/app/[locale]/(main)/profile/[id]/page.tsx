@@ -482,7 +482,7 @@ export default function ProfilePage() {
   const age = calculateAge(escort.birthDate);
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-2 lg:py-8">
       {/* Profile Header - Desktop/Tablet (single row) - Fixed */}
       <div className="hidden lg:block fixed top-0 left-0 right-0 z-50" style={{
         marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
@@ -586,88 +586,86 @@ export default function ProfilePage() {
 
       {/* Profile Header - Mobile (two rows) */}
           <div className="lg:hidden" style={{ marginBottom: '1.5rem' }}>
-            {/* First Row: Back Button + Username + Badges */}
+            {/* First Row: Back Button (left) + Action Icons (right) */}
             <div style={{
               background: 'var(--background-primary)',
-              border: '3px solid green',
+              border: '3px solid red',
               marginBottom: '0.5rem'
             }}>
-              <div className="flex items-center gap-4 py-3">
+              <div className="flex items-center justify-between py-3 px-4">
+                {/* Back Button - Left */}
                 <button
                   onClick={handleBackClick}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  className="flex items-center transition-colors cursor-pointer"
                   style={{ color: 'var(--text-heading)' }}
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-6 h-6" />
                 </button>
 
-                {/* Username with Badges */}
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
-                    {escort?.username || 'Unbekannt'}
-                  </h1>
-                  {/* Verified Badge */}
-                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
-                  </div>
-                  {/* Premium Badge */}
-                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
-                    backgroundColor: 'var(--color-primary)'
-                  }}>
-                    <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
-                  </div>
+                {/* Action Icons - Right */}
+                <div className="flex items-center gap-6">
+                  {/* Bookmark - Visible for all logged in users */}
+                  {user && (
+                    <button
+                      onClick={handleBookmarkClick}
+                      disabled={bookmarkLoading}
+                      className="flex items-center transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ color: 'var(--text-heading)' }}
+                    >
+                      <Bookmark
+                        className="w-6 h-6"
+                        fill={isBookmarked ? 'currentColor' : 'none'}
+                      />
+                    </button>
+                  )}
+
+                  {/* Share */}
+                  <button
+                    onClick={handleShareClick}
+                    className="flex items-center transition-colors cursor-pointer"
+                    style={{ color: 'var(--text-heading)' }}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                    </svg>
+                  </button>
+
+                  {/* Report */}
+                  <button
+                    className="flex items-center transition-colors cursor-pointer"
+                    style={{ color: 'var(--text-heading)' }}
+                  >
+                    <Flag className="w-6 h-6" />
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Second Row: Action Icons */}
+            {/* Second Row: Username + Badges (left aligned) */}
             <div style={{
               background: 'var(--background-primary)',
-              border: '3px solid red'
+              border: '3px solid green'
             }}>
-              <div className="flex items-center justify-around py-3">
-                {/* Bookmark - Visible for all logged in users */}
-                {user && (
-                  <button
-                    onClick={handleBookmarkClick}
-                    disabled={bookmarkLoading}
-                    className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: 'var(--text-heading)' }}
-                  >
-                    <Bookmark
-                      className="w-6 h-6"
-                      fill={isBookmarked ? 'currentColor' : 'none'}
-                    />
-                    <span className="text-xs">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
-                  </button>
-                )}
-
-                {/* Share */}
-                <button
-                  onClick={handleShareClick}
-                  className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer"
-                  style={{ color: 'var(--text-heading)' }}
-                >
-                  <svg
-                    className="w-6 h-6"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-                  </svg>
-                  <span className="text-xs">Teilen</span>
-                </button>
-
-                {/* Report */}
-                <button
-                  className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer"
-                  style={{ color: 'var(--text-heading)' }}
-                >
-                  <Flag className="w-6 h-6" />
-                  <span className="text-xs">Melden</span>
-                </button>
+              <div className="flex items-center gap-2 py-3">
+                <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
+                  {escort?.username || 'Unbekannt'}
+                </h1>
+                {/* Verified Badge */}
+                <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                  <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                </div>
+                {/* Premium Badge */}
+                <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
+                  backgroundColor: 'var(--color-primary)'
+                }}>
+                  <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
+                </div>
               </div>
             </div>
           </div>
@@ -676,7 +674,12 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:pt-8">
           {/* Left Column: Photo Gallery + Tabs */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)', border: '3px solid yellow' }}>
+            <div className="overflow-hidden lg:rounded-lg lg:!mx-0" style={{
+              background: 'var(--background-primary)',
+              border: '3px solid yellow',
+              marginLeft: 'calc(-1 * var(--content-padding-x))',
+              marginRight: 'calc(-1 * var(--content-padding-x))'
+            }}>
               {/* Media Tabs */}
               <div className="flex">
                 <button
