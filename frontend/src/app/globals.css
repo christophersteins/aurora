@@ -47,15 +47,25 @@
      LAYOUT
      ======================================== */
   --max-content-width: 1400px;
-  --sidebar-width: 280px;
+  --sidebar-width: 0px; /* Mobile/Tablet: no sidebar */
   --total-layout-width: 1680px; /* sidebar (280px) + content (1400px) */
-  --sidebar-offset: 0px; /* Mobile: no offset */
+  --sidebar-offset: 0px; /* Mobile/Tablet: no offset */
   --filter-sidebar-width: 24rem; /* Mobile/Tablet: fixed width */
+
+  /* Horizontal content padding - bündig mit Header/Footer */
+  --content-padding-x: 1rem; /* Mobile: 1rem (16px) - entspricht px-4 */
 
   /* ========================================
      RESPONSIVE FONT SIZES
      ======================================== */
   --font-size-base: 14px; /* Default: Mobile */
+}
+
+/* Small screens breakpoint (640px and up) - entspricht Tailwind sm: */
+@media (min-width: 640px) {
+  :root {
+    --content-padding-x: 1.5rem; /* sm: 1.5rem (24px) - entspricht px-6 */
+  }
 }
 
 /* Tablet breakpoint (768px and up) */
@@ -69,6 +79,8 @@
 @media (min-width: 1024px) {
   :root {
     --font-size-base: 15px;
+    --sidebar-width: 280px; /* Desktop: show sidebar */
+    --content-padding-x: 2rem; /* lg: 2rem (32px) - entspricht px-8 */
     /* Calculate sidebar offset to center the entire layout (sidebar + content) */
     --sidebar-offset: max(0px, calc((100vw - var(--total-layout-width)) / 2));
     /* Filter sidebar width: sidebar offset + sidebar width + content padding (2rem = px-8) */
@@ -121,6 +133,13 @@ body {
    ======================================== */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
+  color: var(--text-heading);
+}
+
+/* Subheading styles - smaller and lighter than main headings */
+.subheading {
+  font-size: 1rem;
+  font-weight: 500;
   color: var(--text-heading);
 }
 

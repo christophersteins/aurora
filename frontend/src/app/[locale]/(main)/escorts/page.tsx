@@ -900,7 +900,11 @@ export default function MembersPage() {
 
   return (
     <div className="min-h-screen py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto" style={{
+        maxWidth: 'var(--max-content-width)',
+        paddingLeft: 'var(--content-padding-x)',
+        paddingRight: 'var(--content-padding-x)'
+      }}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl text-heading">{t('title')}</h1>
@@ -909,9 +913,15 @@ export default function MembersPage() {
         {/* Toolbar - Sticky on scroll */}
         <div
           ref={toolbarRef}
-          className={`mb-6 sticky top-0 z-30 bg-[#000000]/80 backdrop-blur-md transition-all duration-300 px-4 py-4 -mx-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 ${
+          className={`mb-6 sticky top-0 z-30 bg-[#000000]/80 backdrop-blur-md transition-all duration-300 py-4 ${
             isToolbarStuck ? 'border-b border-default shadow-md' : ''
           }`}
+          style={{
+            marginLeft: 'calc(-1 * var(--content-padding-x))',
+            marginRight: 'calc(-1 * var(--content-padding-x))',
+            paddingLeft: 'var(--content-padding-x)',
+            paddingRight: 'var(--content-padding-x)'
+          }}
         >
           {/* Mobile Layout (Smartphone) */}
           <div className="block lg:hidden space-y-4">

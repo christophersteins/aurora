@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileText, MessageSquare } from 'lucide-react';
+import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileText, MessageSquare, Check } from 'lucide-react';
 import PricingDisplay from './PricingDisplay';
 import MeetingPointsDisplay from './MeetingPointsDisplay';
 
@@ -116,53 +116,49 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Service
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-              {[
-                'Girlfriend Experience',
-                'Massage',
-                'Erotische Massage',
-                'Outcall',
-                'Incall',
-                'Dinner Date',
-                'Travel Companion',
-                'Overnight',
-                'Role Play',
-              ].map((service) => (
-                <div
-                  key={service}
-                  className="group relative px-4 py-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
-                  style={{
-                    background: 'var(--background-primary)',
-                    borderColor: 'var(--color-primary)',
-                    borderWidth: '1.5px',
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                      style={{ background: 'var(--color-primary)' }}
-                    />
-                    <span
-                      className="text-sm font-medium leading-tight"
-                      style={{ color: 'var(--text-heading)' }}
-                    >
+            {/* Softcore Services */}
+            <div className="mb-8">
+              <h4 className="subheading mb-4">
+                Softcore
+              </h4>
+              <div className="space-y-2">
+                {[
+                  'Girlfriend Experience',
+                  'Massage',
+                  'Erotische Massage',
+                  'Dinner Date',
+                  'Travel Companion',
+                  'Overnight',
+                ].map((service) => (
+                  <div key={service} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
                       {service}
                     </span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                background: 'rgba(139, 92, 246, 0.05)',
-                border: '1px solid var(--color-primary)',
-              }}
-            >
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                💡 <strong>Hinweis:</strong> Alle Services werden mit höchster Diskretion und Professionalität durchgeführt.
-              </p>
+            {/* Hardcore Services */}
+            <div className="mb-6">
+              <h4 className="subheading mb-4">
+                Hardcore
+              </h4>
+              <div className="space-y-2">
+                {[
+                  'Role Play',
+                  'BDSM',
+                  'Fetish Services',
+                ].map((service) => (
+                  <div key={service} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {service}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         );
@@ -275,12 +271,12 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
             </h3>
 
             <div className="space-y-4">
-              {[1, 2, 3].map((review) => (
+              {[5, 4, 5].map((rating, index) => (
                 <div
-                  key={review}
+                  key={index}
                   className="p-4 rounded-lg border"
                   style={{
-                    background: 'var(--background-secondary)',
+                    background: 'var(--background-primary)',
                     borderColor: 'var(--border)',
                   }}
                 >
@@ -294,7 +290,10 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                           <Star
                             key={i}
                             className="w-5 h-5"
-                            style={{ color: '#fbbf24', fill: '#fbbf24' }}
+                            style={{
+                              color: i < rating ? 'var(--color-primary)' : 'var(--border)',
+                              fill: i < rating ? 'var(--color-primary)' : 'none'
+                            }}
                           />
                         ))}
                       </div>
@@ -334,53 +333,49 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Service
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-              {[
-                'Girlfriend Experience',
-                'Massage',
-                'Erotische Massage',
-                'Outcall',
-                'Incall',
-                'Dinner Date',
-                'Travel Companion',
-                'Overnight',
-                'Role Play',
-              ].map((service) => (
-                <div
-                  key={service}
-                  className="group relative px-4 py-3 rounded-xl border transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
-                  style={{
-                    background: 'var(--background-primary)',
-                    borderColor: 'var(--color-primary)',
-                    borderWidth: '1.5px',
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                      style={{ background: 'var(--color-primary)' }}
-                    />
-                    <span
-                      className="text-sm font-medium leading-tight"
-                      style={{ color: 'var(--text-heading)' }}
-                    >
+            {/* Softcore Services */}
+            <div className="mb-8">
+              <h4 className="subheading mb-4">
+                Softcore
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                {[
+                  'Girlfriend Experience',
+                  'Massage',
+                  'Erotische Massage',
+                  'Dinner Date',
+                  'Travel Companion',
+                  'Overnight',
+                ].map((service) => (
+                  <div key={service} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
                       {service}
                     </span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                background: 'rgba(139, 92, 246, 0.05)',
-                border: '1px solid var(--color-primary)',
-              }}
-            >
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                💡 <strong>Hinweis:</strong> Alle Services werden mit höchster Diskretion und Professionalität durchgeführt.
-              </p>
+            {/* Hardcore Services */}
+            <div className="mb-6">
+              <h4 className="subheading mb-4">
+                Hardcore
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+                {[
+                  'Role Play',
+                  'BDSM',
+                  'Fetish Services',
+                ].map((service) => (
+                  <div key={service} className="flex items-center gap-3">
+                    <Check className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
+                    <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
+                      {service}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -561,7 +556,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                     <Star
                       key={i}
                       className="w-5 h-5"
-                      style={{ color: '#fbbf24', fill: '#fbbf24' }}
+                      style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }}
                     />
                   ))}
                 </div>
@@ -599,7 +594,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                   key={index}
                   className="p-5 rounded-lg border"
                   style={{
-                    background: 'var(--background-secondary)',
+                    background: 'var(--background-primary)',
                     borderColor: 'var(--border)',
                   }}
                 >
@@ -613,11 +608,14 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                       </p>
                     </div>
                     <div className="flex items-center gap-0.5">
-                      {[...Array(review.rating)].map((_, i) => (
+                      {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className="w-4 h-4"
-                          style={{ color: '#fbbf24', fill: '#fbbf24' }}
+                          style={{
+                            color: i < review.rating ? 'var(--color-primary)' : 'var(--border)',
+                            fill: i < review.rating ? 'var(--color-primary)' : 'none'
+                          }}
                         />
                       ))}
                     </div>

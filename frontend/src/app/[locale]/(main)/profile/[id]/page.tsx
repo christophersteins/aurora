@@ -460,51 +460,45 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <p style={{ color: 'var(--text-secondary)' }}>Lädt...</p>
-        </div>
-      </main>
+      <div className="min-h-screen py-8">
+        <p style={{ color: 'var(--text-secondary)' }}>Lädt...</p>
+      </div>
     );
   }
 
   if (error || !escort) {
     return (
-      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-primary)', borderColor: 'var(--color-primary)' }}>
-            <p style={{ color: 'var(--color-primary)' }}>{error || 'Profile not found'}</p>
-          </div>
-          <button onClick={() => router.push('/escorts')} className="btn-base btn-primary">
-            Zurück zur Übersicht
-          </button>
+      <div className="min-h-screen py-8">
+        <div className="p-4 rounded-lg mb-4 border-depth" style={{ background: 'var(--background-primary)', borderColor: 'var(--color-primary)' }}>
+          <p style={{ color: 'var(--color-primary)' }}>{error || 'Profile not found'}</p>
         </div>
-      </main>
+        <button onClick={() => router.push('/escorts')} className="btn-base btn-primary">
+          Zurück zur Übersicht
+        </button>
+      </div>
     );
   }
 
   const age = calculateAge(escort.birthDate);
 
   return (
-    <>
-      {/* Fixed Header */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50
+    <div className="min-h-screen py-8">
+      {/* Profile Header - Desktop/Tablet (single row) - Fixed */}
+      <div className="hidden lg:block fixed top-0 left-0 right-0 z-50" style={{
+        marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
+        background: 'rgba(0, 0, 0, 0.8)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '3px solid blue',
+        borderBottom: '1px solid var(--border)'
       }}>
-        <div className="px-4 sm:px-6 lg:px-8" style={{
-          marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
-          maxWidth: 'var(--max-content-width)'
+        <div style={{
+          maxWidth: 'var(--max-content-width)',
+          paddingLeft: 'var(--content-padding-x)',
+          paddingRight: 'var(--content-padding-x)',
+          margin: '0 auto'
         }}>
-          <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-            <div style={{
-              background: 'var(--background-primary)',
-              border: '3px solid blue'
-            }}>
-              <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-4">
               {/* Back Button and Username */}
               <div className="flex items-center gap-8">
                 <button
@@ -585,18 +579,101 @@ export default function ProfilePage() {
                   <Flag className="w-5 h-5" />
                   <span className="hidden sm:inline">Melden</span>
                 </button>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      {/* Profile Header - Mobile (two rows) */}
+          <div className="lg:hidden" style={{ marginBottom: '1.5rem' }}>
+            {/* First Row: Back Button + Username + Badges */}
+            <div style={{
+              background: 'var(--background-primary)',
+              border: '3px solid green',
+              marginBottom: '0.5rem'
+            }}>
+              <div className="flex items-center gap-4 py-3">
+                <button
+                  onClick={handleBackClick}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+
+                {/* Username with Badges */}
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
+                    {escort?.username || 'Unbekannt'}
+                  </h1>
+                  {/* Verified Badge */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                  </div>
+                  {/* Premium Badge */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
+                    backgroundColor: 'var(--color-primary)'
+                  }}>
+                    <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Second Row: Action Icons */}
+            <div style={{
+              background: 'var(--background-primary)',
+              border: '3px solid red'
+            }}>
+              <div className="flex items-center justify-around py-3">
+                {/* Bookmark - Visible for all logged in users */}
+                {user && (
+                  <button
+                    onClick={handleBookmarkClick}
+                    disabled={bookmarkLoading}
+                    className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ color: 'var(--text-heading)' }}
+                  >
+                    <Bookmark
+                      className="w-6 h-6"
+                      fill={isBookmarked ? 'currentColor' : 'none'}
+                    />
+                    <span className="text-xs">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
+                  </button>
+                )}
+
+                {/* Share */}
+                <button
+                  onClick={handleShareClick}
+                  className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                  </svg>
+                  <span className="text-xs">Teilen</span>
+                </button>
+
+                {/* Report */}
+                <button
+                  className="flex flex-col items-center gap-1 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                >
+                  <Flag className="w-6 h-6" />
+                  <span className="text-xs">Melden</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </header>
 
-      <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-
-        {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '40px' }}>
+      {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:pt-8">
           {/* Left Column: Photo Gallery + Tabs */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)', border: '3px solid yellow' }}>
@@ -960,7 +1037,7 @@ export default function ProfilePage() {
 
           {/* Profile Info - 1/3 width - Sticky */}
           <div className="lg:col-span-1">
-            <div style={{ position: 'sticky', top: '90px' }}>
+            <div className="lg:sticky" style={{ top: '64px' }}>
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Rating - Centered */}
               <div className="flex flex-col items-center gap-2 py-2">
@@ -1631,8 +1708,6 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-        </div>
-      </main>
-    </>
+    </div>
   );
 }

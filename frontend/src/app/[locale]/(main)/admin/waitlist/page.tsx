@@ -210,7 +210,11 @@ export default function AdminWaitlistPage() {
 
   return (
     <div className="min-h-screen bg-bg-primary py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto" style={{
+          maxWidth: 'var(--max-content-width)',
+          paddingLeft: 'var(--content-padding-x)',
+          paddingRight: 'var(--content-padding-x)'
+        }}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-text-heading mb-2">Warteliste</h1>

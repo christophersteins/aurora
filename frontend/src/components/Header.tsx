@@ -103,8 +103,8 @@ export default function Header() {
   return (
     <>
       {/* Mobile Header - Top */}
-      <header className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-40">
-        <div className="mx-auto px-4 sm:px-6">
+      <header className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336]">
+        <div className="mx-auto" style={{ paddingLeft: 'var(--content-padding-x)', paddingRight: 'var(--content-padding-x)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center">
@@ -127,7 +127,7 @@ export default function Header() {
       </header>
 
       {/* Desktop Sidebar - Left */}
-      <aside className="hidden lg:flex fixed top-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-r border-[#2f3336] z-40 flex-col" style={{ left: 'var(--sidebar-offset, 0px)', border: '3px solid green' }}>
+      <aside className="hidden lg:flex fixed top-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-r border-[#2f3336] z-40 flex-col" style={{ left: 'var(--sidebar-offset, 0px)' }}>
         <div className="flex-1 flex flex-col py-4 px-3">
           {/* Logo */}
           <Link href="/" className="flex items-center px-4 mb-8">
