@@ -510,7 +510,7 @@ export default function ProfilePage() {
             }}>
               <div className="flex items-center justify-between py-4">
               {/* Back Button and Username */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-8">
                 <button
                   onClick={handleBackClick}
                   className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
@@ -519,7 +519,6 @@ export default function ProfilePage() {
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
                 >
                   <ArrowLeft className="w-5 h-5" />
-                  <span>Zurück</span>
                 </button>
 
                 {/* Username with Badges */}

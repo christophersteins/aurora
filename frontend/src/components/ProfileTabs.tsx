@@ -200,7 +200,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                     background: day.available
                       ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
                       : 'var(--background-secondary)',
-                    borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
+                    borderColor: 'var(--border)',
                     borderWidth: '1px',
                   }}
                 >
@@ -416,7 +416,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                     background: day.available
                       ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
                       : 'var(--background-secondary)',
-                    borderColor: day.available ? 'var(--color-primary)' : 'var(--border)',
+                    borderColor: 'var(--border)',
                     borderWidth: '1px',
                   }}
                 >
