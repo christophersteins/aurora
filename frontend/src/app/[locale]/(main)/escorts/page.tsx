@@ -1217,7 +1217,7 @@ export default function MembersPage() {
             </button>
 
             {/* Location Search Field */}
-            <div className="flex-1 max-w-md relative">
+            <div className="w-72 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
               <input
                 ref={searchInputRef}
