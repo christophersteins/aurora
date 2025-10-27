@@ -509,17 +509,36 @@ export default function ProfilePage() {
               border: '3px solid blue'
             }}>
               <div className="flex items-center justify-between py-4">
-              {/* Back Button */}
-              <button
-                onClick={handleBackClick}
-                className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-                style={{ color: 'var(--text-heading)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Zurück</span>
-              </button>
+              {/* Back Button and Username */}
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleBackClick}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  <span>Zurück</span>
+                </button>
+
+                {/* Username with Badges */}
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
+                    {escort?.username || 'Unbekannt'}
+                  </h1>
+                  {/* Verified Badge */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                  </div>
+                  {/* Premium Badge */}
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
+                    backgroundColor: 'var(--color-primary)'
+                  }}>
+                    <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
+                  </div>
+                </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-6">
@@ -582,7 +601,7 @@ export default function ProfilePage() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
 
         {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '20px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '40px' }}>
           {/* Left Column: Photo Gallery + Tabs */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)', border: '3px solid yellow' }}>
@@ -946,54 +965,11 @@ export default function ProfilePage() {
 
           {/* Profile Info - 1/3 width - Sticky */}
           <div className="lg:col-span-1">
-            <div style={{ position: 'sticky', top: '20px' }}>
+            <div style={{ position: 'sticky', top: '90px' }}>
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
-              {/* Name & Username */}
-              <div>
-                {/* Show name only if showNameInProfile is true and name exists */}
-                {escort.showNameInProfile && escort.firstName && escort.lastName ? (
-                  <>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h1 className="text-xl font-bold" style={{ color: 'var(--text-heading)' }}>
-                        {escort.firstName} {escort.lastName}
-                      </h1>
-                      {/* Verified Badge */}
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                        <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
-                      </div>
-                      {/* Premium Badge */}
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
-                        backgroundColor: 'var(--color-primary)'
-                      }}>
-                        <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
-                      </div>
-                    </div>
-                    <p className="text-base mb-2" style={{ color: 'var(--text-secondary)' }}>
-                      {escort.username}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2 mb-2">
-                      <p className="text-xl font-bold" style={{ color: 'var(--text-heading)' }}>
-                        {escort.username || 'Unbekannt'}
-                      </p>
-                      {/* Verified Badge */}
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                        <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
-                      </div>
-                      {/* Premium Badge */}
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
-                        backgroundColor: 'var(--color-primary)'
-                      }}>
-                        <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Rating - directly below username */}
-                <div className="flex items-center gap-3 mb-4">
+              {/* Rating - Centered */}
+              <div className="flex flex-col items-center gap-2 py-2">
+                <div className="flex items-center gap-2">
                   <div className="flex items-center gap-0.5">
                     <svg width="0" height="0" style={{ position: 'absolute' }}>
                       <defs>
@@ -1011,7 +987,7 @@ export default function ProfilePage() {
                     {[...Array(5)].map((_, i) => (
                       <svg
                         key={i}
-                        className="w-4 h-4"
+                        className="w-5 h-5"
                         viewBox="0 0 24 24"
                         fill={`url(#star-gradient-${i})`}
                         stroke={`url(#star-gradient-${i})`}
@@ -1023,20 +999,31 @@ export default function ProfilePage() {
                       </svg>
                     ))}
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>
+                  <span className="text-xl font-bold" style={{ color: 'var(--text-heading)' }}>
                     {averageRating.toFixed(1)}
                   </span>
-                  <button
-                    onClick={handleReviewsClick}
-                    className="text-xs transition-colors cursor-pointer"
-                    style={{ color: 'var(--text-secondary)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                  >
-                    ({reviewCount} Bewertungen)
-                  </button>
                 </div>
+                <button
+                  onClick={handleReviewsClick}
+                  className="text-sm transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {reviewCount} Bewertungen
+                </button>
+              </div>
 
+              {/* Name - Show only if showNameInProfile is true and name exists */}
+              {escort.showNameInProfile && escort.firstName && escort.lastName && (
+                <div className="text-center pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <p className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>
+                    {escort.firstName} {escort.lastName}
+                  </p>
+                </div>
+              )}
+
+              <div>
                 {/* Location and Distance */}
                 <div className="space-y-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                   {locationText && (
