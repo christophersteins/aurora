@@ -16,6 +16,8 @@ interface Message {
   id: string;
   senderId: string;
   content: string;
+  mediaUrl?: string;
+  mediaType?: string;
   timestamp: Date;
 }
 
@@ -30,6 +32,8 @@ interface LoadMessagesResponse {
     id: string;
     senderId: string;
     content: string;
+    mediaUrl?: string;
+    mediaType?: string;
     createdAt: string;
   }>;
 }
@@ -38,6 +42,8 @@ interface IncomingMessage {
   id: string;
   senderId: string;
   content: string;
+  mediaUrl?: string;
+  mediaType?: string;
   timestamp: string;
 }
 
@@ -55,6 +61,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [isPinned, setIsPinned] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -302,11 +309,68 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
     setInputValue(prev => prev + emojiData.emoji);
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files && files.length > 0) {
-      // TODO: Implement file upload logic
-      console.log('Dateien ausgewählt:', files);
+    if (!files || files.length === 0 || !conversationId) return;
+
+    setIsUploading(true);
+
+    // Get JWT token
+    const storedAuth = localStorage.getItem('aurora-auth-storage');
+    let token = '';
+    if (storedAuth) {
+      try {
+        const parsedAuth = JSON.parse(storedAuth);
+        token = parsedAuth.state?.token || '';
+      } catch (e) {
+        console.error('Error parsing auth:', e);
+        setIsUploading(false);
+        return;
+      }
+    }
+
+    // Create FormData
+    const formData = new FormData();
+    Array.from(files).forEach((file) => {
+      formData.append('files', file);
+    });
+
+    try {
+      // Upload files
+      const response = await fetch(`http://localhost:4000/chat/conversations/${conversationId}/media`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      console.log('✅ Media uploaded:', result);
+
+      // Add uploaded messages to local state immediately
+      if (result.messages && Array.isArray(result.messages)) {
+        const newMessages: Message[] = result.messages.map((msg: any) => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          content: msg.content || '',
+          mediaUrl: msg.mediaUrl,
+          mediaType: msg.mediaType,
+          timestamp: new Date(msg.createdAt),
+        }));
+
+        setMessages(prev => [...prev, ...newMessages]);
+      }
+    } catch (error) {
+      console.error('Error uploading media:', error);
+      alert('Fehler beim Hochladen der Medien');
+    } finally {
+      setIsUploading(false);
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -609,9 +673,34 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                       : 'bg-page-secondary text-body rounded-bl-md border border-default'
                   }`}
                 >
-                  <p className="break-words">
-                    {searchTerm ? highlightText(msg.content, searchTerm) : msg.content}
-                  </p>
+                  {/* Media Content */}
+                  {msg.mediaUrl && (
+                    <div className="mb-2">
+                      {msg.mediaType === 'image' ? (
+                        <img
+                          src={`http://localhost:4000${msg.mediaUrl}`}
+                          alt="Shared media"
+                          className="rounded-lg max-w-full h-auto max-h-96 object-contain cursor-pointer"
+                          onClick={() => window.open(`http://localhost:4000${msg.mediaUrl}`, '_blank')}
+                        />
+                      ) : msg.mediaType === 'video' ? (
+                        <video
+                          src={`http://localhost:4000${msg.mediaUrl}`}
+                          controls
+                          className="rounded-lg max-w-full h-auto max-h-96"
+                        />
+                      ) : null}
+                    </div>
+                  )}
+
+                  {/* Text Content */}
+                  {msg.content && (
+                    <p className="break-words">
+                      {searchTerm ? highlightText(msg.content, searchTerm) : msg.content}
+                    </p>
+                  )}
+
+                  {/* Timestamp */}
                   <span className="text-xs opacity-70 block mt-1">
                     {msg.timestamp.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -635,11 +724,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           className="hidden"
         />
 
+        {/* Upload Status */}
+        {isUploading && (
+          <div className="mb-2 flex items-center gap-2 text-sm text-primary">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+            <span>Dateien werden hochgeladen...</span>
+          </div>
+        )}
+
         <div className="flex gap-2 items-center">
           {/* Attachment Button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            disabled={!isConnected || isLoading}
+            disabled={!isConnected || isLoading || isUploading}
             className="p-2.5 text-muted hover:text-primary hover:bg-page-secondary rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title="Fotos oder Videos anhängen"
           >

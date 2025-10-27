@@ -83,12 +83,20 @@ export class ChatService {
     });
   }
 
-  async sendMessage(conversationId: string, senderId: string, content: string): Promise<Message> {
-    const message = this.messageRepository.create({
-      conversationId,
-      senderId,
-      content,
-    });
+  async sendMessage(
+    conversationId: string,
+    senderId: string,
+    content?: string,
+    mediaUrl?: string,
+    mediaType?: string,
+  ): Promise<Message> {
+    const message = new Message();
+    message.conversationId = conversationId;
+    message.senderId = senderId;
+    if (content) message.content = content;
+    if (mediaUrl) message.mediaUrl = mediaUrl;
+    if (mediaType) message.mediaType = mediaType;
+
     return await this.messageRepository.save(message);
   }
 

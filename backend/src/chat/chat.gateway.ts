@@ -44,6 +44,8 @@ export class ChatGateway {
       conversationId: savedMessage.conversationId,
       senderId: savedMessage.senderId,
       content: savedMessage.content,
+      mediaUrl: savedMessage.mediaUrl,
+      mediaType: savedMessage.mediaType,
       timestamp: savedMessage.createdAt,
     };
 

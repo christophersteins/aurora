@@ -50,6 +50,7 @@
   --sidebar-width: 280px;
   --total-layout-width: 1680px; /* sidebar (280px) + content (1400px) */
   --sidebar-offset: 0px; /* Mobile: no offset */
+  --filter-sidebar-width: 24rem; /* Mobile/Tablet: fixed width */
 
   /* ========================================
      RESPONSIVE FONT SIZES
@@ -70,6 +71,8 @@
     --font-size-base: 15px;
     /* Calculate sidebar offset to center the entire layout (sidebar + content) */
     --sidebar-offset: max(0px, calc((100vw - var(--total-layout-width)) / 2));
+    /* Filter sidebar width: sidebar offset + sidebar width + content padding (2rem = px-8) */
+    --filter-sidebar-width: calc(var(--sidebar-offset) + var(--sidebar-width) + 2rem);
   }
 }
 

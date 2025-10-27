@@ -127,10 +127,13 @@ export default function MemberFilterSidebar({
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-96 shadow-xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed top-0 left-0 h-full w-96 lg:w-auto shadow-xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        style={{ background: 'var(--background-primary)' }}
+        style={{
+          background: 'var(--background-primary)',
+          width: 'var(--filter-sidebar-width, 24rem)'
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-default sticky top-0 z-10"

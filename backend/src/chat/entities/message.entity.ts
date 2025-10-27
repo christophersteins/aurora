@@ -11,8 +11,14 @@ export class Message {
   @Column()
   senderId: string;
 
-  @Column('text')
-  content: string;
+  @Column({ type: 'text', nullable: true })
+  content?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  mediaUrl?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  mediaType?: string; // 'image' or 'video'
 
   @CreateDateColumn()
   createdAt: Date;
