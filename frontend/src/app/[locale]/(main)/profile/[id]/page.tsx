@@ -499,12 +499,16 @@ export default function ProfilePage() {
         right: 0,
         zIndex: 50
       }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <div className="lg:ml-[280px]" style={{
-            background: 'var(--background-primary)',
-            border: '3px solid blue'
-          }}>
-            <div className="flex items-center justify-between py-4">
+        <div className="px-4 sm:px-6 lg:px-8" style={{
+          marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
+          maxWidth: 'var(--max-content-width)'
+        }}>
+          <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+            <div style={{
+              background: 'var(--background-primary)',
+              border: '3px solid blue'
+            }}>
+              <div className="flex items-center justify-between py-4">
               {/* Back Button */}
               <button
                 onClick={handleBackClick}
@@ -567,6 +571,7 @@ export default function ProfilePage() {
                   <Flag className="w-5 h-5" />
                   <span className="hidden sm:inline">Melden</span>
                 </button>
+                </div>
               </div>
             </div>
           </div>
