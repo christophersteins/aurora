@@ -324,54 +324,10 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
 
   return (
     <>
-      {/* Desktop: Sidebar Navigation + Content */}
-      <div className="hidden lg:flex gap-8 rounded-lg" style={{ background: 'var(--background-primary)' }}>
-        {/* Left Sidebar: Anchor Navigation */}
-        <div className="w-48 flex-shrink-0">
-          <div className="sticky top-24 space-y-2">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
-              const Icon = tab.icon;
-
-              return (
-                <a
-                  key={tab.id}
-                  href={`#${tab.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.getElementById(tab.id);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      setActiveTab(tab.id);
-                      if (onTabChange) onTabChange(tab.id);
-                    }
-                  }}
-                  className="flex items-center gap-3 px-4 py-2 text-sm font-medium transition-colors cursor-pointer rounded-lg"
-                  style={{
-                    color: isActive ? 'var(--color-primary)' : 'var(--color-link-secondary)',
-                    background: isActive ? 'rgba(139, 92, 246, 0.1)' : 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.opacity = '0.7';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.opacity = '1';
-                    }
-                  }}
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span>{tab.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Content Area */}
-        <div className="flex-1 py-6 sm:py-8 space-y-12">
+      {/* Desktop: Content Only */}
+      <div className="hidden lg:block rounded-lg" style={{ background: 'var(--background-primary)' }}>
+        {/* Content Area */}
+        <div className="py-6 sm:py-8 space-y-12">
         {/* Service Section */}
           <div id="service" className="scroll-mt-24">
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>

@@ -303,15 +303,15 @@ export default function SettingsPage() {
                 <button
                   key={section.id}
                   onClick={() => handleTabClick(section.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group ${
+                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
                     isActive
-                      ? 'text-action-primary'
-                      : 'text-body'
+                      ? 'bg-page-secondary'
+                      : 'hover:bg-page-secondary/50'
                   }`}
                   style={{ borderRadius: 0 }}
                 >
-                  <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`} />
-                  <span className={`text-left transition-colors ${isActive ? '' : 'group-hover:text-[#b8b9bb]'}`}>{section.label}</span>
+                  <Icon className={`w-5 h-5 flex-shrink-0 transition-all ${isActive ? 'scale-105' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={`text-left transition-all ${isActive ? 'font-bold' : ''}`}>{section.label}</span>
                 </button>
               );
             })}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
@@ -17,6 +17,7 @@ import { chatService } from '@/services/chatService';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { isAuthenticated, user, token, _hasHydrated } = useAuthStore();
   const { totalUnreadCount, setTotalUnreadCount } = useChatStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,6 +26,14 @@ export default function Header() {
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const t = useTranslations('nav');
+
+  // Helper function to check if a link is active
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/' || pathname === '/de' || pathname === '/en';
+    }
+    return pathname?.includes(path);
+  };
 
   // Fetch unread count when user is authenticated
   useEffect(() => {
@@ -132,26 +141,38 @@ export default function Header() {
           <nav className="flex-1 space-y-1">
             <Link
               href="/"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-secondary'
+              }`}
             >
-              <Home size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('home')}</span>
+              <Home size={26} className="flex-shrink-0" strokeWidth={isActive('/') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/') ? 'font-bold' : 'font-medium'}`}>{t('home')}</span>
             </Link>
 
             {isAuthenticated && (
               <>
                 <button
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors w-full cursor-pointer ${
+                    isActive('/notifications')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-secondary'
+                  }`}
                 >
-                  <Bell size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">{t('notifications')}</span>
+                  <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/notifications') ? 'font-bold' : 'font-medium'}`}>{t('notifications')}</span>
                 </button>
                 <Link
                   href="/chat"
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors relative"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
+                    isActive('/chat')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-secondary'
+                  }`}
                 >
-                  <MessageCircle size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">{t('messages')}</span>
+                  <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
                   {totalUnreadCount > 0 && (
                     <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
                       {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
@@ -163,48 +184,72 @@ export default function Header() {
 
             <Link
               href="/escorts"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/escorts')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-secondary'
+              }`}
             >
-              <Users size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('members')}</span>
+              <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
             </Link>
             <Link
               href="/clubs"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/clubs')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-secondary'
+              }`}
             >
-              <Building2 size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('clubsAndCo')}</span>
+              <Building2 size={26} className="flex-shrink-0" strokeWidth={isActive('/clubs') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/clubs') ? 'font-bold' : 'font-medium'}`}>{t('clubsAndCo')}</span>
             </Link>
             <Link
               href="/videos"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/videos')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-secondary'
+              }`}
             >
-              <Video size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('videos')}</span>
+              <Video size={26} className="flex-shrink-0" strokeWidth={isActive('/videos') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/videos') ? 'font-bold' : 'font-medium'}`}>{t('videos')}</span>
             </Link>
             <Link
               href="/premium"
-              className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/premium')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-secondary'
+              }`}
             >
-              <Sparkles size={26} className="flex-shrink-0" />
-              <span className="text-xl font-medium">{t('premium')}</span>
+              <Sparkles size={26} className="flex-shrink-0" strokeWidth={isActive('/premium') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/premium') ? 'font-bold' : 'font-medium'}`}>{t('premium')}</span>
             </Link>
 
             {isAuthenticated && (
               <>
                 <Link
                   href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                    isActive('/escort-profile') || isActive('/customer-profile')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-secondary'
+                  }`}
                 >
-                  <User size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">{t('myProfile')}</span>
+                  <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/escort-profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
                 </Link>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                    isActive('/settings')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-secondary'
+                  }`}
                 >
-                  <Settings size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">{t('settings')}</span>
+                  <Settings size={26} className="flex-shrink-0" strokeWidth={isActive('/settings') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/settings') ? 'font-bold' : 'font-medium'}`}>{t('settings')}</span>
                 </Link>
               </>
             )}
@@ -282,36 +327,61 @@ export default function Header() {
               <Link
                 href="/"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive('/')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                    : 'link-secondary font-medium'
+                }`}
               >
+                <Home size={20} strokeWidth={isActive('/') ? 2.5 : 2} />
                 {t('home')}
               </Link>
               <Link
                 href="/escorts"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive('/escorts')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                    : 'link-secondary font-medium'
+                }`}
               >
+                <Users size={20} strokeWidth={isActive('/escorts') ? 2.5 : 2} />
                 {t('members')}
               </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive('/clubs')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                    : 'link-secondary font-medium'
+                }`}
               >
+                <Building2 size={20} strokeWidth={isActive('/clubs') ? 2.5 : 2} />
                 {t('clubsAndCo')}
               </Link>
               <Link
                 href="/videos"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive('/videos')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                    : 'link-secondary font-medium'
+                }`}
               >
+                <Video size={20} strokeWidth={isActive('/videos') ? 2.5 : 2} />
                 {t('videos')}
               </Link>
               <Link
                 href="/premium"
                 onClick={closeMobileMenu}
-                className="block px-4 py-3 link-secondary rounded-lg font-medium"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive('/premium')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                    : 'link-secondary font-medium'
+                }`}
               >
+                <Sparkles size={20} strokeWidth={isActive('/premium') ? 2.5 : 2} />
                 {t('premium')}
               </Link>
             </nav>
@@ -345,9 +415,13 @@ export default function Header() {
                   {/* Notifications Link */}
                   <button
                     onClick={closeMobileMenu}
-                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary cursor-pointer"
+                    className={`w-full flex items-center space-x-3 px-4 py-3 cursor-pointer rounded-lg transition-colors ${
+                      isActive('/notifications')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                        : 'link-secondary'
+                    }`}
                   >
-                    <Bell size={18} className="text-[#71767b]" />
+                    <Bell size={18} strokeWidth={isActive('/notifications') ? 2.5 : 2} />
                     <span>{t('notifications')}</span>
                   </button>
 
@@ -355,10 +429,14 @@ export default function Header() {
                   <Link
                     href="/chat"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between px-4 py-3 link-secondary"
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                      isActive('/chat')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                        : 'link-secondary'
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <MessageCircle size={18} className="text-[#71767b]" />
+                      <MessageCircle size={18} strokeWidth={isActive('/chat') ? 2.5 : 2} />
                       <span>{t('messages')}</span>
                     </div>
                     {totalUnreadCount > 0 && (
@@ -371,24 +449,32 @@ export default function Header() {
                   <Link
                     href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 link-secondary"
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive('/escort-profile') || isActive('/customer-profile')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                        : 'link-secondary'
+                    }`}
                   >
-                    <User size={18} className="text-[#71767b]" />
+                    <User size={18} strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
                     <span>{t('myProfile')}</span>
                   </Link>
                   <Link
                     href="/settings"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-3 px-4 py-3 link-secondary"
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive('/settings')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
+                        : 'link-secondary'
+                    }`}
                   >
-                    <Settings size={18} className="text-[#71767b]" />
+                    <Settings size={18} strokeWidth={isActive('/settings') ? 2.5 : 2} />
                     <span>{t('settings')}</span>
                   </Link>
                   <button
                     onClick={handleLogoutClick}
-                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary"
+                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary rounded-lg transition-colors"
                   >
-                    <LogOut size={18} className="text-[#71767b]" />
+                    <LogOut size={18} />
                     <span>{t('logout')}</span>
                   </button>
                 </>
