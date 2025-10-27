@@ -1456,13 +1456,16 @@ export default function MembersPage() {
 
                   {/* Information */}
                   <div className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <h3 className="text-base font-normal text-body">
+                    <div className="flex items-center gap-2 mb-3 min-w-0">
+                      <h3 className="text-base font-normal text-body truncate">
                         {escort.username || t('unknown')}
                       </h3>
-                      <div className="flex items-center justify-center w-4 h-4 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                        <Check className="w-2.5 h-2.5" style={{ color: 'var(--text-button)', strokeWidth: 3 }} />
-                      </div>
+                      {/* Verified Badge - only show if verified */}
+                      {escort.isVerified && (
+                        <div className="flex items-center justify-center w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                          <Check className="w-2.5 h-2.5" style={{ color: 'var(--text-button)', strokeWidth: 3 }} />
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-muted">
