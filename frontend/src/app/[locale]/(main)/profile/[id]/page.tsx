@@ -581,10 +581,10 @@ export default function ProfilePage() {
       <main className="min-h-screen py-8" style={{ background: 'var(--background-primary)' }}>
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
 
-        {/* Main Profile Layout: Gallery (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:items-stretch" style={{ paddingTop: '60px' }}>
-          {/* Photo Gallery - 2/3 width */}
-          <div className="lg:col-span-2 flex flex-col">
+        {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '60px' }}>
+          {/* Left Column: Photo Gallery + Tabs */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
             <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
               {/* Media Tabs */}
               <div className="flex">
@@ -937,11 +937,17 @@ export default function ProfilePage() {
               )}
               </div>
             </div>
+
+            {/* Profile Tabs Section */}
+            <div ref={tabsContainerRef}>
+              <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
+            </div>
           </div>
 
-          {/* Profile Info - 1/3 width */}
+          {/* Profile Info - 1/3 width - Sticky */}
           <div className="lg:col-span-1">
-            <div className="rounded-lg p-6 border-depth space-y-6 lg:h-[600px]" style={{ background: 'var(--background-primary)' }}>
+            <div style={{ position: 'sticky', top: '80px' }}>
+            <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
                 {/* Show name only if showNameInProfile is true and name exists */}
@@ -1210,13 +1216,7 @@ export default function ProfilePage() {
               <Phone className="w-4 h-4" />
               <span className="text-sm font-medium">Telefonnummer anzeigen</span>
             </button>
-          </div>
-        </div>
-
-        {/* Profile Tabs Section - Same width as gallery (2/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2" ref={tabsContainerRef}>
-            <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
+            </div>
           </div>
         </div>
 
