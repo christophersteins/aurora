@@ -582,10 +582,10 @@ export default function ProfilePage() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
 
         {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '60px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" style={{ paddingTop: '20px' }}>
           {/* Left Column: Photo Gallery + Tabs */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)' }}>
+            <div className="rounded-lg overflow-hidden" style={{ background: 'var(--background-primary)', border: '3px solid yellow' }}>
               {/* Media Tabs */}
               <div className="flex">
                 <button
@@ -946,7 +946,7 @@ export default function ProfilePage() {
 
           {/* Profile Info - 1/3 width - Sticky */}
           <div className="lg:col-span-1">
-            <div style={{ position: 'sticky', top: '80px' }}>
+            <div style={{ position: 'sticky', top: '20px' }}>
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Name & Username */}
               <div>
