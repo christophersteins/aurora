@@ -63,7 +63,7 @@ export default function ProfilePage() {
   // Check if escort is bookmarked
   useEffect(() => {
     const checkBookmarkStatus = async () => {
-      if (!user || !escort || user.role !== 'customer' || !token) {
+      if (!user || !escort || !token) {
         return;
       }
 
@@ -430,10 +430,6 @@ export default function ProfilePage() {
       return;
     }
 
-    if (user.role !== 'customer') {
-      return;
-    }
-
     setBookmarkLoading(true);
     try {
       if (isBookmarked) {
@@ -541,8 +537,8 @@ export default function ProfilePage() {
 
               {/* Action Buttons */}
               <div className="flex items-center gap-6">
-                {/* Bookmark - Only visible for customers */}
-                {user && user.role === 'customer' && (
+                {/* Bookmark - Visible for all logged in users */}
+                {user && (
                   <button
                     onClick={handleBookmarkClick}
                     disabled={bookmarkLoading}
@@ -1163,16 +1159,14 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <button
                   onClick={handleMessageClick}
-                  className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
                 >
-                  <MessageCircle className="w-5 h-5" />
                   Nachricht schreiben
                 </button>
                 <button
                   onClick={handleDateClick}
-                  className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center"
                 >
-                  <Send className="w-5 h-5" />
                   Date vereinbaren
                 </button>
               </div>
@@ -1326,16 +1320,6 @@ export default function ProfilePage() {
                   </div>
                 );
               })}
-            </div>
-
-            {/* Button zu allen Escorts */}
-            <div className="mt-8 flex justify-center">
-              <button
-                onClick={() => router.push('/escorts')}
-                className="btn-base btn-secondary"
-              >
-                Zu allen Escorts
-              </button>
             </div>
           </div>
         )}

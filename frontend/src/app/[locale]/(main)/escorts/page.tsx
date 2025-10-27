@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
-import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star, Gem } from 'lucide-react';
+import { ListFilter, MapPin, LayoutGrid, Grid3x3, ArrowUpDown, X, Check, Crown, Search, Star, Gem, RotateCcw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { scrollPositionUtil } from '@/utils/scrollPosition';
 
@@ -932,7 +932,7 @@ export default function MembersPage() {
                   placeholder={t('searchPlaceholder')}
                   className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                 />
-                
+
                 {/* Clear or Location Icon */}
                 <button
                   onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
@@ -1011,21 +1011,35 @@ export default function MembersPage() {
               </div>
             </div>
 
-            {/* Second Row: Filter + Sort + View Switcher */}
+            {/* Second Row: Filter + Reset + Sort + View Switcher */}
             <div className="flex items-center justify-between gap-3">
-              {/* Left Side: Filter Button */}
-              <button
-                onClick={() => setFilterSidebarOpen(true)}
-                className="btn-base btn-primary flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <ListFilter className="w-5 h-5" />
-                {t('filter')}
+              {/* Left Side: Filter Button + Reset Icon */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setFilterSidebarOpen(true)}
+                  className="btn-base btn-primary flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <ListFilter className="w-5 h-5" />
+                  {t('filter')}
+                  {hasActiveFilters() && (
+                    <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: '#eff3f4', color: '#8b5cf6' }}>
+                      {t('active')}
+                    </span>
+                  )}
+                </button>
+
+                {/* Reset Filters Icon */}
                 {hasActiveFilters() && (
-                  <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: '#eff3f4', color: '#8b5cf6' }}>
-                    {t('active')}
-                  </span>
+                  <button
+                    onClick={handleResetFilters}
+                    className="p-2 rounded-lg border border-default bg-page-secondary text-muted hover:border-primary hover:text-primary transition cursor-pointer"
+                    title={t('resetFilters')}
+                    aria-label={t('resetFilters')}
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                  </button>
                 )}
-              </button>
+              </div>
 
               {/* Right Side: Sort Dropdown + View Switcher */}
               <div className="flex items-center gap-2">
@@ -1216,6 +1230,18 @@ export default function MembersPage() {
               )}
             </button>
 
+            {/* Reset Filters Icon */}
+            {hasActiveFilters() && (
+              <button
+                onClick={handleResetFilters}
+                className="p-2 rounded-lg border border-default bg-page-secondary text-muted hover:border-primary hover:text-primary transition cursor-pointer"
+                title={t('resetFilters')}
+                aria-label={t('resetFilters')}
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+            )}
+
             {/* Location Search Field */}
             <div className="w-72 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
@@ -1231,7 +1257,7 @@ export default function MembersPage() {
                 placeholder={t('desktopSearchPlaceholder')}
                 className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
               />
-              
+
               {/* Clear or Location Icon */}
               <button
                 onClick={locationSearch ? handleClearLocationSearch : handleUseCurrentLocation}
@@ -1358,18 +1384,6 @@ export default function MembersPage() {
               </button>
             </div>
           </div>
-
-          {/* Reset filters (if active) */}
-          {hasActiveFilters() && (
-            <div className="mt-3">
-              <button
-                onClick={handleResetFilters}
-                className="text-sm link-primary hover:underline cursor-pointer"
-              >
-                {t('resetAllFilters')}
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Escorts Grid */}
