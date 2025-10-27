@@ -6,7 +6,7 @@ import { escortService } from '@/services/escortService';
 import { profilePictureService } from '@/services/profilePictureService';
 import { galleryService, GalleryPhoto } from '@/services/galleryService';
 import { User } from '@/types/auth.types';
-import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag, ArrowLeft, Star, Phone, Copy, MessageCircle, Expand, Heart, MessageSquare } from 'lucide-react';
+import { Check, MapPin, Home, Gem, Circle, Clock, Bookmark, Send, Flag, ArrowLeft, Star, Phone, Copy, MessageCircle, Expand, Heart, MessageSquare, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import ProfileTabs from '@/components/ProfileTabs';
@@ -157,11 +157,19 @@ export default function ProfilePage() {
         if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
           const [escortLon, escortLat] = data.location.coordinates;
 
-          // Fetch location name
+          // Fetch location name via API route
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${escortLat}&lon=${escortLon}`
+              `/api/geocode?lat=${escortLat}&lon=${escortLon}`,
+              {
+                signal: AbortSignal.timeout(6000) // 6 second timeout
+              }
             );
+
+            if (!response.ok) {
+              throw new Error(`API error: ${response.status}`);
+            }
+
             const locationData = await response.json();
 
             const city = locationData.address?.city ||
@@ -177,6 +185,7 @@ export default function ProfilePage() {
               setLocationText('Standort verfügbar');
             }
           } catch (error) {
+            // Silently fail - location name is not critical
             console.error('Error fetching location:', error);
             setLocationText('Standort verfügbar');
           }
@@ -498,9 +507,9 @@ export default function ProfilePage() {
           paddingRight: 'var(--content-padding-x)',
           margin: '0 auto'
         }}>
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-4 gap-6">
               {/* Back Button and Username */}
-              <div className="flex items-center gap-8">
+              <div className="flex items-center gap-8 min-w-0 flex-1">
                 <button
                   onClick={handleBackClick}
                   className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
@@ -512,72 +521,47 @@ export default function ProfilePage() {
                 </button>
 
                 {/* Username with Badges */}
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
+                <div className="flex items-center gap-2 min-w-0">
+                  <h1 className="text-lg font-bold truncate" style={{ color: 'var(--text-heading)' }}>
                     {escort?.username || 'Unbekannt'}
                   </h1>
-                  {/* Verified Badge */}
-                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
-                  </div>
-                  {/* Premium Badge */}
-                  <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
-                    backgroundColor: 'var(--color-primary)'
-                  }}>
-                    <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
-                  </div>
+                  {/* Verified Badge - only show if verified */}
+                  {escort?.isVerified && (
+                    <div className="flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                      <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-6">
-                {/* Bookmark - Visible for all logged in users */}
-                {user && (
-                  <button
-                    onClick={handleBookmarkClick}
-                    disabled={bookmarkLoading}
-                    className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ color: 'var(--text-heading)' }}
-                    onMouseEnter={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading-hover)')}
-                    onMouseLeave={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading)')}
-                  >
-                    <Bookmark
-                      className="w-5 h-5"
-                      fill={isBookmarked ? 'currentColor' : 'none'}
-                    />
-                    <span className="hidden sm:inline">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
-                  </button>
-                )}
-
-                {/* Share */}
+              <div className="flex items-center gap-6 flex-shrink-0">
+                {/* Bookmark */}
                 <button
-                  onClick={handleShareClick}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  onClick={handleBookmarkClick}
+                  disabled={bookmarkLoading}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ color: 'var(--text-heading)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
+                  onMouseEnter={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                  onMouseLeave={(e) => !bookmarkLoading && (e.currentTarget.style.color = 'var(--text-heading)')}
                 >
-                  <svg
+                  <Bookmark
                     className="w-5 h-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-                  </svg>
-                  <span className="hidden sm:inline">Teilen</span>
+                    fill={isBookmarked ? 'currentColor' : 'none'}
+                  />
+                  <span className="hidden sm:inline">{isBookmarked ? 'Gemerkt' : 'Merken'}</span>
                 </button>
 
-                {/* Report */}
+                {/* Date */}
                 <button
+                  onClick={handleDateClick}
                   className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
                   style={{ color: 'var(--text-heading)' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
                 >
-                  <Flag className="w-5 h-5" />
-                  <span className="hidden sm:inline">Melden</span>
+                  <Calendar className="w-5 h-5" />
+                  <span className="hidden sm:inline">Date vereinbaren</span>
                 </button>
               </div>
             </div>
@@ -586,85 +570,62 @@ export default function ProfilePage() {
 
       {/* Profile Header - Mobile (two rows) */}
           <div className="lg:hidden" style={{ marginBottom: '1.5rem' }}>
-            {/* First Row: Back Button (left) + Action Icons (right) */}
+            {/* First Row: Back Button + Username (left) + Action Icons (right) */}
             <div style={{
               background: 'var(--background-primary)',
               border: '3px solid red',
               marginBottom: '0.5rem'
             }}>
-              <div className="flex items-center justify-between py-3 px-4">
-                {/* Back Button - Left */}
-                <button
-                  onClick={handleBackClick}
-                  className="flex items-center transition-colors cursor-pointer"
-                  style={{ color: 'var(--text-heading)' }}
-                >
-                  <ArrowLeft className="w-6 h-6" />
-                </button>
+              <div className="flex items-center justify-between py-3 lg:px-4 gap-3">
+                {/* Back Button + Username - Left */}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <button
+                    onClick={handleBackClick}
+                    className="flex items-center transition-colors cursor-pointer flex-shrink-0"
+                    style={{ color: 'var(--text-heading)' }}
+                  >
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
 
-                {/* Action Icons - Right */}
-                <div className="flex items-center gap-6">
-                  {/* Bookmark - Visible for all logged in users */}
-                  {user && (
-                    <button
-                      onClick={handleBookmarkClick}
-                      disabled={bookmarkLoading}
-                      className="flex items-center transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  <div className="flex items-center gap-2 min-w-0">
+                    <h1
+                      className="text-lg font-bold truncate"
                       style={{ color: 'var(--text-heading)' }}
                     >
-                      <Bookmark
-                        className="w-6 h-6"
-                        fill={isBookmarked ? 'currentColor' : 'none'}
-                      />
-                    </button>
-                  )}
+                      {escort?.username || 'Unbekannt'}
+                    </h1>
+                    {/* Verified Badge - only show if verified */}
+                    {escort?.isVerified && (
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                        <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-                  {/* Share */}
+                {/* Action Icons - Right */}
+                <div className="flex items-center gap-6 flex-shrink-0">
+                  {/* Bookmark */}
                   <button
-                    onClick={handleShareClick}
-                    className="flex items-center transition-colors cursor-pointer"
+                    onClick={handleBookmarkClick}
+                    disabled={bookmarkLoading}
+                    className="flex items-center transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ color: 'var(--text-heading)' }}
                   >
-                    <svg
+                    <Bookmark
                       className="w-6 h-6"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-                    </svg>
+                      fill={isBookmarked ? 'currentColor' : 'none'}
+                    />
                   </button>
 
-                  {/* Report */}
+                  {/* Date */}
                   <button
+                    onClick={handleDateClick}
                     className="flex items-center transition-colors cursor-pointer"
                     style={{ color: 'var(--text-heading)' }}
                   >
-                    <Flag className="w-6 h-6" />
+                    <Calendar className="w-6 h-6" />
                   </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Second Row: Username + Badges (left aligned) */}
-            <div style={{
-              background: 'var(--background-primary)',
-              border: '3px solid green'
-            }}>
-              <div className="flex items-center gap-2 py-3">
-                <h1 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>
-                  {escort?.username || 'Unbekannt'}
-                </h1>
-                {/* Verified Badge */}
-                <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                  <Check className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', strokeWidth: 3 }} />
-                </div>
-                {/* Premium Badge */}
-                <div className="flex items-center justify-center w-5 h-5 rounded-full" style={{
-                  backgroundColor: 'var(--color-primary)'
-                }}>
-                  <Gem className="w-3 h-3" style={{ color: 'var(--color-link-secondary)', fill: 'none', strokeWidth: 2 }} />
                 </div>
               </div>
             </div>
@@ -750,6 +711,19 @@ export default function ProfilePage() {
                     background: 'var(--background-secondary)'
                   }}
                 >
+                {/* Premium Badge - Top Right */}
+                <div
+                  className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-full"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--color-primary), #b845ed)',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
+                  <Gem className="w-4 h-4" style={{ color: '#ffffff', fill: 'none', strokeWidth: 2 }} />
+                  <span className="text-xs font-semibold text-white hidden sm:inline">Premium</span>
+                </div>
+
                 {photos.length > 0 ? (
                   <>
                     {/* Determine if current media is restricted */}
@@ -1036,6 +1010,58 @@ export default function ProfilePage() {
             <div ref={tabsContainerRef}>
               <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
             </div>
+
+            {/* Action Buttons - Mobile Only (below gallery) */}
+            <div className="lg:hidden mt-6 space-y-3">
+              <button
+                onClick={handleMessageClick}
+                className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
+              >
+                Nachricht schreiben
+              </button>
+              <button
+                onClick={handleDateClick}
+                className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center"
+              >
+                Date vereinbaren
+              </button>
+            </div>
+
+            {/* Share & Report - Below content (all devices) */}
+            <div className="mt-8 pt-6 border-t border-default">
+              <div className="flex items-center justify-center gap-8">
+                {/* Share */}
+                <button
+                  onClick={handleShareClick}
+                  className="flex flex-col items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                  </svg>
+                  <span>Teilen</span>
+                </button>
+
+                {/* Report */}
+                <button
+                  className="flex flex-col items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-secondary)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  <Flag className="w-6 h-6" />
+                  <span>Melden</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Profile Info - 1/3 width - Sticky */}
@@ -1235,8 +1261,8 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
+              {/* Action Buttons - Desktop Only */}
+              <div className="hidden lg:block space-y-3">
                 <button
                   onClick={handleMessageClick}
                   className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
