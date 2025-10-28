@@ -859,3 +859,146 @@ button[class*="rounded-full"][class*="h-6"][class*="w-11"]:hover {
 .animate-subtle-pulse {
   animation: subtlePulse 2s ease-in-out infinite;
 }
+
+
+/* ========================================
+   MOBILE BOTTOM NAV FIX
+   ======================================== */
+/* Ensure mobile bottom navigation is always visible */
+nav[class*='lg:hidden'][class*='fixed'][class*='bottom-0'] {
+  z-index: 9999 !important;
+  position: fixed !important;
+  bottom: 0 !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+/* Ensure sticky toolbar doesn't interfere with bottom nav */
+.sticky.top-0 {
+  max-height: calc(100vh - 80px) !important; /* Leave space for bottom nav */
+}
+
+/* ========================================
+   ULTIMATE MOBILE BOTTOM NAV FIX
+   ======================================== */
+@media (max-width: 1023px) {
+  /* Force bottom nav above everything */
+  body > nav.fixed.bottom-0,
+  #__next nav.fixed.bottom-0,
+  nav[class*='lg\:hidden'][class*='fixed'][class*='bottom-0'] {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important; 
+    right: 0 !important;
+    z-index: 2147483647 !important;
+    transform: translate3d(0, 0, 1000px) !important;
+    -webkit-transform: translate3d(0, 0, 1000px) !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+    will-change: transform !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Kill sticky behavior on escorts page toolbar */
+  div.sticky.top-0 {
+    position: relative !important;
+    top: auto !important;
+    z-index: 1 !important;
+  }
+}
+
+/* ========================================
+   AGGRESSIVE MOBILE NAV FIX - FINAL SOLUTION
+   ======================================== */
+
+/* Remove ALL overflow hidden from body and html on mobile */
+@media (max-width: 1023px) {
+  html, body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Force main content to not overflow */
+  main {
+    overflow: visible !important;
+    position: relative !important;
+    padding-bottom: 100px !important;
+  }
+  
+  /* Remove sticky from ALL elements except bottom nav */
+  .sticky {
+    position: relative !important;
+  }
+  
+  /* FORCE bottom nav to be visible */
+  nav[class*='hidden'][class*='fixed'][class*='bottom'],
+  nav.fixed.bottom-0,
+  .lg\:hidden.fixed.bottom-0 {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 2147483647 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    clip: auto !important;
+    clip-path: none !important;
+  }
+  
+  /* Ensure no element can cover the bottom nav */
+  * {
+    max-z-index: 9998 !important;
+  }
+  
+  nav[class*='bottom-0'] {
+    z-index: 2147483647 !important;
+  }
+}
+
+/* ========================================
+   DEFINITIVE MOBILE BOTTOM NAV FIX
+   ======================================== */
+@media (max-width: 1023px) {
+  /* Force the bottom nav to ALWAYS be on top */
+  nav.fixed.bottom-0.border-t {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 2147483647 !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateZ(999px) !important;
+  }
+  
+  /* Prevent ANY element from blocking the bottom area */
+  body {
+    padding-bottom: 80px !important;
+  }
+  
+  main {
+    padding-bottom: 80px !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* No sticky elements on mobile */
+  .sticky {
+    position: relative !important;
+  }
+}
+
+/* Extra safety - target by multiple selectors */
+.lg\:hidden.fixed.bottom-0,
+nav[class*='lg:hidden'][class*='fixed'][class*='bottom-0'],
+nav.fixed[style*='zIndex'] {
+  z-index: 2147483647 !important;
+}

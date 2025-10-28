@@ -2,6 +2,7 @@
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import { usePathname } from 'next/navigation';
 
 export default function MainLayout({
@@ -15,8 +16,14 @@ export default function MainLayout({
   return (
     <>
       <Header />
-      {/* Mobile: normal flow, Desktop: margin for sidebar */}
-      <main className="flex-1 lg:pt-0" style={{ marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))' }}>
+      {/* Mobile: normal flow with bottom padding, Desktop: margin for sidebar */}
+      <main 
+        className="flex-1 lg:pt-0 pb-20 lg:pb-0" 
+        style={{ 
+          marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
+          paddingBottom: '80px',
+        }}
+      >
         <div className="lg:pt-4" style={{
           maxWidth: 'var(--max-content-width)',
           paddingLeft: 'var(--content-padding-x)',
@@ -26,6 +33,7 @@ export default function MainLayout({
         </div>
       </main>
       {!isChatPage && <Footer />}
+      <MobileBottomNav />
     </>
   );
 }
