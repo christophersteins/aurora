@@ -572,9 +572,11 @@ export default function ProfilePage() {
             <div style={{
               background: 'var(--background-primary)',
               border: '3px solid red',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
+              paddingLeft: 'var(--header-footer-padding-x)',
+              paddingRight: 'var(--header-footer-padding-x)'
             }}>
-              <div className="flex items-center justify-between py-3 lg:px-4 gap-3">
+              <div className="flex items-center justify-between py-3 gap-3">
                 {/* Back Button + Username - Left */}
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <button
@@ -1005,12 +1007,18 @@ export default function ProfilePage() {
             </div>
 
             {/* Profile Tabs Section */}
-            <div ref={tabsContainerRef}>
+            <div ref={tabsContainerRef} className="lg:px-0" style={{
+              paddingLeft: 'var(--header-footer-padding-x)',
+              paddingRight: 'var(--header-footer-padding-x)'
+            }}>
               <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
             {/* Action Buttons - Mobile Only (below gallery) */}
-            <div className="lg:hidden mt-6 space-y-3">
+            <div className="lg:hidden mt-6 space-y-3" style={{
+              paddingLeft: 'var(--header-footer-padding-x)',
+              paddingRight: 'var(--header-footer-padding-x)'
+            }}>
               <button
                 onClick={handleMessageClick}
                 className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
@@ -1026,7 +1034,10 @@ export default function ProfilePage() {
             </div>
 
             {/* Share & Report - Below content (all devices) */}
-            <div className="mt-8 pt-6 border-t border-default">
+            <div className="mt-8 pt-6 border-t border-default lg:px-0" style={{
+              paddingLeft: 'var(--header-footer-padding-x)',
+              paddingRight: 'var(--header-footer-padding-x)'
+            }}>
               <div className="flex items-center justify-center gap-8">
                 {/* Share */}
                 <button
@@ -1063,7 +1074,10 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Info - 1/3 width - Sticky */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:px-0" style={{
+            paddingLeft: 'var(--header-footer-padding-x)',
+            paddingRight: 'var(--header-footer-padding-x)'
+          }}>
             <div className="lg:sticky" style={{ top: '64px' }}>
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Rating - Centered */}
@@ -1306,7 +1320,10 @@ export default function ProfilePage() {
 
         {/* Similar Escorts Section */}
         {similarEscorts.length > 0 && (
-          <div className="mt-8">
+          <div className="mt-8 lg:px-0" style={{
+            paddingLeft: 'var(--header-footer-padding-x)',
+            paddingRight: 'var(--header-footer-padding-x)'
+          }}>
             <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
               Weitere Escorts in deiner Nähe
             </h2>
