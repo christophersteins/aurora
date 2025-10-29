@@ -5,7 +5,7 @@ import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useUIStore } from '@/store/uiStore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -28,6 +28,7 @@ export default function Header() {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const savedScrollY = useRef(0);
   const t = useTranslations('nav');
 
   // Helper function to check if a link is active
@@ -70,36 +71,29 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Prevent scrolling when mobile menu is open
+  // Prevent scrolling when mobile menu is open and restore scroll position when closed
   useEffect(() => {
     if (mobileMenuOpen) {
       // Save current scroll position
-      const scrollY = window.scrollY;
+      savedScrollY.current = window.scrollY;
+
       // Prevent scrolling on body
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
+      document.body.style.top = `-${savedScrollY.current}px`;
       document.body.style.width = '100%';
     } else {
       // Restore scrolling
-      const scrollY = document.body.style.top;
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
-      // Restore scroll position
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
 
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-    };
+      // Restore scroll position - use requestAnimationFrame for smoother restoration
+      requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollY.current);
+      });
+    }
   }, [mobileMenuOpen]);
 
   // Fetch unread count when user is authenticated
