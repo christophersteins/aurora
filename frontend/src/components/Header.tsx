@@ -26,6 +26,8 @@ export default function Header() {
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const t = useTranslations('nav');
 
   // Helper function to check if a link is active
@@ -35,6 +37,70 @@ export default function Header() {
     }
     return pathname?.includes(path);
   };
+
+  // Handle header visibility on scroll (mobile only)
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Only apply on mobile/tablet (lg breakpoint is 1024px)
+      if (window.innerWidth >= 1024) {
+        setShowHeader(true);
+        return;
+      }
+
+      // Always show header at top of page
+      if (currentScrollY < 10) {
+        setShowHeader(true);
+        setLastScrollY(currentScrollY);
+        return;
+      }
+
+      // Show header when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY) {
+        setShowHeader(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setShowHeader(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  // Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      // Prevent scrolling on body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+    } else {
+      // Restore scrolling
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [mobileMenuOpen]);
 
   // Fetch unread count when user is authenticated
   useEffect(() => {
@@ -104,7 +170,10 @@ export default function Header() {
   return (
     <>
       {/* Mobile Header - Top */}
-      <header className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336]">
+      <header
+        className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-30 transition-transform duration-300"
+        style={{ transform: showHeader ? 'translateY(0)' : 'translateY(-100%)' }}
+      >
         <div className="mx-auto" style={{ paddingLeft: 'var(--content-padding-x)', paddingRight: 'var(--content-padding-x)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
