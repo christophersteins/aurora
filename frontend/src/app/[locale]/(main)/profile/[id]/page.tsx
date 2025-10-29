@@ -632,9 +632,11 @@ export default function ProfilePage() {
           </div>
 
       {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 lg:pt-8">
-          {/* Left Column: Photo Gallery + Tabs */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6 lg:pt-8">
+          {/* Left Column: Gallery + Tabs + Share/Report */}
+          <div className="lg:col-span-2 flex flex-col gap-6 order-1 lg:order-1">
+            {/* Photo Gallery */}
+            <div>
             <div className="overflow-hidden lg:rounded-lg lg:!mx-0" style={{
               background: 'var(--background-primary)',
               border: '3px solid yellow',
@@ -1005,6 +1007,7 @@ export default function ProfilePage() {
               )}
               </div>
             </div>
+            </div>
 
             {/* Profile Tabs Section */}
             <div ref={tabsContainerRef} className="lg:px-0" style={{
@@ -1014,26 +1017,7 @@ export default function ProfilePage() {
               <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
-            {/* Action Buttons - Mobile Only (below gallery) */}
-            <div className="lg:hidden mt-6 space-y-3" style={{
-              paddingLeft: 'var(--header-footer-padding-x)',
-              paddingRight: 'var(--header-footer-padding-x)'
-            }}>
-              <button
-                onClick={handleMessageClick}
-                className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
-              >
-                Nachricht schreiben
-              </button>
-              <button
-                onClick={handleDateClick}
-                className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center"
-              >
-                Date vereinbaren
-              </button>
-            </div>
-
-            {/* Share & Report - Below content (all devices) */}
+            {/* Share & Report - Below content */}
             <div className="mt-8 pt-6 border-t border-default lg:px-0" style={{
               paddingLeft: 'var(--header-footer-padding-x)',
               paddingRight: 'var(--header-footer-padding-x)'
@@ -1074,11 +1058,13 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Info - 1/3 width - Sticky */}
-          <div className="lg:col-span-1 lg:px-0" style={{
+          <div className="lg:col-span-1 lg:px-0 order-2 lg:order-2" style={{
             paddingLeft: 'var(--header-footer-padding-x)',
             paddingRight: 'var(--header-footer-padding-x)'
           }}>
-            <div className="lg:sticky" style={{ top: '64px' }}>
+            <div className="lg:sticky lg:top-20" style={{
+              alignSelf: 'start'
+            }}>
             <div className="rounded-lg p-6 border-depth space-y-6" style={{ background: 'var(--background-primary)' }}>
               {/* Rating - Centered */}
               <div className="flex flex-col items-center gap-2 py-2">
@@ -1273,8 +1259,8 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Action Buttons - Desktop Only */}
-              <div className="hidden lg:block space-y-3">
+              {/* Action Buttons */}
+              <div className="space-y-3">
                 <button
                   onClick={handleMessageClick}
                   className="w-full btn-base btn-primary cursor-pointer flex items-center justify-center"
@@ -1316,14 +1302,13 @@ export default function ProfilePage() {
             </button>
             </div>
           </div>
-        </div>
 
-        {/* Similar Escorts Section */}
-        {similarEscorts.length > 0 && (
-          <div className="mt-8 lg:px-0" style={{
-            paddingLeft: 'var(--header-footer-padding-x)',
-            paddingRight: 'var(--header-footer-padding-x)'
-          }}>
+          {/* Similar Escorts Section */}
+          {similarEscorts.length > 0 && (
+            <div className="lg:col-span-3 mt-8 lg:px-0 order-3 lg:order-3" style={{
+              paddingLeft: 'var(--header-footer-padding-x)',
+              paddingRight: 'var(--header-footer-padding-x)'
+            }}>
             <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
               Weitere Escorts in deiner Nähe
             </h2>
@@ -1442,8 +1427,9 @@ export default function ProfilePage() {
                 );
               })}
             </div>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {/* Fullscreen Gallery Modal */}
         {isFullscreen && (
