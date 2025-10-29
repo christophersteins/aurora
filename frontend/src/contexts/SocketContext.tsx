@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { usePathname } from 'next/navigation';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -48,6 +49,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const pathname = usePathname();
   const currentConversationIdRef = useRef<string | null>(null);
   const currentUserIdRef = useRef<string | null>(null);
+  const { setUserOnline, setUserOffline } = useOnlineStatusStore();
 
   // Get current user ID from localStorage
   useEffect(() => {
@@ -126,13 +128,26 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     });
 
+    // Listen for user online/offline events
+    socketInstance.on('user:online', (data: { userId: string; timestamp: Date }) => {
+      console.log('🟢 User came online:', data.userId);
+      setUserOnline(data.userId);
+    });
+
+    socketInstance.on('user:offline', (data: { userId: string; timestamp: Date }) => {
+      console.log('🔴 User went offline:', data.userId);
+      setUserOffline(data.userId, new Date(data.timestamp));
+    });
+
     setSocket(socketInstance);
 
     return () => {
+      socketInstance.off('user:online');
+      socketInstance.off('user:offline');
       socketInstance.offAny();
       socketInstance.disconnect();
     };
-  }, []);
+  }, [setUserOnline, setUserOffline]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

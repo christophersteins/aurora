@@ -12,12 +12,14 @@ import { de } from 'date-fns/locale';
 import ProfileTabs from '@/components/ProfileTabs';
 import { scrollPositionUtil } from '@/utils/scrollPosition';
 import { useAuthStore } from '@/store/authStore';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
 import axios from 'axios';
 
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { user, token } = useAuthStore();
+  const { getUserStatus, userStatuses } = useOnlineStatusStore();
   const [escort, setEscort] = useState<User | null>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1135,37 +1137,47 @@ export default function ProfilePage() {
 
                   {/* Online Status */}
                   <div className="flex items-center gap-2">
-                    {escort.isOnline ? (
-                      <>
-                        <Circle className="w-4 h-4" style={{ color: '#10b981', fill: '#10b981' }} />
-                        <span className="text-sm" style={{ color: 'var(--color-primary)' }}>
-                          Jetzt online
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Clock className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                          {escort.lastSeen ? (
-                            (() => {
-                              try {
-                                const lastSeenDate = new Date(escort.lastSeen);
-                                const timeAgo = formatDistanceToNow(lastSeenDate, {
-                                  addSuffix: true,
-                                  locale: de
-                                });
-                                return `Zuletzt online ${timeAgo}`;
-                              } catch (error) {
-                                console.error('Error formatting lastSeen:', error, escort.lastSeen);
-                                return 'Offline';
-                              }
-                            })()
-                          ) : (
-                            'Offline'
-                          )}
-                        </span>
-                      </>
-                    )}
+                    {(() => {
+                      // Get real-time status from store or fallback to escort data
+                      const liveStatus = getUserStatus(escort.id);
+                      const isOnline = liveStatus.lastSeen ? liveStatus.isOnline : (escort.isOnline || false);
+                      const lastSeen = liveStatus.lastSeen || (escort.lastSeen ? new Date(escort.lastSeen) : null);
+
+                      if (isOnline) {
+                        return (
+                          <>
+                            <Circle className="w-4 h-4" style={{ color: '#10b981', fill: '#10b981' }} />
+                            <span className="text-sm" style={{ color: 'var(--color-primary)' }}>
+                              Jetzt online
+                            </span>
+                          </>
+                        );
+                      } else {
+                        return (
+                          <>
+                            <Clock className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                              {lastSeen ? (
+                                (() => {
+                                  try {
+                                    const timeAgo = formatDistanceToNow(lastSeen, {
+                                      addSuffix: true,
+                                      locale: de
+                                    });
+                                    return `Zuletzt online ${timeAgo}`;
+                                  } catch (error) {
+                                    console.error('Error formatting lastSeen:', error, lastSeen);
+                                    return 'Offline';
+                                  }
+                                })()
+                              ) : (
+                                'Offline'
+                              )}
+                            </span>
+                          </>
+                        );
+                      }
+                    })()}
                   </div>
                 </div>
 

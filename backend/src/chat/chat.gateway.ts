@@ -52,6 +52,9 @@ export class ChatGateway {
         // Set user as online
         await this.usersService.setUserOnline(userId);
         console.log(`🟢 User ${userId} is now online`);
+
+        // Broadcast to all clients that this user is now online
+        this.server.emit('user:online', { userId, timestamp: new Date() });
       }
     } catch (error) {
       console.error('❌ Error handling connection:', error.message);
@@ -78,6 +81,9 @@ export class ChatGateway {
         // Set user as offline
         await this.usersService.setUserOffline(userId);
         console.log(`🔴 User ${userId} is now offline`);
+
+        // Broadcast to all clients that this user is now offline
+        this.server.emit('user:offline', { userId, timestamp: new Date() });
       }
     } catch (error) {
       console.error('❌ Error handling disconnect:', error.message);

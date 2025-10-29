@@ -8,6 +8,7 @@ import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
 import { ProfilePreviewModal } from './ProfilePreviewModal';
@@ -56,6 +57,7 @@ interface IncomingMessage {
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
   const { socket, isConnected } = useSocket();
   const { markConversationAsRead } = useChatStore();
+  const { getUserStatus } = useOnlineStatusStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -584,13 +586,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const getOnlineStatus = () => {
     if (!conversation) return '';
 
-    if (conversation.otherUserIsOnline) {
+    // Get real-time status from store
+    const liveStatus = getUserStatus(conversation.otherUserId);
+    const isOnline = liveStatus.lastSeen ? liveStatus.isOnline : (conversation.otherUserIsOnline || false);
+    const lastSeen = liveStatus.lastSeen || (conversation.otherUserLastSeen ? new Date(conversation.otherUserLastSeen) : null);
+
+    if (isOnline) {
       return 'Online';
     }
 
-    if (conversation.otherUserLastSeen) {
-      const lastSeenDate = new Date(conversation.otherUserLastSeen);
-      return `Zuletzt online ${formatDistanceToNow(lastSeenDate, { addSuffix: true, locale: de })}`;
+    if (lastSeen) {
+      return `Zuletzt online ${formatDistanceToNow(lastSeen, { addSuffix: true, locale: de })}`;
     }
 
     return 'Offline';
