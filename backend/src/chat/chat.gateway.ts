@@ -6,7 +6,9 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
 import { ChatService } from './chat.service';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
   cors: {
@@ -18,14 +20,68 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatService) {}
+  // Map to track user ID to socket ID
+  private userSocketMap = new Map<string, string>();
 
-  handleConnection(client: Socket) {
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async handleConnection(client: Socket) {
     console.log(`✅ Client connected: ${client.id}`);
+
+    try {
+      // Extract JWT token from handshake auth or query
+      const token = client.handshake.auth?.token || client.handshake.query?.token;
+
+      if (!token) {
+        console.log('⚠️ No token provided, skipping online status update');
+        return;
+      }
+
+      // Verify token and extract user ID
+      const payload = await this.jwtService.verifyAsync(token);
+      const userId = payload.sub;
+
+      if (userId) {
+        // Store the user-socket mapping
+        this.userSocketMap.set(userId, client.id);
+
+        // Set user as online
+        await this.usersService.setUserOnline(userId);
+        console.log(`🟢 User ${userId} is now online`);
+      }
+    } catch (error) {
+      console.error('❌ Error handling connection:', error.message);
+    }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     console.log(`❌ Client disconnected: ${client.id}`);
+
+    try {
+      // Find the user ID for this socket
+      let userId: string | undefined;
+      for (const [uid, socketId] of this.userSocketMap.entries()) {
+        if (socketId === client.id) {
+          userId = uid;
+          break;
+        }
+      }
+
+      if (userId) {
+        // Remove from map
+        this.userSocketMap.delete(userId);
+
+        // Set user as offline
+        await this.usersService.setUserOffline(userId);
+        console.log(`🔴 User ${userId} is now offline`);
+      }
+    } catch (error) {
+      console.error('❌ Error handling disconnect:', error.message);
+    }
   }
 
   @SubscribeMessage('sendMessage')

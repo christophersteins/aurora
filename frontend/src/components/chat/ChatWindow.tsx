@@ -590,7 +590,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
     if (conversation.otherUserLastSeen) {
       const lastSeenDate = new Date(conversation.otherUserLastSeen);
-      return `zuletzt online ${formatDistanceToNow(lastSeenDate, { addSuffix: true, locale: de })}`;
+      return `Zuletzt online ${formatDistanceToNow(lastSeenDate, { addSuffix: true, locale: de })}`;
     }
 
     return 'Offline';

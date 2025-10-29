@@ -37,6 +37,8 @@ export class UsersService {
       emailVerificationToken: userData.emailVerificationToken,
       emailVerificationExpires: userData.emailVerificationExpires,
       emailVerified: userData.emailVerified ?? false,
+      isOnline: false, // New users start offline
+      lastSeen: new Date(), // Set initial lastSeen to now
     });
 
     return this.usersRepository.save(user);
@@ -77,6 +79,8 @@ export class UsersService {
         'user.hasPiercings',
         'user.isSmoker',
         'user.description',
+        'user.isOnline',
+        'user.lastSeen',
         'user.createdAt',
         'user.updatedAt',
       ])
@@ -133,6 +137,8 @@ export class UsersService {
         'user.hasPiercings',
         'user.isSmoker',
         'user.description',
+        'user.isOnline',
+        'user.lastSeen',
         'user.createdAt',
         'user.updatedAt',
       ])
@@ -516,6 +522,11 @@ export class UsersService {
     user.emailVerified = true;
     user.emailVerificationToken = null as any;
     user.emailVerificationExpires = null as any;
+    // Set initial online status
+    if (!user.lastSeen) {
+      user.lastSeen = new Date();
+      user.isOnline = false;
+    }
 
     return this.usersRepository.save(user);
   }
@@ -654,6 +665,8 @@ export class UsersService {
         'user.hasPiercings',
         'user.isSmoker',
         'user.showNameInProfile',
+        'user.isOnline',
+        'user.lastSeen',
       ])
       .addSelect('ST_AsGeoJSON(user.location)::json', 'location')
       .where('user.role = :role', { role: UserRole.ESCORT })
@@ -841,5 +854,20 @@ export class UsersService {
       .getMany();
 
     return users;
+  }
+
+  // Online status methods
+  async setUserOnline(userId: string): Promise<void> {
+    await this.usersRepository.update(userId, {
+      isOnline: true,
+      lastSeen: new Date(),
+    });
+  }
+
+  async setUserOffline(userId: string): Promise<void> {
+    await this.usersRepository.update(userId, {
+      isOnline: false,
+      lastSeen: new Date(),
+    });
   }
 }

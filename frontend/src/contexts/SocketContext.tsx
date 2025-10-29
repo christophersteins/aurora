@@ -74,9 +74,24 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [pathname]);
 
   useEffect(() => {
+    // Get JWT token from localStorage
+    let token: string | null = null;
+    const storedAuth = localStorage.getItem('aurora-auth-storage');
+    if (storedAuth) {
+      try {
+        const parsedAuth = JSON.parse(storedAuth);
+        token = parsedAuth.state?.token || null;
+      } catch (e) {
+        console.error('Error parsing auth:', e);
+      }
+    }
+
     const socketInstance = io('http://localhost:4000', {
       transports: ['websocket', 'polling'],
       autoConnect: true,
+      auth: {
+        token: token,
+      },
     });
 
     socketInstance.on('connect', () => {

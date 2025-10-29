@@ -140,11 +140,6 @@ export default function ProfilePage() {
         const username = params.id as string;
         const data = await escortService.getEscortByUsername(username);
 
-        // Temporary: Add mock data for testing if backend doesn't provide it
-        if (!data.isOnline && !data.lastSeen) {
-          data.lastSeen = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
-        }
-
         setEscort(data);
 
         // Load gallery photos
@@ -1156,10 +1151,10 @@ export default function ProfilePage() {
                               try {
                                 const lastSeenDate = new Date(escort.lastSeen);
                                 const timeAgo = formatDistanceToNow(lastSeenDate, {
-                                  addSuffix: false,
+                                  addSuffix: true,
                                   locale: de
                                 });
-                                return `Zuletzt online vor ${timeAgo}`;
+                                return `Zuletzt online ${timeAgo}`;
                               } catch (error) {
                                 console.error('Error formatting lastSeen:', error, escort.lastSeen);
                                 return 'Offline';
