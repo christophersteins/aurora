@@ -3,7 +3,6 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
-import { useUIStore } from '@/store/uiStore';
 import { Users, Calendar, MessageCircle, Bell, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -11,7 +10,6 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isAuthenticated, user, _hasHydrated } = useAuthStore();
   const { totalUnreadCount } = useChatStore();
-  const { mobileMenuOpen } = useUIStore();
   const t = useTranslations('nav');
 
   // Helper function to check if a link is active
@@ -27,8 +25,8 @@ export default function MobileBottomNav() {
     }
   };
 
-  // Don't show if not authenticated, not hydrated, or mobile menu is open
-  if (!_hasHydrated || !isAuthenticated || mobileMenuOpen) {
+  // Don't show if not authenticated or not hydrated
+  if (!_hasHydrated || !isAuthenticated) {
     return null;
   }
 

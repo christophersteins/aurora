@@ -1016,3 +1016,17 @@ nav[class*='lg:hidden'][class*='fixed'][class*='bottom-0'],
 nav.fixed[style*='zIndex'] {
   z-index: 2147483647 !important;
 }
+
+/* ========================================
+   DESKTOP: HIDE MOBILE BOTTOM NAV
+   ======================================== */
+/* Ensure mobile bottom nav is NEVER visible on desktop (>= 1024px) */
+@media (min-width: 1024px) {
+  nav.lg\:hidden.fixed.bottom-0,
+  nav[class*='lg:hidden'][class*='fixed'][class*='bottom-0'] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
