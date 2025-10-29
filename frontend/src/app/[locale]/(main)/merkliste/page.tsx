@@ -139,7 +139,7 @@ export default function MerklistePage() {
 
   return (
     <div className="min-h-screen py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

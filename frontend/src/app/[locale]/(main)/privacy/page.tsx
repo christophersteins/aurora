@@ -7,7 +7,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen py-12">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
         <div>
           <h1 className="text-4xl font-bold text-heading mb-8">{t('title')}</h1>
 

@@ -498,10 +498,9 @@ export default function ProfilePage() {
         background: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        border: '3px solid blue',
         borderBottom: '1px solid var(--border)'
       }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{
+        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{
           maxWidth: 'var(--max-content-width)',
           margin: '0 auto'
         }}>
@@ -571,7 +570,6 @@ export default function ProfilePage() {
             {/* First Row: Back Button + Username (left) + Action Icons (right) */}
             <div style={{
               background: 'var(--background-primary)',
-              border: '3px solid red',
               marginBottom: '0.5rem',
               paddingLeft: 'var(--header-footer-padding-x)',
               paddingRight: 'var(--header-footer-padding-x)'
@@ -632,16 +630,18 @@ export default function ProfilePage() {
           </div>
 
       {/* Main Profile Layout: Gallery + Tabs (2/3) + Info (1/3) */}
-      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6 lg:pt-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-0 flex flex-col lg:grid lg:grid-cols-3 gap-6 mb-6 lg:pt-8" style={{
+        maxWidth: 'var(--max-content-width)',
+        width: '100%'
+      }}>
           {/* Left Column: Gallery + Tabs + Share/Report */}
           <div className="lg:col-span-2 flex flex-col gap-6 order-1 lg:order-1">
             {/* Photo Gallery */}
             <div>
             <div className="overflow-hidden lg:rounded-lg lg:!mx-0" style={{
               background: 'var(--background-primary)',
-              border: '3px solid yellow',
-              marginLeft: 'calc(-1 * var(--content-padding-x))',
-              marginRight: 'calc(-1 * var(--content-padding-x))'
+              marginLeft: 'calc(-1 * var(--content-padding-left))',
+              marginRight: '0'
             }}>
               {/* Media Tabs */}
               <div className="flex">
@@ -1058,10 +1058,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Profile Info - 1/3 width - Sticky */}
-          <div className="lg:col-span-1 lg:px-0 order-2 lg:order-2" style={{
-            paddingLeft: 'var(--header-footer-padding-x)',
-            paddingRight: 'var(--header-footer-padding-x)'
-          }}>
+          <div className="lg:col-span-1 px-4 sm:px-6 lg:px-0 order-2 lg:order-2">
             <div className="lg:sticky lg:top-20" style={{
               alignSelf: 'start'
             }}>
@@ -1305,10 +1302,7 @@ export default function ProfilePage() {
 
           {/* Similar Escorts Section */}
           {similarEscorts.length > 0 && (
-            <div className="lg:col-span-3 mt-8 lg:px-0 order-3 lg:order-3" style={{
-              paddingLeft: 'var(--header-footer-padding-x)',
-              paddingRight: 'var(--header-footer-padding-x)'
-            }}>
+            <div className="lg:col-span-3 mt-8 px-4 sm:px-6 lg:px-0 order-3 lg:order-3">
             <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-heading)' }}>
               Weitere Escorts in deiner Nähe
             </h2>

@@ -1,7 +1,7 @@
 export default function DesignTest() {
   return (
     <div className="min-h-screen py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 space-y-12" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-0 space-y-12" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Hero Section mit Gradient */}
         <div className="text-center space-y-4">
           <h1 className="text-6xl">

@@ -132,7 +132,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <div className="relative bg-page-primary py-20 md:py-32">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-6xl font-bold text-heading mb-6">
               Finde deine perfekte
@@ -236,7 +236,7 @@ export default function HomePage() {
 
       {/* iPhone Mockup Section */}
       <div className="py-20 bg-page-primary">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-heading mb-4">
               Entdecke Premium-Escorts
@@ -368,7 +368,7 @@ export default function HomePage() {
 
       {/* Features Section */}
       <div className="py-20 bg-page-secondary">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">

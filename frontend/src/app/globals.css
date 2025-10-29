@@ -46,14 +46,16 @@
   /* ========================================
      LAYOUT
      ======================================== */
-  --max-content-width: 1400px;
+  --max-content-width: 1100px;
   --sidebar-width: 0px; /* Mobile/Tablet: no sidebar */
-  --total-layout-width: 1680px; /* sidebar (280px) + content (1400px) */
+  --total-layout-width: 1360px; /* sidebar (260px) + content (1100px) */
   --sidebar-offset: 0px; /* Mobile/Tablet: no offset */
   --filter-sidebar-width: 24rem; /* Mobile/Tablet: fixed width */
 
   /* Horizontal content padding - Page content only */
   --content-padding-x: 0; /* Mobile/Tablet: 0 - bündig mit Header/Footer */
+  --content-padding-left: 0; /* Mobile/Tablet: 0 */
+  --content-padding-right: 0; /* Mobile/Tablet: 0 */
 
   /* Header/Footer padding - consistent across all breakpoints */
   --header-footer-padding-x: 1rem; /* Mobile: 1rem (16px) */
@@ -85,13 +87,15 @@
 @media (min-width: 1024px) {
   :root {
     --font-size-base: 15px;
-    --sidebar-width: 280px; /* Desktop: show sidebar */
-    --content-padding-x: 2rem; /* Desktop: 2rem (32px) - entspricht px-8 */
+    --sidebar-width: 260px; /* Desktop: show sidebar */
+    --content-padding-x: 0rem; /* Desktop: 0rem - kein Padding links/rechts */
+    --content-padding-left: 2rem; /* Desktop: 2rem (32px) - Abstand links */
+    --content-padding-right: 0rem; /* Desktop: 0rem - kein Abstand rechts */
     --header-footer-padding-x: 2rem; /* Desktop: 2rem (32px) */
     /* Calculate sidebar offset to center the entire layout (sidebar + content) */
     --sidebar-offset: max(0px, calc((100vw - var(--total-layout-width)) / 2));
-    /* Filter sidebar width: sidebar offset + sidebar width + content padding (2rem = px-8) */
-    --filter-sidebar-width: calc(var(--sidebar-offset) + var(--sidebar-width) + 2rem);
+    /* Filter sidebar width: sidebar offset + sidebar width + content padding left */
+    --filter-sidebar-width: calc(var(--sidebar-offset) + var(--sidebar-width) + var(--content-padding-left));
   }
 }
 
@@ -1030,3 +1034,25 @@ nav.fixed[style*='zIndex'] {
     pointer-events: none !important;
   }
 }
+
+/* ========================================
+   DESKTOP SIDEBAR: REMOVE LEFT PADDING FROM LINKS
+   ======================================== */
+@media (min-width: 1024px) {
+  /* Desktop Sidebar: Remove left padding from navigation links */
+  aside nav a,
+  aside nav button {
+    padding-left: 0 !important;
+  }
+
+  /* Logo should also have no left padding */
+  aside .flex.items-center.px-4 {
+    padding-left: 0 !important;
+  }
+
+  /* Bottom section buttons */
+  aside button.flex.items-center {
+    padding-left: 0 !important;
+  }
+}
+

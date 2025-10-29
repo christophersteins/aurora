@@ -25,9 +25,11 @@ export default function MainLayout({
         }}
       >
         <div className="lg:pt-4" style={{
+          width: '100%',
           maxWidth: 'var(--max-content-width)',
-          paddingLeft: 'var(--content-padding-x)',
-          paddingRight: 'var(--content-padding-x)'
+          paddingLeft: 'var(--content-padding-left)',
+          paddingRight: 'var(--content-padding-right)',
+          boxSizing: 'border-box'
         }}>
           {children}
         </div>

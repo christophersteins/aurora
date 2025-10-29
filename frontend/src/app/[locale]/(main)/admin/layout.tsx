@@ -52,7 +52,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-bg-primary">
       {/* Admin Navigation */}
       <nav className="bg-bg-secondary border-b border-border">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <h1 className="text-xl font-bold gradient-text">Aurora Admin</h1>
