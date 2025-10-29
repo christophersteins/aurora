@@ -493,16 +493,19 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen py-2 lg:py-8">
       {/* Profile Header - Desktop/Tablet (single row) - Fixed */}
-      <div className="hidden lg:block fixed top-0 left-0 right-0 z-50" style={{
-        marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
+      <div className="hidden lg:block fixed top-0 z-50" style={{
+        left: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px) + var(--content-padding-left, 0px))',
+        width: 'calc(var(--max-content-width, 1100px) - var(--content-padding-left, 0px))',
         background: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--border)'
+        borderRight: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-0" style={{
-          maxWidth: 'var(--max-content-width)',
-          margin: '0 auto'
+        <div style={{
+          paddingLeft: '0',
+          paddingRight: '2rem'
         }}>
             <div className="flex items-center justify-between py-4 gap-6">
               {/* Back Button and Username */}
@@ -572,7 +575,9 @@ export default function ProfilePage() {
               background: 'var(--background-primary)',
               marginBottom: '0.5rem',
               paddingLeft: 'var(--header-footer-padding-x)',
-              paddingRight: 'var(--header-footer-padding-x)'
+              paddingRight: 'var(--header-footer-padding-x)',
+              borderBottom: '1px solid var(--border)',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
             }}>
               <div className="flex items-center justify-between py-3 gap-3">
                 {/* Back Button + Username - Left */}
@@ -1010,18 +1015,12 @@ export default function ProfilePage() {
             </div>
 
             {/* Profile Tabs Section */}
-            <div ref={tabsContainerRef} className="lg:px-0" style={{
-              paddingLeft: 'var(--header-footer-padding-x)',
-              paddingRight: 'var(--header-footer-padding-x)'
-            }}>
+            <div ref={tabsContainerRef} className="px-4 sm:px-6 lg:px-0">
               <ProfileTabs escort={escort} initialTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
             {/* Share & Report - Below content */}
-            <div className="mt-8 pt-6 border-t border-default lg:px-0" style={{
-              paddingLeft: 'var(--header-footer-padding-x)',
-              paddingRight: 'var(--header-footer-padding-x)'
-            }}>
+            <div className="mt-8 pt-6 border-t border-default px-4 sm:px-6 lg:px-0">
               <div className="flex items-center justify-center gap-8">
                 {/* Share */}
                 <button
