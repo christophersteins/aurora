@@ -494,8 +494,8 @@ export default function ProfilePage() {
     <div className="min-h-screen py-2 lg:py-8">
       {/* Profile Header - Desktop/Tablet (single row) - Fixed */}
       <div className="hidden lg:block fixed top-0 z-50" style={{
-        left: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px) + var(--content-padding-left, 0px))',
-        width: 'calc(var(--max-content-width, 1100px) - var(--content-padding-left, 0px))',
+        left: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
+        width: 'var(--max-content-width, 1100px)',
         background: 'rgba(0, 0, 0, 0.8)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
@@ -504,7 +504,7 @@ export default function ProfilePage() {
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}>
         <div style={{
-          paddingLeft: '0',
+          paddingLeft: 'var(--content-padding-left)',
           paddingRight: '2rem'
         }}>
             <div className="flex items-center justify-between py-4 gap-6">
@@ -962,7 +962,7 @@ export default function ProfilePage() {
 
               {/* Thumbnail Gallery */}
               {photos.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 px-4">
+                <div className="flex gap-2 overflow-x-auto pb-2 px-4 lg:px-0">
                   {photos.map((photo, index) => {
                     const isRestricted = !user && photo.isFsk18;
                     return (

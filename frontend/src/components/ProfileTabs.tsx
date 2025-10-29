@@ -380,7 +380,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
         {/* Preise Section */}
-          <div id="preise" className="scroll-mt-24">
+          <div id="preise" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Preise
             </h3>
@@ -388,7 +388,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
         {/* Zeiten Section */}
-          <div id="zeiten" className="scroll-mt-24">
+          <div id="zeiten" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Zeiten
             </h3>
@@ -450,7 +450,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
         {/* Treffpunkte Section */}
-          <div id="treffpunkte" className="scroll-mt-24">
+          <div id="treffpunkte" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Treffpunkte
             </h3>
@@ -459,7 +459,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
         {/* Über mich Section */}
-          <div id="ueber-mich" className="scroll-mt-24">
+          <div id="ueber-mich" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Über mich
             </h3>
@@ -545,7 +545,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
         {/* Bewertungen Section */}
-          <div id="bewertungen" className="scroll-mt-24">
+          <div id="bewertungen" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold" style={{ color: 'var(--text-heading)' }}>
                 Bewertungen
@@ -694,7 +694,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
           {/* Preise Section */}
-          <div id="preise" className="scroll-mt-24">
+          <div id="preise" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Preise
             </h3>
@@ -702,7 +702,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
           {/* Zeiten Section */}
-          <div id="zeiten" className="scroll-mt-24">
+          <div id="zeiten" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Zeiten
             </h3>
@@ -764,7 +764,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
           {/* Treffpunkte Section */}
-          <div id="treffpunkte" className="scroll-mt-24">
+          <div id="treffpunkte" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Treffpunkte
             </h3>
@@ -773,7 +773,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
           {/* Über mich Section */}
-          <div id="ueber-mich" className="scroll-mt-24">
+          <div id="ueber-mich" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-heading)' }}>
               Über mich
             </h3>
@@ -859,7 +859,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
           </div>
 
           {/* Bewertungen Section */}
-          <div id="bewertungen" className="scroll-mt-24">
+          <div id="bewertungen" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold" style={{ color: 'var(--text-heading)' }}>
                 Bewertungen
