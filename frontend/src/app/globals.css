@@ -875,6 +875,13 @@ nav[class*='lg:hidden'][class*='fixed'][class*='bottom-0'] {
   display: flex !important;
 }
 
+/* Hide navigation text on very small screens (< 420px) */
+@media (max-width: 419px) {
+  .mobile-nav-text {
+    display: none !important;
+  }
+}
+
 /* Ensure sticky toolbar doesn't interfere with bottom nav */
 .sticky.top-0 {
   max-height: calc(100vh - 80px) !important; /* Leave space for bottom nav */

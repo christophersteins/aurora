@@ -3,6 +3,7 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
+import { useUIStore } from '@/store/uiStore';
 import { Users, Calendar, MessageCircle, Bell, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -10,6 +11,7 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isAuthenticated, user, _hasHydrated } = useAuthStore();
   const { totalUnreadCount } = useChatStore();
+  const { mobileMenuOpen } = useUIStore();
   const t = useTranslations('nav');
 
   // Helper function to check if a link is active
@@ -17,8 +19,16 @@ export default function MobileBottomNav() {
     return pathname?.includes(path);
   };
 
-  // Don't show if not authenticated or not hydrated
-  if (!_hasHydrated || !isAuthenticated) {
+  // Handle click on active link - scroll to top instead of reload
+  const handleEscortsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname?.includes('/escorts')) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Don't show if not authenticated, not hydrated, or mobile menu is open
+  if (!_hasHydrated || !isAuthenticated || mobileMenuOpen) {
     return null;
   }
 
@@ -37,24 +47,26 @@ export default function MobileBottomNav() {
         borderColor: 'var(--border)',
         paddingBottom: 'env(safe-area-inset-bottom)',
         display: 'flex',
+        justifyContent: 'center',
         visibility: 'visible',
         opacity: 1,
       }}
     >
-      <div className="flex justify-around items-center h-16 px-2">
+      <div className="flex justify-around items-center h-16 px-2 w-full max-w-md">
         {/* Escorts */}
         <Link
           href="/escorts"
+          onClick={handleEscortsClick}
           className="flex flex-col items-center justify-center flex-1 py-2"
         >
           <Users
             size={24}
             strokeWidth={isActive('/escorts') ? 2.5 : 2}
             className="mb-1"
-            style={{ color: 'var(--color-secondary)' }}
+            style={{ color: 'var(--text-heading)' }}
           />
           <span
-            className="text-xs"
+            className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: isActive('/escorts') ? 600 : 400,
@@ -73,10 +85,10 @@ export default function MobileBottomNav() {
             size={24}
             strokeWidth={isActive('/dates') ? 2.5 : 2}
             className="mb-1"
-            style={{ color: 'var(--color-secondary)' }}
+            style={{ color: 'var(--text-heading)' }}
           />
           <span
-            className="text-xs"
+            className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: isActive('/dates') ? 600 : 400,
@@ -96,7 +108,7 @@ export default function MobileBottomNav() {
               size={24}
               strokeWidth={isActive('/chat') ? 2.5 : 2}
               className="mb-1"
-              style={{ color: 'var(--color-secondary)' }}
+              style={{ color: 'var(--text-heading)' }}
             />
             {totalUnreadCount > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-action-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -105,7 +117,7 @@ export default function MobileBottomNav() {
             )}
           </div>
           <span
-            className="text-xs"
+            className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: isActive('/chat') ? 600 : 400,
@@ -123,10 +135,10 @@ export default function MobileBottomNav() {
             size={24}
             strokeWidth={isActive('/notifications') ? 2.5 : 2}
             className="mb-1"
-            style={{ color: 'var(--color-secondary)' }}
+            style={{ color: 'var(--text-heading)' }}
           />
           <span
-            className="text-xs"
+            className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: isActive('/notifications') ? 600 : 400,
@@ -145,10 +157,10 @@ export default function MobileBottomNav() {
             size={24}
             strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2}
             className="mb-1"
-            style={{ color: 'var(--color-secondary)' }}
+            style={{ color: 'var(--text-heading)' }}
           />
           <span
-            className="text-xs"
+            className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: (isActive('/escort-profile') || isActive('/customer-profile')) ? 600 : 400,

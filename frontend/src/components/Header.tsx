@@ -4,6 +4,7 @@ import { Link, usePathname } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
+import { useUIStore } from '@/store/uiStore';
 import { useState, useEffect } from 'react';
 import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -20,7 +21,7 @@ export default function Header() {
   const pathname = usePathname();
   const { isAuthenticated, user, token, _hasHydrated } = useAuthStore();
   const { totalUnreadCount, setTotalUnreadCount } = useChatStore();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { mobileMenuOpen, setMobileMenuOpen } = useUIStore();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
@@ -296,186 +297,181 @@ export default function Header() {
         />
       )}
 
-      {/* Mobile Menu Slide-in */}
+      {/* Mobile Menu Slide-in - Same design as Desktop Sidebar */}
       {mobileMenuOpen && (
-        <div className="fixed top-0 right-0 bottom-0 w-[280px] bg-[#15202b] border-l border-[#2f3336] z-50 md:hidden mobile-menu-enter overflow-y-auto">
-          <div className="p-6">
-            {/* Close Button */}
-            <div className="flex justify-end mb-6">
+        <div className="fixed top-0 right-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-l border-[#2f3336] z-50 md:hidden mobile-menu-enter overflow-y-auto">
+          <div className="flex flex-col h-full py-4 px-3">
+            {/* Logo and Close Button */}
+            <div className="flex items-center justify-between px-4 mb-8">
+              <Link href="/" onClick={closeMobileMenu} className="flex items-center">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">
+                  <span className="text-[#0f1419] font-bold text-xl">A</span>
+                </div>
+                <span className="ml-3 text-xl font-bold gradient-text">Aurora</span>
+              </Link>
               <button
                 onClick={closeMobileMenu}
-                className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer"
+                className="p-2 text-[#e7e9ea] hover:text-[#8b5cf6] transition cursor-pointer -mr-2"
                 aria-label={t('close')}
               >
                 <X size={24} />
               </button>
             </div>
 
-            {/* User Info (wenn eingeloggt) */}
-            {isAuthenticated && user && (
-              <div className="mb-6 pb-6 border-b border-[#2f3336]">
-                <div className="flex items-center justify-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] flex items-center justify-center">
-                    <User className="text-[#0f1419] text-xl" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation Links */}
-            <nav className="space-y-1">
+            {/* Navigation Links - Same structure as Desktop Sidebar */}
+            <nav className="flex-1 space-y-1">
               <Link
                 href="/"
                 onClick={closeMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                    : 'link-secondary font-medium'
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-secondary'
                 }`}
               >
-                <Home size={20} strokeWidth={isActive('/') ? 2.5 : 2} />
-                {t('home')}
+                <Home size={26} className="flex-shrink-0" strokeWidth={isActive('/') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/') ? 'font-bold' : 'font-medium'}`}>{t('home')}</span>
               </Link>
+
+              {isAuthenticated && (
+                <>
+                  <button
+                    onClick={closeMobileMenu}
+                    className={`w-full flex items-center gap-4 px-4 py-3 cursor-pointer rounded-xl transition-colors ${
+                      isActive('/notifications')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-secondary'
+                    }`}
+                  >
+                    <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/notifications') ? 'font-bold' : 'font-medium'}`}>{t('notifications')}</span>
+                  </button>
+
+                  <Link
+                    href="/chat"
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
+                      isActive('/chat')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-secondary'
+                    }`}
+                  >
+                    <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
+                    {totalUnreadCount > 0 && (
+                      <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </>
+              )}
+
               <Link
                 href="/escorts"
                 onClick={closeMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/escorts')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                    : 'link-secondary font-medium'
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-secondary'
                 }`}
               >
-                <Users size={20} strokeWidth={isActive('/escorts') ? 2.5 : 2} />
-                {t('members')}
+                <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
               </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/clubs')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                    : 'link-secondary font-medium'
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-secondary'
                 }`}
               >
-                <Building2 size={20} strokeWidth={isActive('/clubs') ? 2.5 : 2} />
-                {t('clubsAndCo')}
+                <Building2 size={26} className="flex-shrink-0" strokeWidth={isActive('/clubs') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/clubs') ? 'font-bold' : 'font-medium'}`}>{t('clubsAndCo')}</span>
               </Link>
               <Link
                 href="/videos"
                 onClick={closeMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/videos')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                    : 'link-secondary font-medium'
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-secondary'
                 }`}
               >
-                <Video size={20} strokeWidth={isActive('/videos') ? 2.5 : 2} />
-                {t('videos')}
+                <Video size={26} className="flex-shrink-0" strokeWidth={isActive('/videos') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/videos') ? 'font-bold' : 'font-medium'}`}>{t('videos')}</span>
               </Link>
               <Link
                 href="/premium"
                 onClick={closeMobileMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/premium')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                    : 'link-secondary font-medium'
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-secondary'
                 }`}
               >
-                <Sparkles size={20} strokeWidth={isActive('/premium') ? 2.5 : 2} />
-                {t('premium')}
+                <Sparkles size={26} className="flex-shrink-0" strokeWidth={isActive('/premium') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/premium') ? 'font-bold' : 'font-medium'}`}>{t('premium')}</span>
               </Link>
+
+              {isAuthenticated && (
+                <>
+                  <Link
+                    href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                      isActive('/escort-profile') || isActive('/customer-profile')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-secondary'
+                    }`}
+                  >
+                    <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/escort-profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                      isActive('/settings')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-secondary'
+                    }`}
+                  >
+                    <Settings size={26} className="flex-shrink-0" strokeWidth={isActive('/settings') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/settings') ? 'font-bold' : 'font-medium'}`}>{t('settings')}</span>
+                  </Link>
+                </>
+              )}
             </nav>
 
-            {/* Language Switcher - Only for logged out users */}
-            {!isAuthenticated && (
-              <div className="mt-6 pt-6 border-t border-[#2f3336]">
-                <LanguageSwitcher />
-              </div>
-            )}
-
-            {/* Auth Buttons / User Menu */}
-            <div className="mt-6 pt-6 border-t border-[#2f3336] space-y-1">
+            {/* Bottom Section */}
+            <div className="mt-auto pt-4 border-t border-[#2f3336] space-y-2">
               {!isAuthenticated ? (
-                <div className="space-y-3">
+                <>
                   <button
                     onClick={openLoginModal}
-                    className="w-full btn-base btn-secondary"
+                    className="w-full btn-base btn-secondary !py-3 text-base cursor-pointer"
                   >
                     {t('login')}
                   </button>
                   <button
                     onClick={openRegisterModal}
-                    className="w-full btn-base btn-primary"
+                    className="w-full btn-base btn-primary !py-3 text-base cursor-pointer"
                   >
                     {t('register')}
                   </button>
-                </div>
+                  <LanguageSwitcher />
+                </>
               ) : (
                 <>
-                  {/* Notifications Link */}
-                  <button
-                    onClick={closeMobileMenu}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 cursor-pointer rounded-lg transition-colors ${
-                      isActive('/notifications')
-                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                        : 'link-secondary'
-                    }`}
-                  >
-                    <Bell size={18} strokeWidth={isActive('/notifications') ? 2.5 : 2} />
-                    <span>{t('notifications')}</span>
-                  </button>
-
-                  {/* Messages Link */}
-                  <Link
-                    href="/chat"
-                    onClick={closeMobileMenu}
-                    className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                      isActive('/chat')
-                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                        : 'link-secondary'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <MessageCircle size={18} strokeWidth={isActive('/chat') ? 2.5 : 2} />
-                      <span>{t('messages')}</span>
-                    </div>
-                    {totalUnreadCount > 0 && (
-                      <span className="min-w-[20px] h-[20px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  <Link
-                    href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
-                    onClick={closeMobileMenu}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive('/escort-profile') || isActive('/customer-profile')
-                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                        : 'link-secondary'
-                    }`}
-                  >
-                    <User size={18} strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
-                    <span>{t('myProfile')}</span>
-                  </Link>
-                  <Link
-                    href="/settings"
-                    onClick={closeMobileMenu}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive('/settings')
-                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea] font-bold'
-                        : 'link-secondary'
-                    }`}
-                  >
-                    <Settings size={18} strokeWidth={isActive('/settings') ? 2.5 : 2} />
-                    <span>{t('settings')}</span>
-                  </Link>
                   <button
                     onClick={handleLogoutClick}
-                    className="w-full flex items-center space-x-3 px-4 py-3 link-secondary rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
                   >
-                    <LogOut size={18} />
-                    <span>{t('logout')}</span>
+                    <LogOut size={26} className="flex-shrink-0" />
+                    <span className="text-xl font-medium">{t('logout')}</span>
                   </button>
                 </>
               )}

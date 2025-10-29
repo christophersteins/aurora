@@ -17,9 +17,9 @@ export default function MainLayout({
     <>
       <Header />
       {/* Mobile: normal flow with bottom padding, Desktop: margin for sidebar */}
-      <main 
-        className="flex-1 lg:pt-0 pb-20 lg:pb-0" 
-        style={{ 
+      <main
+        className="flex-1 lg:pt-0 pb-20 lg:pb-0"
+        style={{
           marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
           paddingBottom: '80px',
         }}
