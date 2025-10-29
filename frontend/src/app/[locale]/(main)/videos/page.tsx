@@ -81,11 +81,7 @@ export default function VideosPage() {
 
   return (
     <main className="min-h-screen py-8 bg-page-primary">
-      <div className="mx-auto" style={{
-          maxWidth: 'var(--max-content-width)',
-          paddingLeft: 'var(--content-padding-x)',
-          paddingRight: 'var(--content-padding-x)'
-        }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-heading mb-4">

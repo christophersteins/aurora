@@ -9,7 +9,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-page-primary border-t border-[#2f3336] mt-auto" style={{ marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))', border: '3px solid blue' }}>
-      <div className="py-12" style={{ maxWidth: 'var(--max-content-width)', paddingLeft: 'var(--content-padding-x)', paddingRight: 'var(--content-padding-x)' }}>
+      <div className="py-12" style={{ maxWidth: 'var(--max-content-width)', paddingLeft: 'var(--header-footer-padding-x)', paddingRight: 'var(--header-footer-padding-x)' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1">
             <div className="flex items-center mb-4">

@@ -501,10 +501,8 @@ export default function ProfilePage() {
         border: '3px solid blue',
         borderBottom: '1px solid var(--border)'
       }}>
-        <div style={{
+        <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{
           maxWidth: 'var(--max-content-width)',
-          paddingLeft: 'var(--content-padding-x)',
-          paddingRight: 'var(--content-padding-x)',
           margin: '0 auto'
         }}>
             <div className="flex items-center justify-between py-4 gap-6">

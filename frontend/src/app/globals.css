@@ -52,8 +52,11 @@
   --sidebar-offset: 0px; /* Mobile/Tablet: no offset */
   --filter-sidebar-width: 24rem; /* Mobile/Tablet: fixed width */
 
-  /* Horizontal content padding - bündig mit Header/Footer */
-  --content-padding-x: 1rem; /* Mobile: 1rem (16px) - entspricht px-4 */
+  /* Horizontal content padding - Page content only */
+  --content-padding-x: 0; /* Mobile/Tablet: 0 - bündig mit Header/Footer */
+
+  /* Header/Footer padding - consistent across all breakpoints */
+  --header-footer-padding-x: 1rem; /* Mobile: 1rem (16px) */
 
   /* ========================================
      RESPONSIVE FONT SIZES
@@ -64,7 +67,8 @@
 /* Small screens breakpoint (640px and up) - entspricht Tailwind sm: */
 @media (min-width: 640px) {
   :root {
-    --content-padding-x: 1.5rem; /* sm: 1.5rem (24px) - entspricht px-6 */
+    --content-padding-x: 0; /* sm: 0 - bündig mit Header/Footer */
+    --header-footer-padding-x: 1.5rem; /* sm: 1.5rem (24px) */
   }
 }
 
@@ -72,6 +76,8 @@
 @media (min-width: 768px) {
   :root {
     --font-size-base: 15px;
+    --content-padding-x: 0; /* Tablet: 0 - bündig mit Header/Footer */
+    --header-footer-padding-x: 1.5rem; /* Tablet: 1.5rem (24px) */
   }
 }
 
@@ -80,7 +86,8 @@
   :root {
     --font-size-base: 15px;
     --sidebar-width: 280px; /* Desktop: show sidebar */
-    --content-padding-x: 2rem; /* lg: 2rem (32px) - entspricht px-8 */
+    --content-padding-x: 2rem; /* Desktop: 2rem (32px) - entspricht px-8 */
+    --header-footer-padding-x: 2rem; /* Desktop: 2rem (32px) */
     /* Calculate sidebar offset to center the entire layout (sidebar + content) */
     --sidebar-offset: max(0px, calc((100vw - var(--total-layout-width)) / 2));
     /* Filter sidebar width: sidebar offset + sidebar width + content padding (2rem = px-8) */

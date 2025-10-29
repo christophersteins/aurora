@@ -174,7 +174,7 @@ export default function Header() {
         className="lg:hidden bg-[#000000]/80 backdrop-blur-md border-b border-[#2f3336] fixed top-0 left-0 right-0 z-30 transition-transform duration-300"
         style={{ transform: showHeader ? 'translateY(0)' : 'translateY(-100%)' }}
       >
-        <div className="mx-auto" style={{ paddingLeft: 'var(--content-padding-x)', paddingRight: 'var(--content-padding-x)' }}>
+        <div className="mx-auto" style={{ paddingLeft: 'var(--header-footer-padding-x)', paddingRight: 'var(--header-footer-padding-x)' }}>
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center">

@@ -72,11 +72,7 @@ export default function PremiumPage() {
 
   return (
     <main className="min-h-screen py-12 bg-page-primary">
-      <div className="mx-auto" style={{
-          maxWidth: 'var(--max-content-width)',
-          paddingLeft: 'var(--content-padding-x)',
-          paddingRight: 'var(--content-padding-x)'
-        }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed] mb-6">
