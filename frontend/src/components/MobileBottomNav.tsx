@@ -12,6 +12,9 @@ export default function MobileBottomNav() {
   const { totalUnreadCount } = useChatStore();
   const t = useTranslations('nav');
 
+  // Check if we're on the chat page
+  const isChatPage = pathname?.includes('/chat');
+
   // Helper function to check if a link is active
   const isActive = (path: string) => {
     return pathname?.includes(path);
@@ -25,8 +28,8 @@ export default function MobileBottomNav() {
     }
   };
 
-  // Don't show if not authenticated or not hydrated
-  if (!_hasHydrated || !isAuthenticated) {
+  // Don't show if not authenticated, not hydrated, or on chat page
+  if (!_hasHydrated || !isAuthenticated || isChatPage) {
     return null;
   }
 

@@ -112,10 +112,10 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="flex bg-page-primary overflow-hidden justify-center h-[calc(100vh-64px)] lg:h-screen">
-        <div className="flex w-full mx-auto px-4 sm:px-6 lg:px-0" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="flex bg-page-primary overflow-hidden justify-center w-full h-full">
+        <div className="flex w-full h-full mx-auto overflow-hidden" style={{ maxWidth: 'var(--max-content-width)' }}>
           {/* Conversation List - Hidden on mobile when chat is selected */}
-          <div className={`${selectedConversationId ? 'hidden md:block' : 'block'} w-full md:w-80 flex-shrink-0`}>
+          <div className={`${selectedConversationId ? 'hidden md:block' : 'block'} w-full md:w-80 flex-shrink-0 h-full`}>
             <ConversationList
               conversations={conversations}
               selectedId={selectedConversationId}
@@ -125,21 +125,12 @@ export default function ChatPage() {
           </div>
 
           {/* Chat Window - Hidden on mobile when no chat selected */}
-          <div className={`${!selectedConversationId ? 'hidden md:flex' : 'flex'} flex-1 min-w-0`}>
-            {/* Back button for mobile */}
-            {selectedConversationId && (
-              <div className="md:hidden absolute top-4 left-4 z-20">
-                <button
-                  onClick={() => setSelectedConversationId(null)}
-                  className="p-2 bg-page-secondary rounded-full border border-default shadow-lg hover:bg-page-primary transition-all"
-                >
-                  <svg className="w-6 h-6 text-heading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-              </div>
-            )}
-            <ChatWindow conversationId={selectedConversationId} currentUserId={user?.id || ''} />
+          <div className={`${!selectedConversationId ? 'hidden md:flex' : 'flex'} flex-1 min-w-0 h-full`}>
+            <ChatWindow
+              conversationId={selectedConversationId}
+              currentUserId={user?.id || ''}
+              onBack={() => setSelectedConversationId(null)}
+            />
           </div>
         </div>
       </div>

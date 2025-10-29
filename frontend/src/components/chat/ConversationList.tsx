@@ -201,9 +201,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   const favoritesCount = conversations.filter(conv => conv.isPinned === true).length;
 
   return (
-    <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full overflow-y-auto flex flex-col">
-      {/* Sticky Header Container - combines Header, Search, and Tabs */}
-      <div className="sticky top-0 z-10 bg-page-primary backdrop-blur-sm bg-page-primary/95 border-b border-default">
+    <div className="w-full md:w-80 border-l border-r border-default bg-page-primary h-full flex flex-col overflow-hidden">
+      {/* Fixed Header Container - combines Header, Search, and Tabs */}
+      <div className="flex-shrink-0 bg-page-primary border-b border-default">
         {/* Header */}
         <div className="px-4 pt-4 flex justify-between items-center">
           <h1 className="text-xl font-bold text-heading">Nachrichten</h1>

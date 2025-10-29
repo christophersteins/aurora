@@ -17,6 +17,15 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
 
+  // Auf Mobile zu Chat-Übersicht redirecten
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768; // md breakpoint
+    if (isMobile) {
+      router.replace('/chat');
+      return;
+    }
+  }, [router]);
+
   useEffect(() => {
     const findOrCreateConversation = async () => {
       try {

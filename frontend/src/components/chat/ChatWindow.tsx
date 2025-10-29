@@ -5,7 +5,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star, ArrowLeft } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import { useOnlineStatusStore } from '@/store/onlineStatusStore';
@@ -27,6 +27,7 @@ interface Message {
 interface ChatWindowProps {
   conversationId: string | null;
   currentUserId: string;
+  onBack?: () => void; // Callback für Mobile Back-Button
 }
 
 interface LoadMessagesResponse {
@@ -54,7 +55,7 @@ interface IncomingMessage {
   timestamp: string;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId, onBack }) => {
   const { socket, isConnected } = useSocket();
   const { markConversationAsRead } = useChatStore();
   const { getUserStatus } = useOnlineStatusStore();
@@ -603,12 +604,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   };
 
   return (
-    <div className="grid h-full bg-page-primary w-full border-r border-default" style={{ gridTemplateRows: 'auto 1fr auto' }}>
-      {/* Header + Search Bar Container */}
-      <div>
+    <div className="flex flex-col h-full bg-page-primary w-full border-r border-default">
+      {/* Header + Search Bar Container - Fixed at top */}
+      <div className="flex-shrink-0 bg-page-primary">
         {/* Header mit Profilbild und Status */}
         <div className="p-4 border-b border-default bg-page-primary">
           <div className="flex items-center gap-3">
+            {/* Back Button - Nur auf Mobile */}
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="md:hidden p-2 -ml-2 text-heading hover:bg-page-secondary rounded-full transition-all"
+                aria-label="Zurück zur Chat-Übersicht"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+            )}
+
             {/* Profilbild */}
             <div
               className="relative flex-shrink-0 cursor-pointer"
@@ -671,7 +683,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
               {/* Dropdown Menu */}
               {showOptionsMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-10">
+                <div className="absolute right-0 mt-2 w-64 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-30">
                   <button
                     onClick={handleMarkAsUnread}
                     className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
@@ -783,8 +795,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         )}
       </div>
 
-      {/* Messages Area - Nimmt den verbleibenden Platz ein */}
-      <div className="overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide" style={{ minHeight: 0 }}>
+      {/* Messages Area - Scrollable middle section */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -881,8 +893,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-default bg-page-primary relative">
+      {/* Input Area - Fixed at bottom */}
+      <div className="flex-shrink-0 p-4 border-t border-default bg-page-primary"
+           style={{
+             paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+           }}>
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
