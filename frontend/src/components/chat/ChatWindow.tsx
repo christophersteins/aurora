@@ -1033,6 +1033,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           username={conversation.otherUserName}
           profilePicture={conversation.otherUserProfilePicture}
           role={conversation.otherUserRole}
+          isOnline={conversation.otherUserIsOnline}
+          lastSeen={conversation.otherUserLastSeen}
         />
       )}
     </div>

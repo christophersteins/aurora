@@ -1,9 +1,12 @@
 'use client';
 
 import React from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Circle, Clock } from 'lucide-react';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import Link from 'next/link';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
+import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface ProfilePreviewModalProps {
   isOpen: boolean;
@@ -12,6 +15,8 @@ interface ProfilePreviewModalProps {
   username: string;
   profilePicture?: string;
   role?: string;
+  isOnline?: boolean;
+  lastSeen?: string;
 }
 
 export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
@@ -21,8 +26,17 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
   username,
   profilePicture,
   role,
+  isOnline,
+  lastSeen,
 }) => {
+  const { getUserStatus } = useOnlineStatusStore();
+
   if (!isOpen) return null;
+
+  // Get real-time status
+  const liveStatus = getUserStatus(userId);
+  const userIsOnline = liveStatus.lastSeen ? liveStatus.isOnline : (isOnline || false);
+  const userLastSeen = liveStatus.lastSeen || (lastSeen ? new Date(lastSeen) : null);
 
   return (
     <div
@@ -45,7 +59,7 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
         </div>
 
         {/* Profile Picture - Large */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <ProfileAvatar
             profilePicture={profilePicture}
             role={role}
@@ -55,9 +69,32 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
         </div>
 
         {/* Username */}
-        <h2 className="text-2xl font-bold text-heading text-center mb-6">
+        <h2 className="text-2xl font-bold text-heading text-center mb-2">
           {username}
         </h2>
+
+        {/* Online Status */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          {userIsOnline ? (
+            <>
+              <Circle className="w-3 h-3" style={{ color: '#10b981', fill: '#10b981' }} />
+              <span className="text-sm" style={{ color: 'var(--color-primary)' }}>
+                Jetzt online
+              </span>
+            </>
+          ) : (
+            <>
+              <Clock className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                {userLastSeen ? (
+                  `Zuletzt online ${formatDistanceToNow(userLastSeen, { addSuffix: true, locale: de })}`
+                ) : (
+                  'Offline'
+                )}
+              </span>
+            </>
+          )}
+        </div>
 
         {/* Action Buttons */}
         <div className="space-y-3">

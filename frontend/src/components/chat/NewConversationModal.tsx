@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
+import { Circle } from 'lucide-react';
 
 interface User {
   id: string;
@@ -10,6 +12,8 @@ interface User {
   lastName?: string;
   profilePicture?: string;
   role?: string;
+  isOnline?: boolean;
+  lastSeen?: string;
 }
 
 interface NewConversationModalProps {
@@ -23,6 +27,7 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
   onClose,
   onCreateConversation,
 }) => {
+  const { getUserStatus } = useOnlineStatusStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -150,39 +155,54 @@ export const NewConversationModal: React.FC<NewConversationModalProps> = ({
           {/* Search Results Dropdown */}
           {showResults && searchResults.length > 0 && (
             <div className="absolute z-10 w-full mt-2 bg-page-primary border border-default rounded-xl shadow-lg max-h-64 overflow-y-auto">
-              {searchResults.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => handleSelectUser(user)}
-                  className="w-full px-4 py-3 flex items-center gap-3 hover:bg-page-secondary transition-all text-left first:rounded-t-xl last:rounded-b-xl"
-                >
-                  {/* Avatar */}
-                  {user.profilePicture ? (
-                    <img
-                      src={user.profilePicture}
-                      alt={user.username}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <span className="text-primary font-semibold">
-                        {user.username.charAt(0).toUpperCase()}
-                      </span>
+              {searchResults.map((user) => {
+                const liveStatus = getUserStatus(user.id);
+                const isOnline = liveStatus.lastSeen ? liveStatus.isOnline : (user.isOnline || false);
+
+                return (
+                  <button
+                    key={user.id}
+                    onClick={() => handleSelectUser(user)}
+                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-page-secondary transition-all text-left first:rounded-t-xl last:rounded-b-xl"
+                  >
+                    {/* Avatar with online indicator */}
+                    <div className="relative">
+                      {user.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          alt={user.username}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <span className="text-primary font-semibold">
+                            {user.username.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      {isOnline && (
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-page-primary"></div>
+                      )}
                     </div>
-                  )}
-                  {/* User Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-heading truncate">
-                      {user.username}
-                    </p>
-                    {(user.firstName || user.lastName) && (
-                      <p className="text-sm text-muted truncate">
-                        {user.firstName} {user.lastName}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              ))}
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-heading truncate">
+                          {user.username}
+                        </p>
+                        {isOnline && (
+                          <Circle className="w-2 h-2 fill-success text-success" />
+                        )}
+                      </div>
+                      {(user.firstName || user.lastName) && (
+                        <p className="text-sm text-muted truncate">
+                          {user.firstName} {user.lastName}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
 

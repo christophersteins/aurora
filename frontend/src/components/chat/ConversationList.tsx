@@ -5,6 +5,9 @@ import { SquarePen, Search, X, Star, Pin, MailOpen, Trash2 } from 'lucide-react'
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
 import { chatService } from '@/services/chatService';
+import { useOnlineStatusStore } from '@/store/onlineStatusStore';
+import { formatDistanceToNow } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -47,6 +50,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   onSelectConversation,
   onNewConversation,
 }) => {
+  const { getUserStatus } = useOnlineStatusStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -341,8 +345,15 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                       size="md"
                       className="shadow-md"
                     />
-                    {/* Online indicator - you can add logic for this later */}
-                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success rounded-full border-2 border-page-primary"></div>
+                    {/* Online indicator */}
+                    {(() => {
+                      const liveStatus = getUserStatus(conv.otherUserId);
+                      const isOnline = liveStatus.lastSeen ? liveStatus.isOnline : (conv.otherUserIsOnline || false);
+
+                      return isOnline ? (
+                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-success rounded-full border-2 border-page-primary"></div>
+                      ) : null;
+                    })()}
                   </div>
 
                   {/* Content */}
@@ -354,7 +365,14 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         {conv.otherUserName}
                       </h3>
                       <span className="text-xs text-muted">
-                        vor 5 Min
+                        {conv.lastMessageTime ? (
+                          formatDistanceToNow(new Date(conv.lastMessageTime), {
+                            addSuffix: true,
+                            locale: de
+                          })
+                        ) : (
+                          'Keine Nachrichten'
+                        )}
                       </span>
                     </div>
 
