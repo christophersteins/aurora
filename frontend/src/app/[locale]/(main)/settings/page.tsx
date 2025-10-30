@@ -6,14 +6,27 @@ import { useRouter } from '@/i18n/routing';
 import { useEffect } from 'react';
 
 export default function Settings() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, _hasHydrated } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only redirect after the store has been hydrated from localStorage
+    if (_hasHydrated && !isAuthenticated) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, _hasHydrated, router]);
+
+  // Show loading state while hydrating
+  if (!_hasHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-muted">Lädt...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return null;
