@@ -604,9 +604,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   };
 
   return (
-    <div className="flex flex-col h-full bg-page-primary w-full border-r border-default">
-      {/* Header + Search Bar Container - Fixed at top */}
-      <div className="flex-shrink-0 bg-page-primary">
+    <div className="flex flex-col h-full bg-page-primary w-full border-r border-default relative">
+      {/* Header + Search Bar Container - Fixed at top on mobile */}
+      <div className="flex-shrink-0 bg-page-primary fixed md:relative top-0 left-0 right-0 z-20 md:z-auto">
         {/* Header mit Profilbild und Status */}
         <div className="p-4 border-b border-default bg-page-primary">
           <div className="flex items-center gap-3">
@@ -824,8 +824,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         )}
       </div>
 
-      {/* Messages Area - Scrollable middle section */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide">
+      {/* Messages Area - Scrollable middle section with padding for fixed header/footer on mobile */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide pt-[80px] md:pt-4 pb-[100px] md:pb-4">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -922,8 +922,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
         )}
       </div>
 
-      {/* Input Area - Fixed at bottom */}
-      <div className="flex-shrink-0 p-4 border-t border-default bg-page-primary"
+      {/* Input Area - Fixed at bottom on mobile */}
+      <div className="flex-shrink-0 p-4 border-t border-default bg-page-primary fixed md:relative bottom-0 left-0 right-0 z-20 md:z-auto"
            style={{
              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
            }}>
