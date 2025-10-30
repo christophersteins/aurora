@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useUIStore } from '@/store/uiStore';
 import { useState, useEffect, useRef } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles, LogIn } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles, LogIn, Bookmark } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -215,6 +215,18 @@ export default function Header() {
               <span className={`text-xl ${isActive('/') ? 'font-bold' : 'font-medium'}`}>{t('home')}</span>
             </Link>
 
+            <Link
+              href="/escorts"
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                isActive('/escorts')
+                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                  : 'link-primary'
+              }`}
+            >
+              <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
+              <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
+            </Link>
+
             {isAuthenticated && (
               <>
                 <button
@@ -243,20 +255,19 @@ export default function Header() {
                     </span>
                   )}
                 </Link>
+                <Link
+                  href="/bookmarks"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                    isActive('/bookmarks')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-primary'
+                  }`}
+                >
+                  <Bookmark size={26} className="flex-shrink-0" strokeWidth={isActive('/bookmarks') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/bookmarks') ? 'font-bold' : 'font-medium'}`}>{t('bookmarks')}</span>
+                </Link>
               </>
             )}
-
-            <Link
-              href="/escorts"
-              className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                isActive('/escorts')
-                  ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-primary'
-              }`}
-            >
-              <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
-              <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
-            </Link>
             <Link
               href="/clubs"
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
@@ -396,6 +407,19 @@ export default function Header() {
                 <span className={`text-xl ${isActive('/') ? 'font-bold' : 'font-medium'}`}>{t('home')}</span>
               </Link>
 
+              <Link
+                href="/escorts"
+                onClick={closeMobileMenu}
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                  isActive('/escorts')
+                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                    : 'link-primary'
+                }`}
+              >
+                <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
+                <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
+              </Link>
+
               {isAuthenticated && (
                 <>
                   <button
@@ -427,21 +451,21 @@ export default function Header() {
                       </span>
                     )}
                   </Link>
+
+                  <Link
+                    href="/bookmarks"
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                      isActive('/bookmarks')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-primary'
+                    }`}
+                  >
+                    <Bookmark size={26} className="flex-shrink-0" strokeWidth={isActive('/bookmarks') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/bookmarks') ? 'font-bold' : 'font-medium'}`}>{t('bookmarks')}</span>
+                  </Link>
                 </>
               )}
-
-              <Link
-                href="/escorts"
-                onClick={closeMobileMenu}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                  isActive('/escorts')
-                    ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-primary'
-                }`}
-              >
-                <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
-                <span className={`text-xl ${isActive('/escorts') ? 'font-bold' : 'font-medium'}`}>{t('members')}</span>
-              </Link>
               <Link
                 href="/clubs"
                 onClick={closeMobileMenu}

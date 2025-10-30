@@ -264,10 +264,19 @@ export default function SettingsPage() {
                       setActiveSection(section.id);
                       localStorage.setItem('settings-active-section', section.id);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer text-body hover:text-[#b8b9bb] ${
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium cursor-pointer text-body ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
-                    style={{ borderRadius: 0 }}
+                    style={{
+                      borderRadius: 0,
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-left flex-1">{section.label}</span>
@@ -303,14 +312,25 @@ export default function SettingsPage() {
                 <button
                   key={section.id}
                   onClick={() => handleTabClick(section.id)}
-                  className={`w-full flex items-center gap-3 !pl-6 pr-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
+                  className={`w-full flex items-center gap-3 !pl-6 pr-4 py-4 text-sm font-medium cursor-pointer group text-body ${
                     isActive
                       ? 'bg-page-secondary'
-                      : 'hover:bg-page-secondary/50'
+                      : ''
                   }`}
                   style={{
                     borderRadius: 0,
+                    transition: 'background-color 0.2s',
                     ...(isActive && { borderRight: '2px solid var(--color-primary)' })
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = '';
+                    }
                   }}
                 >
                   <Icon className={`w-5 h-5 flex-shrink-0 transition-all ${isActive ? 'scale-105' : ''}`} strokeWidth={isActive ? 2.5 : 2} />

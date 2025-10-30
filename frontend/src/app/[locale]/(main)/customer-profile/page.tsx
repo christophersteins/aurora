@@ -247,10 +247,19 @@ export default function CustomerProfilePage() {
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-all text-body hover-bg-page-secondary bg-page-primary cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium cursor-pointer text-body bg-page-primary ${
                       !isLast ? 'border-b border-[#2f3336]' : ''
                     }`}
-                    style={{ borderRadius: 0 }}
+                    style={{
+                      borderRadius: 0,
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="text-left">{section.label}</span>
