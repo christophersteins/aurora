@@ -236,24 +236,31 @@ export default function Header() {
                       : 'link-primary'
                   }`}
                 >
-                  <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                  <div className="relative flex-shrink-0">
+                    <Bell size={26} strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                  </div>
                   <span className={`text-xl ${isActive('/notifications') ? 'font-bold' : 'font-medium'}`}>{t('notifications')}</span>
                 </button>
                 <Link
                   href="/chat"
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                     isActive('/chat')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                       : 'link-primary'
                   }`}
                 >
-                  <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                  <div className="relative flex-shrink-0">
+                    <MessageCircle size={26} strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                    {totalUnreadCount > 0 && (
+                      <span
+                        className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"
+                        style={{ background: 'var(--color-primary)' }}
+                      >
+                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                      </span>
+                    )}
+                  </div>
                   <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
-                  {totalUnreadCount > 0 && (
-                    <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                      {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-                    </span>
-                  )}
                 </Link>
                 <Link
                   href="/bookmarks"
@@ -430,26 +437,33 @@ export default function Header() {
                         : 'link-primary'
                     }`}
                   >
-                    <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                    <div className="relative flex-shrink-0">
+                      <Bell size={26} strokeWidth={isActive('/notifications') ? 2.5 : 2} />
+                    </div>
                     <span className={`text-xl ${isActive('/notifications') ? 'font-bold' : 'font-medium'}`}>{t('notifications')}</span>
                   </button>
 
                   <Link
                     href="/chat"
                     onClick={closeMobileMenu}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                       isActive('/chat')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                         : 'link-primary'
                     }`}
                   >
-                    <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                    <div className="relative flex-shrink-0">
+                      <MessageCircle size={26} strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                      {totalUnreadCount > 0 && (
+                        <span
+                          className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"
+                          style={{ background: 'var(--color-primary)' }}
+                        >
+                          {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
+                        </span>
+                      )}
+                    </div>
                     <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
-                    {totalUnreadCount > 0 && (
-                      <span className="ml-auto min-w-[24px] h-[24px] px-1.5 bg-action-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                        {totalUnreadCount > 99 ? '99+' : totalUnreadCount}
-                      </span>
-                    )}
                   </Link>
 
                   <Link

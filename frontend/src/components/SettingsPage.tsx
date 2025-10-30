@@ -31,7 +31,7 @@ export default function SettingsPage() {
     { id: 'sicherheit', label: t('sections.security'), icon: Lock },
     { id: 'datenschutz', label: t('sections.privacy'), icon: Shield },
     { id: 'mitteilungen', label: t('sections.notifications'), icon: Bell },
-    { id: 'chat', label: 'Chat', icon: MessageCircle },
+    { id: 'chat', label: 'Nachrichten', icon: MessageCircle },
     { id: 'premium', label: t('sections.premium'), icon: Star },
     { id: 'barrierefreiheit', label: t('sections.accessibility'), icon: Accessibility },
     { id: 'sprache', label: t('sections.language'), icon: Globe },
@@ -623,7 +623,7 @@ export default function SettingsPage() {
                   : 'hidden'
               }`}
             >
-              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Chat</h2>
+              <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Nachrichten</h2>
 
               <div className="space-y-6">
                 {/* Read Receipts Toggle */}
