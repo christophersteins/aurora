@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useUIStore } from '@/store/uiStore';
 import { useState, useEffect, useRef } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles, LogIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -291,7 +291,7 @@ export default function Header() {
               <span className={`text-xl ${isActive('/premium') ? 'font-bold' : 'font-medium'}`}>{t('premium')}</span>
             </Link>
 
-            {isAuthenticated && (
+            {isAuthenticated ? (
               <>
                 <Link
                   href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
@@ -316,37 +316,37 @@ export default function Header() {
                   <span className={`text-xl ${isActive('/settings') ? 'font-bold' : 'font-medium'}`}>{t('settings')}</span>
                 </Link>
               </>
+            ) : (
+              <>
+                <button
+                  onClick={openLoginModal}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-secondary w-full cursor-pointer"
+                >
+                  <LogIn size={26} className="flex-shrink-0" strokeWidth={2} />
+                  <span className="text-xl font-medium">{t('login')}</span>
+                </button>
+                <button
+                  onClick={openRegisterModal}
+                  className="w-full flex items-center justify-center px-4 py-3 rounded-xl btn-base btn-primary cursor-pointer mt-4"
+                >
+                  <span className="text-xl font-medium">{t('register')}</span>
+                </button>
+              </>
             )}
           </nav>
 
           {/* Bottom Section */}
           <div className="mt-auto pt-4 border-t border-[#2f3336] space-y-2">
-            {!isAuthenticated ? (
-              <>
-                <button
-                  onClick={openLoginModal}
-                  className="w-full btn-base btn-secondary !py-3 text-base cursor-pointer"
-                >
-                  {t('login')}
-                </button>
-                <button
-                  onClick={openRegisterModal}
-                  className="w-full btn-base btn-primary !py-3 text-base cursor-pointer"
-                >
-                  {t('register')}
-                </button>
-                <LanguageSwitcher />
-              </>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogoutClick}
+                className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+              >
+                <LogOut size={26} className="flex-shrink-0" />
+                <span className="text-xl font-medium">{t('logout')}</span>
+              </button>
             ) : (
-              <>
-                <button
-                  onClick={handleLogoutClick}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
-                >
-                  <LogOut size={26} className="flex-shrink-0" />
-                  <span className="text-xl font-medium">{t('logout')}</span>
-                </button>
-              </>
+              <LanguageSwitcher />
             )}
           </div>
         </div>
@@ -479,7 +479,7 @@ export default function Header() {
                 <span className={`text-xl ${isActive('/premium') ? 'font-bold' : 'font-medium'}`}>{t('premium')}</span>
               </Link>
 
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <>
                   <Link
                     href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
@@ -506,37 +506,37 @@ export default function Header() {
                     <span className={`text-xl ${isActive('/settings') ? 'font-bold' : 'font-medium'}`}>{t('settings')}</span>
                   </Link>
                 </>
+              ) : (
+                <>
+                  <button
+                    onClick={openLoginModal}
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-secondary w-full cursor-pointer"
+                  >
+                    <LogIn size={26} className="flex-shrink-0" strokeWidth={2} />
+                    <span className="text-xl font-medium">{t('login')}</span>
+                  </button>
+                  <button
+                    onClick={openRegisterModal}
+                    className="w-full flex items-center justify-center px-4 py-3 rounded-xl btn-base btn-primary cursor-pointer mt-4"
+                  >
+                    <span className="text-xl font-medium">{t('register')}</span>
+                  </button>
+                </>
               )}
             </nav>
 
             {/* Bottom Section */}
             <div className="mt-auto pt-4 border-t border-[#2f3336] space-y-2">
-              {!isAuthenticated ? (
-                <>
-                  <button
-                    onClick={openLoginModal}
-                    className="w-full btn-base btn-secondary !py-3 text-base cursor-pointer"
-                  >
-                    {t('login')}
-                  </button>
-                  <button
-                    onClick={openRegisterModal}
-                    className="w-full btn-base btn-primary !py-3 text-base cursor-pointer"
-                  >
-                    {t('register')}
-                  </button>
-                  <LanguageSwitcher />
-                </>
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogoutClick}
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                >
+                  <LogOut size={26} className="flex-shrink-0" />
+                  <span className="text-xl font-medium">{t('logout')}</span>
+                </button>
               ) : (
-                <>
-                  <button
-                    onClick={handleLogoutClick}
-                    className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
-                  >
-                    <LogOut size={26} className="flex-shrink-0" />
-                    <span className="text-xl font-medium">{t('logout')}</span>
-                  </button>
-                </>
+                <LanguageSwitcher />
               )}
             </div>
           </div>
