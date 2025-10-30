@@ -9,6 +9,7 @@ import MultiSelectDropdown from './MultiSelectDropdown';
 import DatePicker from './DatePicker';
 import ToggleSwitch from './ToggleSwitch';
 import AvailabilityScheduler from './AvailabilityScheduler';
+import MeetingPointsSelector from './MeetingPointsSelector';
 import { ArrowLeft, User, Sparkles, Image, Video, Briefcase, Clock, MapPinned, Euro, FileText, ShieldCheck, Check } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import {
@@ -62,6 +63,7 @@ export default function EscortProfileForm() {
     services: user?.services || [],
     description: user?.description || '',
     availability: user?.availability || {},
+    meetingPoints: user?.meetingPoints || [],
     price30Min: user?.price30Min || undefined,
     price1Hour: user?.price1Hour || undefined,
     price2Hours: user?.price2Hours || undefined,
@@ -164,6 +166,7 @@ export default function EscortProfileForm() {
         services: updatedUser.services || [],
         description: updatedUser.description || '',
         availability: updatedUser.availability || {},
+        meetingPoints: updatedUser.meetingPoints || [],
         price30Min: updatedUser.price30Min || undefined,
         price1Hour: updatedUser.price1Hour || undefined,
         price2Hours: updatedUser.price2Hours || undefined,
@@ -1026,7 +1029,15 @@ export default function EscortProfileForm() {
               }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Treffpunkte</h2>
-              <p className="text-muted text-sm">Treffpunkte-Felder (Arbeitsort, Incall/Outcall) werden hier hinzugefügt.</p>
+              <p className="text-muted text-sm mb-4">Wähle alle Orte aus, an denen du dich treffen möchtest.</p>
+              <MeetingPointsSelector
+                selectedPoints={formData.meetingPoints || []}
+                onChange={(points) => {
+                  const newData = { ...formData, meetingPoints: points };
+                  setFormData(newData);
+                  debouncedSave(newData);
+                }}
+              />
             </div>
 
             {/* Preise Section */}

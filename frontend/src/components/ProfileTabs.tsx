@@ -18,6 +18,7 @@ interface ProfileTabsProps {
     priceOvernight?: number;
     priceWeekend?: number;
     description?: string;
+    meetingPoints?: string[];
   };
   initialTab?: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen';
   onTabChange?: (tab: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen') => void;
@@ -241,7 +242,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Treffpunkte
             </h3>
 
-            <MeetingPointsDisplay />
+            <MeetingPointsDisplay selectedPoints={escort?.meetingPoints} />
           </>
         );
       case 'ueber-mich':
@@ -455,7 +456,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Treffpunkte
             </h3>
 
-            <MeetingPointsDisplay />
+            <MeetingPointsDisplay selectedPoints={escort?.meetingPoints} />
           </div>
 
         {/* Über mich Section */}
@@ -769,7 +770,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Treffpunkte
             </h3>
 
-            <MeetingPointsDisplay />
+            <MeetingPointsDisplay selectedPoints={escort?.meetingPoints} />
           </div>
 
           {/* Über mich Section */}

@@ -122,3 +122,54 @@ export const INTIMATE_HAIR = [
   'Behaart',
   'Stark behaart',
 ];
+
+export const MEETING_POINTS = [
+  {
+    id: 'escort_apartment',
+    label: 'Bei mir (Wohnung)',
+    description: 'Treffen in meiner privaten Wohnung',
+    icon: 'family_home',
+  },
+  {
+    id: 'escort_shared',
+    label: 'Bei mir (WG)',
+    description: 'Treffen in meiner Wohngemeinschaft',
+    icon: 'family_group',
+  },
+  {
+    id: 'client_home',
+    label: 'Bei dir zu Hause',
+    description: 'Ich komme zu dir nach Hause',
+    icon: 'location_home',
+  },
+  {
+    id: 'hotel',
+    label: 'Hotel',
+    description: 'Treffen in einem Hotel',
+    icon: 'king_bed',
+  },
+  {
+    id: 'office',
+    label: 'Büro',
+    description: 'Diskretes Treffen im Büro',
+    icon: 'business_center',
+  },
+  {
+    id: 'car',
+    label: 'Auto',
+    description: 'Treffen im Auto',
+    icon: 'directions_car',
+  },
+  {
+    id: 'club',
+    label: 'Club',
+    description: 'Begleitung in Club oder Bar',
+    icon: 'domino_mask',
+  },
+  {
+    id: 'outdoor',
+    label: 'Im Freien',
+    description: 'Treffen an öffentlichen Orten',
+    icon: 'park',
+  },
+] as const;

@@ -95,6 +95,11 @@ export class UpdateEscortProfileDto {
   @IsOptional()
   availability?: any; // Verfügbarkeitszeiten pro Wochentag
 
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  meetingPoints?: string[]; // Treffpunkte
+
   // === PREISE ===
 
   @IsOptional()

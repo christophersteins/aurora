@@ -49,6 +49,7 @@ export interface User {
   services?: string[];
   description?: string;
   availability?: AvailabilitySchedule;
+  meetingPoints?: string[];
   isOnline?: boolean;
   lastSeen?: string;
   readReceipts?: boolean;
@@ -113,6 +114,7 @@ export interface UpdateEscortProfileDto {
   services?: string[];
   description?: string;
   availability?: AvailabilitySchedule;
+  meetingPoints?: string[];
   // Preise
   price30Min?: number;
   price1Hour?: number;

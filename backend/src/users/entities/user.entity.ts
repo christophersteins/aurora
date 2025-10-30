@@ -150,6 +150,9 @@ export class User {
   @Column({ type: 'jsonb', nullable: true })
   availability: any; // Verfügbarkeitszeiten pro Wochentag
 
+  @Column('text', { array: true, nullable: true })
+  meetingPoints: string[]; // Treffpunkte
+
   // === PREISE ===
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
