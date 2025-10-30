@@ -38,6 +38,10 @@ export const routing = defineRouting({
     '/verify-email': {
       en: '/verify-email',
       de: '/email-verifizieren'
+    },
+    '/bookmarks': {
+      en: '/bookmarks',
+      de: '/merkliste'
     }
   }
 });

@@ -12,8 +12,8 @@ type GridView = 'compact' | 'comfortable';
 
 export default function MerklistePage() {
   const router = useRouter();
-  const t = useTranslations('members');
-  const { user, token } = useAuthStore();
+  const t = useTranslations('bookmarks');
+  const { user, token, _hasHydrated } = useAuthStore();
   const [bookmarkedEscorts, setBookmarkedEscorts] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +47,14 @@ export default function MerklistePage() {
       const fallbackCoords = { latitude: 51.1657, longitude: 10.4515 }; // Center of Germany
 
       try {
-        const response = await fetch('https://ipapi.co/json/');
+        const response = await fetch('https://ipapi.co/json/', {
+          signal: AbortSignal.timeout(5000), // 5 second timeout
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch location');
+        }
+
         const data = await response.json();
 
         const latitude = data.latitude || fallbackCoords.latitude;
@@ -56,7 +63,7 @@ export default function MerklistePage() {
         setUserLatitude(latitude);
         setUserLongitude(longitude);
       } catch (error) {
-        console.error('Error getting location from IP:', error);
+        console.warn('Could not get location from IP, using fallback:', error);
         setUserLatitude(fallbackCoords.latitude);
         setUserLongitude(fallbackCoords.longitude);
       }
@@ -66,6 +73,12 @@ export default function MerklistePage() {
   }, []);
 
   useEffect(() => {
+    // Wait for hydration before checking auth
+    if (!_hasHydrated) {
+      return;
+    }
+
+    // Redirect to login if not authenticated after hydration
     if (!user || !token) {
       router.push('/login');
       return;
@@ -82,14 +95,14 @@ export default function MerklistePage() {
         setBookmarkedEscorts(response.data);
       } catch (err: any) {
         console.error('Error fetching bookmarks:', err);
-        setError(err.response?.data?.message || 'Fehler beim Laden der Merkliste');
+        setError(err.response?.data?.message || 'Error loading bookmarks');
       } finally {
         setLoading(false);
       }
     };
 
     fetchBookmarks();
-  }, [user, token, router]);
+  }, [_hasHydrated, user, token, router]);
 
   const removeBookmark = async (escortId: string) => {
     if (!token) return;
@@ -106,7 +119,8 @@ export default function MerklistePage() {
     }
   };
 
-  if (!user) {
+  // Show loading while hydrating or fetching data
+  if (!_hasHydrated || !user) {
     return null;
   }
 
@@ -143,7 +157,7 @@ export default function MerklistePage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl text-heading">Meine Merkliste</h1>
+          <h1 className="text-4xl text-heading">{t('title')}</h1>
 
           {/* View Switcher */}
           <div className="flex gap-2">
@@ -178,16 +192,16 @@ export default function MerklistePage() {
         <div className="text-center py-12 rounded-lg border-depth" style={{ background: 'var(--background-primary)' }}>
           <Heart className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
           <p style={{ color: 'var(--text-heading)' }} className="text-xl font-semibold mb-2">
-            Keine Profile gemerkt
+            {t('noBookmarks')}
           </p>
           <p style={{ color: 'var(--text-secondary)' }} className="mb-4">
-            Markiere Profile mit dem Merken-Button, um sie hier zu sehen
+            {t('noBookmarksDescription')}
           </p>
           <button
             onClick={() => router.push('/escorts')}
             className="btn-base btn-primary cursor-pointer"
           >
-            Escorts durchsuchen
+            {t('browseEscorts')}
           </button>
         </div>
       ) : (
@@ -233,7 +247,7 @@ export default function MerklistePage() {
                     background: 'rgba(0, 0, 0, 0.6)',
                     color: 'var(--color-primary)',
                   }}
-                  title="Von Merkliste entfernen"
+                  title={t('removeFromBookmarks')}
                 >
                   <Heart className="w-5 h-5" fill="currentColor" />
                 </button>

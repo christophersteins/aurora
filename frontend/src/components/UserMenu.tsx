@@ -107,17 +107,15 @@ export default function UserMenu() {
               <span className="font-medium">{t('dates')}</span>
             </Link>
 
-            {/* Merkliste - nur für Kunden */}
-            {user.role === 'customer' && (
-              <Link
-                href="/merkliste"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 link-secondary"
-              >
-                <Bookmark size={18} className="text-[#71767b]" />
-                <span className="font-medium">{t('bookmarks')}</span>
-              </Link>
-            )}
+            {/* Merkliste */}
+            <Link
+              href="/bookmarks"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center space-x-3 px-4 py-3 link-secondary"
+            >
+              <Bookmark size={18} className="text-[#71767b]" />
+              <span className="font-medium">{t('bookmarks')}</span>
+            </Link>
 
             <Link
               href="/settings"
