@@ -42,6 +42,10 @@ export const routing = defineRouting({
     '/bookmarks': {
       en: '/bookmarks',
       de: '/merkliste'
+    },
+    '/profile': {
+      en: '/profile',
+      de: '/profil'
     }
   }
 });

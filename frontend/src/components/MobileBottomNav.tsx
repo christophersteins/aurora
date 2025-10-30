@@ -151,12 +151,12 @@ export default function MobileBottomNav() {
 
         {/* My Profile */}
         <Link
-          href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+          href={user?.role === 'escort' ? '/profile' : '/customer-profile'}
           className="flex flex-col items-center justify-center flex-1 py-2"
         >
           <User
             size={24}
-            strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2}
+            strokeWidth={isActive('/profile') || isActive('/customer-profile') ? 2.5 : 2}
             className="mb-1"
             style={{ color: 'var(--text-heading)' }}
           />
@@ -164,7 +164,7 @@ export default function MobileBottomNav() {
             className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
-              fontWeight: (isActive('/escort-profile') || isActive('/customer-profile')) ? 600 : 400,
+              fontWeight: (isActive('/profile') || isActive('/customer-profile')) ? 600 : 400,
             }}
           >
             {t('myProfile')}

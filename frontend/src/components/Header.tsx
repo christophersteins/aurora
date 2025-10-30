@@ -312,15 +312,15 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <Link
-                  href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+                  href={user?.role === 'escort' ? '/profile' : '/customer-profile'}
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                    isActive('/escort-profile') || isActive('/customer-profile')
+                    isActive('/profile') || isActive('/customer-profile')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                       : 'link-primary'
                   }`}
                 >
-                  <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
-                  <span className={`text-xl ${isActive('/escort-profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
+                  <User size={26} className="flex-shrink-0" strokeWidth={isActive('/profile') || isActive('/customer-profile') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
                 </Link>
                 <Link
                   href="/settings"
@@ -520,16 +520,16 @@ export default function Header() {
               {isAuthenticated ? (
                 <>
                   <Link
-                    href={user?.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+                    href={user?.role === 'escort' ? '/profile' : '/customer-profile'}
                     onClick={closeMobileMenu}
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                      isActive('/escort-profile') || isActive('/customer-profile')
+                      isActive('/profile') || isActive('/customer-profile')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                         : 'link-primary'
                     }`}
                   >
-                    <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
-                    <span className={`text-xl ${isActive('/escort-profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
+                    <User size={26} className="flex-shrink-0" strokeWidth={isActive('/profile') || isActive('/customer-profile') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/profile') || isActive('/customer-profile') ? 'font-bold' : 'font-medium'}`}>{t('myProfile')}</span>
                   </Link>
                   <Link
                     href="/settings"

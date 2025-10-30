@@ -89,7 +89,7 @@ export default function UserMenu() {
           {/* Menu Items */}
           <div className="py-1">
             <Link
-              href={user.role === 'escort' ? '/escort-profile' : '/customer-profile'}
+              href={user.role === 'escort' ? '/profile' : '/customer-profile'}
               onClick={() => setIsOpen(false)}
               className="flex items-center space-x-3 px-4 py-3 link-secondary"
             >

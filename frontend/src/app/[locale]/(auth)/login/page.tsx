@@ -34,7 +34,7 @@ export default function LoginPage() {
       if (response.user.role === 'customer') {
         router.push('/');
       } else if (response.user.role === 'escort') {
-        router.push('/escort-profile');
+        router.push('/profile');
       } else {
         router.push('/');
       }
