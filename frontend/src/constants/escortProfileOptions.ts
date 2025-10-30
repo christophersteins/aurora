@@ -139,6 +139,7 @@ export const MEETING_POINTS = [
   {
     id: 'client_home',
     label: 'Bei dir zu Hause',
+    editLabel: 'Beim Kunden zu Hause',
     description: 'Ich komme zu dir nach Hause',
     icon: 'location_home',
   },
@@ -155,16 +156,16 @@ export const MEETING_POINTS = [
     icon: 'business_center',
   },
   {
-    id: 'car',
-    label: 'Auto',
-    description: 'Treffen im Auto',
-    icon: 'directions_car',
-  },
-  {
     id: 'club',
     label: 'Club',
     description: 'Begleitung in Club oder Bar',
     icon: 'domino_mask',
+  },
+  {
+    id: 'car',
+    label: 'Auto',
+    description: 'Treffen im Auto',
+    icon: 'directions_car',
   },
   {
     id: 'outdoor',

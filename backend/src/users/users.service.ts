@@ -256,6 +256,17 @@ export class UsersService {
       isSmoker?: boolean;
       services?: string[];
       description?: string;
+      availability?: any;
+      meetingPoints?: string[];
+      price30Min?: number;
+      price1Hour?: number;
+      price2Hours?: number;
+      price3Hours?: number;
+      price6Hours?: number;
+      price12Hours?: number;
+      price24Hours?: number;
+      priceOvernight?: number;
+      priceWeekend?: number;
     },
   ): Promise<User> {
     console.log('updateEscortProfile called for user:', userId);
@@ -302,6 +313,21 @@ export class UsersService {
     if (updateData.services !== undefined) user.services = updateData.services;
     if (updateData.description !== undefined) user.description = updateData.description;
 
+    // Update availability and meeting points
+    if (updateData.availability !== undefined) user.availability = updateData.availability;
+    if (updateData.meetingPoints !== undefined) user.meetingPoints = updateData.meetingPoints;
+
+    // Update prices
+    if (updateData.price30Min !== undefined) user.price30Min = updateData.price30Min;
+    if (updateData.price1Hour !== undefined) user.price1Hour = updateData.price1Hour;
+    if (updateData.price2Hours !== undefined) user.price2Hours = updateData.price2Hours;
+    if (updateData.price3Hours !== undefined) user.price3Hours = updateData.price3Hours;
+    if (updateData.price6Hours !== undefined) user.price6Hours = updateData.price6Hours;
+    if (updateData.price12Hours !== undefined) user.price12Hours = updateData.price12Hours;
+    if (updateData.price24Hours !== undefined) user.price24Hours = updateData.price24Hours;
+    if (updateData.priceOvernight !== undefined) user.priceOvernight = updateData.priceOvernight;
+    if (updateData.priceWeekend !== undefined) user.priceWeekend = updateData.priceWeekend;
+
     console.log('User data after update (before save):', {
       id: user.id,
       birthDate: user.birthDate,
@@ -309,6 +335,9 @@ export class UsersService {
       weight: user.weight,
       bodyType: user.bodyType,
       cupSize: user.cupSize,
+      meetingPoints: user.meetingPoints,
+      availability: user.availability,
+      services: user.services,
     });
 
     // Save and reload to ensure we get the latest data
@@ -328,6 +357,9 @@ export class UsersService {
       weight: reloadedUser.weight,
       bodyType: reloadedUser.bodyType,
       cupSize: reloadedUser.cupSize,
+      meetingPoints: reloadedUser.meetingPoints,
+      availability: reloadedUser.availability,
+      services: reloadedUser.services,
     });
 
     return reloadedUser;
