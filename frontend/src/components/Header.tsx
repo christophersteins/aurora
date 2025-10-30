@@ -208,7 +208,7 @@ export default function Header() {
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isActive('/')
                   ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-secondary'
+                  : 'link-primary'
               }`}
             >
               <Home size={26} className="flex-shrink-0" strokeWidth={isActive('/') ? 2.5 : 2} />
@@ -221,7 +221,7 @@ export default function Header() {
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors w-full cursor-pointer ${
                     isActive('/notifications')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                      : 'link-secondary'
+                      : 'link-primary'
                   }`}
                 >
                   <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
@@ -232,7 +232,7 @@ export default function Header() {
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
                     isActive('/chat')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                      : 'link-secondary'
+                      : 'link-primary'
                   }`}
                 >
                   <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
@@ -251,7 +251,7 @@ export default function Header() {
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isActive('/escorts')
                   ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-secondary'
+                  : 'link-primary'
               }`}
             >
               <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
@@ -262,7 +262,7 @@ export default function Header() {
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isActive('/clubs')
                   ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-secondary'
+                  : 'link-primary'
               }`}
             >
               <Building2 size={26} className="flex-shrink-0" strokeWidth={isActive('/clubs') ? 2.5 : 2} />
@@ -273,7 +273,7 @@ export default function Header() {
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isActive('/videos')
                   ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-secondary'
+                  : 'link-primary'
               }`}
             >
               <Video size={26} className="flex-shrink-0" strokeWidth={isActive('/videos') ? 2.5 : 2} />
@@ -284,7 +284,7 @@ export default function Header() {
               className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                 isActive('/premium')
                   ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                  : 'link-secondary'
+                  : 'link-primary'
               }`}
             >
               <Sparkles size={26} className="flex-shrink-0" strokeWidth={isActive('/premium') ? 2.5 : 2} />
@@ -298,7 +298,7 @@ export default function Header() {
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                     isActive('/escort-profile') || isActive('/customer-profile')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                      : 'link-secondary'
+                      : 'link-primary'
                   }`}
                 >
                   <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
@@ -309,7 +309,7 @@ export default function Header() {
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                     isActive('/settings')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                      : 'link-secondary'
+                      : 'link-primary'
                   }`}
                 >
                   <Settings size={26} className="flex-shrink-0" strokeWidth={isActive('/settings') ? 2.5 : 2} />
@@ -320,7 +320,7 @@ export default function Header() {
               <>
                 <button
                   onClick={openLoginModal}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-secondary w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-primary w-full cursor-pointer"
                 >
                   <LogIn size={26} className="flex-shrink-0" strokeWidth={2} />
                   <span className="text-xl font-medium">{t('login')}</span>
@@ -340,7 +340,7 @@ export default function Header() {
             {isAuthenticated ? (
               <button
                 onClick={handleLogoutClick}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                className="flex items-center gap-4 px-4 py-3 rounded-xl link-primary transition-colors w-full cursor-pointer"
               >
                 <LogOut size={26} className="flex-shrink-0" />
                 <span className="text-xl font-medium">{t('logout')}</span>
@@ -389,7 +389,7 @@ export default function Header() {
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/')
                     ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-secondary'
+                    : 'link-primary'
                 }`}
               >
                 <Home size={26} className="flex-shrink-0" strokeWidth={isActive('/') ? 2.5 : 2} />
@@ -403,7 +403,7 @@ export default function Header() {
                     className={`w-full flex items-center gap-4 px-4 py-3 cursor-pointer rounded-xl transition-colors ${
                       isActive('/notifications')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                        : 'link-secondary'
+                        : 'link-primary'
                     }`}
                   >
                     <Bell size={26} className="flex-shrink-0" strokeWidth={isActive('/notifications') ? 2.5 : 2} />
@@ -416,7 +416,7 @@ export default function Header() {
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors relative ${
                       isActive('/chat')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                        : 'link-secondary'
+                        : 'link-primary'
                     }`}
                   >
                     <MessageCircle size={26} className="flex-shrink-0" strokeWidth={isActive('/chat') ? 2.5 : 2} />
@@ -436,7 +436,7 @@ export default function Header() {
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/escorts')
                     ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-secondary'
+                    : 'link-primary'
                 }`}
               >
                 <Users size={26} className="flex-shrink-0" strokeWidth={isActive('/escorts') ? 2.5 : 2} />
@@ -448,7 +448,7 @@ export default function Header() {
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/clubs')
                     ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-secondary'
+                    : 'link-primary'
                 }`}
               >
                 <Building2 size={26} className="flex-shrink-0" strokeWidth={isActive('/clubs') ? 2.5 : 2} />
@@ -460,7 +460,7 @@ export default function Header() {
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/videos')
                     ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-secondary'
+                    : 'link-primary'
                 }`}
               >
                 <Video size={26} className="flex-shrink-0" strokeWidth={isActive('/videos') ? 2.5 : 2} />
@@ -472,7 +472,7 @@ export default function Header() {
                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                   isActive('/premium')
                     ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                    : 'link-secondary'
+                    : 'link-primary'
                 }`}
               >
                 <Sparkles size={26} className="flex-shrink-0" strokeWidth={isActive('/premium') ? 2.5 : 2} />
@@ -487,7 +487,7 @@ export default function Header() {
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                       isActive('/escort-profile') || isActive('/customer-profile')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                        : 'link-secondary'
+                        : 'link-primary'
                     }`}
                   >
                     <User size={26} className="flex-shrink-0" strokeWidth={isActive('/escort-profile') || isActive('/customer-profile') ? 2.5 : 2} />
@@ -499,7 +499,7 @@ export default function Header() {
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                       isActive('/settings')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
-                        : 'link-secondary'
+                        : 'link-primary'
                     }`}
                   >
                     <Settings size={26} className="flex-shrink-0" strokeWidth={isActive('/settings') ? 2.5 : 2} />
@@ -510,7 +510,7 @@ export default function Header() {
                 <>
                   <button
                     onClick={openLoginModal}
-                    className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-secondary w-full cursor-pointer"
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors link-primary w-full cursor-pointer"
                   >
                     <LogIn size={26} className="flex-shrink-0" strokeWidth={2} />
                     <span className="text-xl font-medium">{t('login')}</span>
@@ -530,7 +530,7 @@ export default function Header() {
               {isAuthenticated ? (
                 <button
                   onClick={handleLogoutClick}
-                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-secondary transition-colors w-full cursor-pointer"
+                  className="flex items-center gap-4 px-4 py-3 rounded-xl link-primary transition-colors w-full cursor-pointer"
                 >
                   <LogOut size={26} className="flex-shrink-0" />
                   <span className="text-xl font-medium">{t('logout')}</span>

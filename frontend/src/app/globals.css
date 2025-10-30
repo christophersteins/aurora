@@ -594,25 +594,25 @@ textarea:focus {
 }
 
 .link-primary {
-  color: var(--color-primary);
-  font-weight: 500;
-  transition: color 0.2s ease-in-out;
-}
-
-.link-primary:hover {
-  color: var(--color-primary-hover);
-  text-decoration: underline;
-}
-
-.link-secondary {
   color: var(--text-heading);
   font-weight: 500;
   transition: color 0.2s ease-in-out;
 }
 
-.link-secondary:hover {
+.link-primary:hover {
   color: var(--text-heading-hover);
   text-decoration: none;
+}
+
+.link-secondary {
+  color: var(--color-primary);
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.link-secondary:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
 }
 
 /* ========================================
