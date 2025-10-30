@@ -192,7 +192,7 @@ export default function Header() {
 
       {/* Desktop Sidebar - Left */}
       <aside className="hidden lg:flex fixed top-0 bottom-0 w-[260px] bg-[#000000]/80 backdrop-blur-md border-r border-[#2f3336] z-40 flex-col" style={{ left: 'var(--sidebar-offset, 0px)' }}>
-        <div className="flex-1 flex flex-col py-4 pl-3 pr-6">
+        <div className="flex-1 flex flex-col pt-8 pb-4 pl-3 pr-6">
           {/* Logo */}
           <Link href="/" className="flex items-center px-4 mb-8">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r from-[#00d4ff] via-[#4d7cfe] to-[#b845ed]">

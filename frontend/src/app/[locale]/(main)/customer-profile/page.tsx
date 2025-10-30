@@ -196,7 +196,7 @@ export default function CustomerProfilePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto px-4 sm:px-6 lg:px-0 py-8" style={{ maxWidth: 'var(--max-content-width)' }}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-0 pt-8 pb-8 lg:pt-4" style={{ maxWidth: 'var(--max-content-width)' }}>
         {/* Überschrift mit Button - Desktop Layout */}
         <div className="hidden lg:flex lg:items-center lg:justify-between mb-6">
           <h1 className="text-3xl font-bold text-heading">Profil bearbeiten</h1>

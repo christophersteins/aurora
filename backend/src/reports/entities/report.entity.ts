@@ -28,7 +28,7 @@ export class Report {
   reporter: User;
 
   @Column({ nullable: true })
-  reporterId: string;
+  reporterId: string | null;
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'reportedUserId' })
