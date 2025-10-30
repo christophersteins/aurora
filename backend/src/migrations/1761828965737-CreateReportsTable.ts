@@ -24,7 +24,7 @@ export class CreateReportsTable1761828965737 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE "reports" (
                 "id" SERIAL NOT NULL,
-                "reporterId" uuid NOT NULL,
+                "reporterId" uuid,
                 "reportedUserId" uuid NOT NULL,
                 "category" "reports_category_enum" NOT NULL,
                 "description" text NOT NULL,

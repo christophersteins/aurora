@@ -23,11 +23,11 @@ export class Report {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'reporterId' })
   reporter: User;
 
-  @Column()
+  @Column({ nullable: true })
   reporterId: string;
 
   @ManyToOne(() => User, { nullable: false })

@@ -14,7 +14,7 @@ export class ReportsService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(createReportDto: CreateReportDto, reporterId: string): Promise<Report> {
+  async create(createReportDto: CreateReportDto, reporterId: string | null): Promise<Report> {
     // Check if reported user exists
     const reportedUser = await this.usersRepository.findOne({
       where: { id: createReportDto.reportedUserId },
@@ -24,23 +24,25 @@ export class ReportsService {
       throw new NotFoundException('Reported user not found');
     }
 
-    // Prevent users from reporting themselves
-    if (reporterId === createReportDto.reportedUserId) {
+    // Prevent users from reporting themselves (only if logged in)
+    if (reporterId && reporterId === createReportDto.reportedUserId) {
       throw new BadRequestException('You cannot report yourself');
     }
 
-    // Check if user has already reported this user for the same category
-    const existingReport = await this.reportsRepository.findOne({
-      where: {
-        reporterId,
-        reportedUserId: createReportDto.reportedUserId,
-        category: createReportDto.category,
-        status: ReportStatus.PENDING,
-      },
-    });
+    // Check if user has already reported this user for the same category (only if logged in)
+    if (reporterId) {
+      const existingReport = await this.reportsRepository.findOne({
+        where: {
+          reporterId,
+          reportedUserId: createReportDto.reportedUserId,
+          category: createReportDto.category,
+          status: ReportStatus.PENDING,
+        },
+      });
 
-    if (existingReport) {
-      throw new BadRequestException('You have already reported this user for this reason');
+      if (existingReport) {
+        throw new BadRequestException('You have already reported this user for this reason');
+      }
     }
 
     const report = this.reportsRepository.create({

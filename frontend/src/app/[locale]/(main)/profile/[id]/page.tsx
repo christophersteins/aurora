@@ -1088,13 +1088,7 @@ export default function ProfilePage() {
 
                 {/* Report */}
                 <button
-                  onClick={() => {
-                    if (_hasHydrated && isAuthenticated) {
-                      setReportModalOpen(true);
-                    } else {
-                      setLoginModalOpen(true);
-                    }
-                  }}
+                  onClick={() => setReportModalOpen(true)}
                   className="flex flex-col items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
                   style={{ color: 'var(--text-secondary)' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}

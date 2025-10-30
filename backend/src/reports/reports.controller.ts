@@ -8,9 +8,10 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
   create(@Body() createReportDto: CreateReportDto, @Request() req) {
-    return this.reportsService.create(createReportDto, req.user.id);
+    // Extract user ID from request if user is authenticated, otherwise null
+    const reporterId = req.user?.id || null;
+    return this.reportsService.create(createReportDto, reporterId);
   }
 
   @Get()
