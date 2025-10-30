@@ -991,9 +991,9 @@ export default function ProfilePage() {
                   <button
                     onClick={() => setIsFullscreen(true)}
                     className="flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
-                    style={{ color: 'var(--color-primary)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
+                    style={{ color: 'var(--text-heading)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
@@ -1142,10 +1142,8 @@ export default function ProfilePage() {
                 </div>
                 <button
                   onClick={handleReviewsClick}
-                  className="text-sm transition-colors cursor-pointer"
+                  className="text-sm cursor-pointer hover:underline"
                   style={{ color: 'var(--text-secondary)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
                 >
                   {reviewCount} Bewertungen
                 </button>
@@ -1165,7 +1163,7 @@ export default function ProfilePage() {
                 <div className="space-y-1 mb-4 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                   {locationText && (
                     <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <Home className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
                       <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                         {locationText}
                       </span>
@@ -1173,7 +1171,7 @@ export default function ProfilePage() {
                   )}
                   {distanceKm !== null && (
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                      <MapPin className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
                       <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                         {distanceKm} km von dir entfernt
                       </span>
@@ -1191,8 +1189,8 @@ export default function ProfilePage() {
                       if (isOnline) {
                         return (
                           <>
-                            <Circle className="w-4 h-4" style={{ color: '#10b981', fill: '#10b981' }} />
-                            <span className="text-sm" style={{ color: 'var(--color-primary)' }}>
+                            <Circle className="w-4 h-4" style={{ color: 'var(--text-secondary)', fill: 'var(--text-secondary)' }} />
+                            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>
                               Jetzt online
                             </span>
                           </>
@@ -1200,7 +1198,7 @@ export default function ProfilePage() {
                       } else {
                         return (
                           <>
-                            <Clock className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
+                            <Clock className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
                             <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                               {lastSeen ? (
                                 (() => {
@@ -1315,6 +1313,18 @@ export default function ProfilePage() {
                 >
                   Nachricht schreiben
                 </button>
+
+                {/* Phone Number Link */}
+                <button
+                  onClick={() => setShowPhoneModal(true)}
+                  className="flex items-center justify-center gap-2 w-full py-3 transition-colors cursor-pointer"
+                  style={{ color: 'var(--text-heading)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-heading-hover)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-heading)')}
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm font-medium">Telefonnummer anzeigen</span>
+                </button>
               </div>
 
               {/* Tags */}
@@ -1330,18 +1340,6 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-
-            {/* Phone Number Link - Outside container */}
-            <button
-              onClick={() => setShowPhoneModal(true)}
-              className="flex items-center justify-center gap-2 w-full py-3 transition-colors cursor-pointer"
-              style={{ color: 'var(--color-primary)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary-hover)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-medium">Telefonnummer anzeigen</span>
-            </button>
             </div>
           </div>
 

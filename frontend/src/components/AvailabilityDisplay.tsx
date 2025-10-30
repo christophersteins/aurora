@@ -39,8 +39,8 @@ export default function AvailabilityDisplay({ availability }: AvailabilityDispla
             className="relative p-4 rounded-lg border"
             style={{
               background: isAvailable
-                ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
-                : 'var(--background-secondary)',
+                ? 'var(--background-secondary)'
+                : 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)',
               borderColor: 'var(--border)',
               borderWidth: '1px',
             }}

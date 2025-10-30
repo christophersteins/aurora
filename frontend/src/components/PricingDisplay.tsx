@@ -160,15 +160,25 @@ export default function PricingDisplay({ prices }: PricingDisplayProps) {
               }}
             >
               <div className="p-3">
-                <div className="flex items-center justify-between gap-3">
-                  {/* Left side: Duration */}
+                <div className="flex items-center gap-3">
+                  {/* Icon */}
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: 'var(--color-primary)',
+                    }}
+                  >
+                    <Hourglass className="w-4 h-4" style={{ color: 'white' }} />
+                  </div>
+
+                  {/* Duration */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm truncate" style={{ color: 'var(--text-secondary)' }}>
+                    <h4 className="font-medium text-sm truncate" style={{ color: 'var(--text-heading)' }}>
                       {option.duration}
                     </h4>
                   </div>
 
-                  {/* Right side: Price */}
+                  {/* Price */}
                   <div className="text-right flex-shrink-0">
                     <span
                       className="text-lg font-bold"
