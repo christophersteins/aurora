@@ -60,6 +60,10 @@
   /* Header/Footer padding - consistent across all breakpoints */
   --header-footer-padding-x: 1rem; /* Mobile: 1rem (16px) */
 
+  /* Chat empty state positioning - Mobile: account for fixed header/footer */
+  --empty-state-top: 80px;
+  --empty-state-bottom: 100px;
+
   /* ========================================
      RESPONSIVE FONT SIZES
      ======================================== */
@@ -96,6 +100,9 @@
     --sidebar-offset: max(0px, calc((100vw - var(--total-layout-width)) / 2));
     /* Filter sidebar width: sidebar offset + sidebar width + content padding left */
     --filter-sidebar-width: calc(var(--sidebar-offset) + var(--sidebar-width) + var(--content-padding-left));
+    /* Chat empty state positioning - Desktop: no fixed header/footer */
+    --empty-state-top: 0;
+    --empty-state-bottom: 0;
   }
 }
 
@@ -137,25 +144,6 @@ body {
   color: var(--text-regular);
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
-
-  /* TEMPORÄRE VISUALISIERUNG: 1360px Layout-Breite */
-  position: relative;
-}
-
-@media (min-width: 1024px) {
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: var(--sidebar-offset);
-    width: var(--total-layout-width);
-    background: rgba(139, 92, 246, 0.1); /* Leicht violetter Hintergrund */
-    border-left: 2px solid rgba(139, 92, 246, 0.5);
-    border-right: 2px solid rgba(139, 92, 246, 0.5);
-    pointer-events: none;
-    z-index: 9999;
-  }
 }
 
 /* ========================================

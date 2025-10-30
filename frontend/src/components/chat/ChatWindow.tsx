@@ -6,7 +6,7 @@ import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star, ArrowLeft } from 'lucide-react';
+import { Image, Smile, MoreVertical, Send, Search, ChevronUp, ChevronDown, X, Pin, MailOpen, Trash2, Mic, StopCircle, Trash, Star, ArrowLeft, MessageCircle } from 'lucide-react';
 import { chatService } from '@/services/chatService';
 import { useChatStore } from '@/store/chatStore';
 import { useOnlineStatusStore } from '@/store/onlineStatusStore';
@@ -572,13 +572,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
 
   if (!conversationId) {
     return (
-      <div className="flex items-center justify-center h-full w-full bg-page-primary">
-        <div className="text-center px-4">
-          <svg className="w-20 h-20 mx-auto mb-4 text-muted opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-          <p className="text-muted text-lg">Wähle eine Konversation aus</p>
-          <p className="text-muted text-sm mt-2 opacity-75">oder starte eine neue Unterhaltung</p>
+      <div className="flex flex-col h-full w-full bg-page-primary">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center px-4">
+            <svg className="w-20 h-20 mx-auto mb-4 text-muted opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <p className="text-muted text-lg">Wähle eine Konversation aus</p>
+            <p className="text-muted text-sm mt-2 opacity-75">oder starte eine neue Unterhaltung</p>
+          </div>
         </div>
       </div>
     );
@@ -825,7 +827,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
       </div>
 
       {/* Messages Area - Scrollable middle section with padding for fixed header/footer on mobile */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-page-primary scrollbar-hide pt-[80px] md:pt-4 pb-[100px] md:pb-4">
+      <div className={`flex-1 overflow-y-auto bg-page-primary scrollbar-hide md:static fixed inset-0 top-[80px] bottom-[100px] md:top-auto md:bottom-auto ${messages.length === 0 ? 'flex items-center justify-center' : 'p-4 space-y-3 md:pt-4 md:pb-4'}`}>
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -834,14 +836,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             </div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <svg className="w-16 h-16 mx-auto mb-3 text-muted opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <p className="text-muted">Noch keine Nachrichten</p>
-              <p className="text-muted text-sm mt-1 opacity-75">Schreibe die erste Nachricht</p>
-            </div>
+          <div className="text-center px-4">
+            <MessageCircle className="w-16 h-16 mx-auto mb-3 text-muted opacity-30" strokeWidth={1.5} />
+            <p className="text-muted">Noch keine Nachrichten</p>
+            <p className="text-muted text-sm mt-1 opacity-75">Schreibe die erste Nachricht</p>
           </div>
         ) : (
           <>
