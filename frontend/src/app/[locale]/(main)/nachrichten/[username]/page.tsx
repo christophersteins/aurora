@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChatWindow } from '@/components/chat/ChatWindow';
-import { ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
 export default function ChatPage() {
@@ -16,15 +15,6 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
-
-  // Auf Mobile zu Chat-Übersicht redirecten
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768; // md breakpoint
-    if (isMobile) {
-      router.replace('/nachrichten');
-      return;
-    }
-  }, [router]);
 
   useEffect(() => {
     const findOrCreateConversation = async () => {
@@ -95,7 +85,7 @@ export default function ChatPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-64px)] lg:h-screen">
+      <div className="flex items-center justify-center h-screen">
         <p className="text-gray-500">Lade Chat...</p>
       </div>
     );
@@ -103,7 +93,7 @@ export default function ChatPage() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] lg:h-screen gap-4">
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
         <p className="text-red-500">{error}</p>
         <button
           onClick={() => router.back()}
@@ -116,27 +106,14 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] lg:h-screen">
-      {/* Back button for mobile */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b md:hidden" style={{ background: 'var(--background-primary)', borderColor: 'var(--border)' }}>
-        <button
-          onClick={() => router.back()}
-          className="p-2 rounded-full transition-colors"
-          style={{ background: 'var(--background-secondary)' }}
-        >
-          <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-body)' }} />
-        </button>
-        <h1 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>
-          {otherUserName || 'Zurück'}
-        </h1>
-      </div>
-
+    <div className="flex flex-col h-screen">
       {/* Chat container with max width */}
       <div className="flex-1 overflow-hidden">
         <div className="mx-auto h-full" style={{ maxWidth: 'var(--max-content-width)' }}>
           <ChatWindow
             conversationId={conversationId}
             currentUserId={user?.id || ''}
+            onBack={() => router.back()}
           />
         </div>
       </div>

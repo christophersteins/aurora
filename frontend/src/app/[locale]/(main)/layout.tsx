@@ -12,15 +12,20 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const isChatPage = pathname?.includes('/nachrichten');
+  // Check if it's an individual chat page (e.g., /nachrichten/username)
+  const isIndividualChatPage = pathname?.match(/\/nachrichten\/[^\/]+$/);
 
   return (
     <>
-      <Header />
+      {/* Hide header on mobile for individual chat pages */}
+      <div className={isIndividualChatPage ? 'hidden lg:block' : ''}>
+        <Header />
+      </div>
       {/* Mobile: normal flow with bottom padding, Desktop: margin for sidebar */}
       {isChatPage ? (
         // Chat page: Fixed layout without padding/scrolling
         <main
-          className="fixed inset-0 pt-16 lg:pt-0 overflow-hidden"
+          className={`fixed inset-0 ${isIndividualChatPage ? 'pt-0' : 'pt-16'} lg:pt-0 overflow-hidden`}
           style={{
             marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
           }}

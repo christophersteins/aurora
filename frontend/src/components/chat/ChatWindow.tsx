@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSocket } from '@/contexts/SocketContext';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -11,7 +12,6 @@ import { useChatStore } from '@/store/chatStore';
 import { useOnlineStatusStore } from '@/store/onlineStatusStore';
 import ProfileAvatar from '@/components/ProfileAvatar';
 import { Conversation } from '@/types/chat.types';
-import { ProfilePreviewModal } from './ProfilePreviewModal';
 
 interface Message {
   id: string;
@@ -56,6 +56,7 @@ interface IncomingMessage {
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentUserId, onBack }) => {
+  const router = useRouter();
   const { socket, isConnected } = useSocket();
   const { markConversationAsRead } = useChatStore();
   const { getUserStatus } = useOnlineStatusStore();
@@ -69,7 +70,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
   const [searchTerm, setSearchTerm] = useState('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [isPinned, setIsPinned] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -624,7 +624,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
             {/* Profilbild */}
             <div
               className="relative flex-shrink-0 cursor-pointer"
-              onClick={() => setIsProfileModalOpen(true)}
+              onClick={() => {
+                if (conversation?.otherUserName) {
+                  router.push(`/profile/${conversation.otherUserName}`);
+                }
+              }}
               title="Profil anzeigen"
             >
               <ProfileAvatar
@@ -649,19 +653,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
               </p>
             </div>
 
-            {/* Search Button */}
+            {/* Search Button - Nur auf Desktop sichtbar */}
             <button
               onClick={handleSearchToggle}
-              className="p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
-              title="In Chat suchen"
+              className="hidden md:block p-2 text-muted hover:text-heading hover:bg-page-secondary rounded-full transition-all cursor-pointer"
+              title="Nachrichten suchen"
             >
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Favorite/Pin Button */}
+            {/* Favorite/Pin Button - Nur auf Desktop sichtbar */}
             <button
               onClick={handleTogglePin}
-              className={`p-2 rounded-full transition-all cursor-pointer ${
+              className={`hidden md:block p-2 rounded-full transition-all cursor-pointer ${
                 isPinned
                   ? 'text-yellow-500 hover:text-yellow-600 hover:bg-page-secondary'
                   : 'text-muted hover:text-heading hover:bg-page-secondary'
@@ -684,6 +688,29 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
               {/* Dropdown Menu */}
               {showOptionsMenu && (
                 <div className="absolute right-0 mt-2 w-64 bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-30">
+                  {/* Suchen - Nur auf Mobile im Menü */}
+                  <button
+                    onClick={() => {
+                      handleSearchToggle();
+                      setShowOptionsMenu(false);
+                    }}
+                    className="md:hidden w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+                  >
+                    <Search className="w-5 h-5" />
+                    <span>Nachrichten suchen</span>
+                  </button>
+                  {/* Als Favorit markieren - Nur auf Mobile im Menü */}
+                  <button
+                    onClick={() => {
+                      handleTogglePin();
+                      setShowOptionsMenu(false);
+                    }}
+                    className="md:hidden w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+                  >
+                    <Star className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
+                    <span>{isPinned ? 'Favorit entfernen' : 'Als Favorit markieren'}</span>
+                  </button>
+                  <div className="md:hidden border-t border-default my-1"></div>
                   <button
                     onClick={handleMarkAsUnread}
                     className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
@@ -693,10 +720,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
                   </button>
                   <button
                     onClick={handleTogglePin}
-                    className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+                    className="hidden md:block w-full px-4 py-3 text-left hover:bg-page-primary transition-all cursor-pointer"
                   >
-                    <Pin className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
-                    <span>{isPinned ? 'Chat loslösen' : 'Chat anheften'}</span>
+                    <div className="flex items-center gap-3 text-body">
+                      <Pin className={`w-5 h-5 ${isPinned ? 'fill-current' : ''}`} />
+                      <span>{isPinned ? 'Chat loslösen' : 'Chat anheften'}</span>
+                    </div>
                   </button>
                   <div className="border-t border-default my-1"></div>
                   <button
@@ -1038,20 +1067,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
           </div>
         )}
       </div>
-
-      {/* Profile Preview Modal */}
-      {conversation && (
-        <ProfilePreviewModal
-          isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
-          userId={conversation.otherUserId}
-          username={conversation.otherUserName}
-          profilePicture={conversation.otherUserProfilePicture}
-          role={conversation.otherUserRole}
-          isOnline={conversation.otherUserIsOnline}
-          lastSeen={conversation.otherUserLastSeen}
-        />
-      )}
     </div>
   );
 };
