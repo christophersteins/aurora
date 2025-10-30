@@ -119,26 +119,24 @@ export default function ChatPage() {
 
   return (
     <>
-      <div className="flex bg-page-primary overflow-hidden justify-center w-full h-full">
-        <div className="flex w-full h-full mx-auto overflow-hidden" style={{ maxWidth: 'var(--max-content-width)' }}>
-          {/* Conversation List - Hidden on mobile when chat is selected */}
-          <div className={`${selectedConversationId ? 'hidden md:block' : 'block'} w-full md:w-80 flex-shrink-0 h-full`}>
+      <div className="flex bg-page-primary overflow-hidden w-full h-full">
+        {/* Conversation List - Hidden on mobile when chat is selected */}
+        <div className={`${selectedConversationId ? 'hidden md:block' : 'block'} w-full md:w-80 flex-shrink-0 h-full`}>
             <ConversationList
               conversations={conversations}
               selectedId={selectedConversationId}
               onSelectConversation={handleSelectConversation}
               onNewConversation={() => setIsModalOpen(true)}
             />
-          </div>
+        </div>
 
-          {/* Chat Window - Hidden on mobile when no chat selected */}
-          <div className={`${!selectedConversationId ? 'hidden md:flex' : 'flex'} flex-1 min-w-0 h-full`}>
-            <ChatWindow
-              conversationId={selectedConversationId}
-              currentUserId={user?.id || ''}
-              onBack={() => setSelectedConversationId(null)}
-            />
-          </div>
+        {/* Chat Window - Hidden on mobile when no chat selected */}
+        <div className={`${!selectedConversationId ? 'hidden md:flex' : 'flex'} flex-1 min-w-0 h-full`}>
+          <ChatWindow
+            conversationId={selectedConversationId}
+            currentUserId={user?.id || ''}
+            onBack={() => setSelectedConversationId(null)}
+          />
         </div>
       </div>
 

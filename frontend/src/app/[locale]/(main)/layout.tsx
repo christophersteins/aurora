@@ -30,7 +30,9 @@ export default function MainLayout({
             marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))',
           }}
         >
-          {children}
+          <div className="h-full lg:max-w-[var(--max-content-width)] lg:pl-[var(--content-padding-left)]">
+            {children}
+          </div>
         </main>
       ) : (
         // Normal pages: Regular scrollable layout

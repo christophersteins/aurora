@@ -3,10 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChatWindow } from '@/components/chat/ChatWindow';
+import { ConversationList } from '@/components/chat/ConversationList';
 import { useAuthStore } from '@/store/authStore';
+import { useChatStore } from '@/store/chatStore';
 
 export default function ChatPage() {
   const { user } = useAuthStore();
+  const { conversations, setConversations } = useChatStore();
   const params = useParams();
   const router = useRouter();
   const recipientUsername = params.username as string;
@@ -15,6 +18,40 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
+
+  // Load conversations for the sidebar
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const storedAuth = localStorage.getItem('aurora-auth-storage');
+        let token = '';
+        if (storedAuth) {
+          try {
+            const parsedAuth = JSON.parse(storedAuth);
+            token = parsedAuth.state?.token || '';
+          } catch (e) {
+            console.error('Error parsing auth:', e);
+          }
+        }
+
+        const response = await fetch('http://localhost:4000/chat/conversations', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setConversations(data);
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+      }
+    };
+
+    fetchConversations();
+  }, [setConversations]);
 
   useEffect(() => {
     const findOrCreateConversation = async () => {
@@ -105,17 +142,36 @@ export default function ChatPage() {
     );
   }
 
+  const handleSelectConversation = (conversationId: string) => {
+    const conversation = conversations.find(c => c.id === conversationId);
+    if (conversation) {
+      router.push(`/nachrichten/${conversation.otherUserName}`);
+    }
+  };
+
+  const handleNewConversation = () => {
+    router.push('/nachrichten');
+  };
+
   return (
-    <div className="flex flex-col h-screen">
-      {/* Chat container with max width */}
-      <div className="flex-1 overflow-hidden">
-        <div className="mx-auto h-full" style={{ maxWidth: 'var(--max-content-width)' }}>
-          <ChatWindow
-            conversationId={conversationId}
-            currentUserId={user?.id || ''}
-            onBack={() => router.back()}
-          />
-        </div>
+    <div className="flex bg-page-primary overflow-hidden w-full h-full">
+      {/* Conversation List - Hidden on mobile, visible on desktop */}
+      <div className="hidden md:block w-80 flex-shrink-0 h-full">
+        <ConversationList
+          conversations={conversations}
+          selectedId={conversationId}
+          onSelectConversation={handleSelectConversation}
+          onNewConversation={handleNewConversation}
+        />
+      </div>
+
+      {/* Chat Window - Full width on mobile, flex-1 on desktop */}
+      <div className="flex flex-1 min-w-0 h-full">
+        <ChatWindow
+          conversationId={conversationId}
+          currentUserId={user?.id || ''}
+          onBack={() => router.back()}
+        />
       </div>
     </div>
   );

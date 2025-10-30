@@ -137,6 +137,25 @@ body {
   color: var(--text-regular);
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
+
+  /* TEMPORÄRE VISUALISIERUNG: 1360px Layout-Breite */
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: var(--sidebar-offset);
+    width: var(--total-layout-width);
+    background: rgba(139, 92, 246, 0.1); /* Leicht violetter Hintergrund */
+    border-left: 2px solid rgba(139, 92, 246, 0.5);
+    border-right: 2px solid rgba(139, 92, 246, 0.5);
+    pointer-events: none;
+    z-index: 9999;
+  }
 }
 
 /* ========================================
