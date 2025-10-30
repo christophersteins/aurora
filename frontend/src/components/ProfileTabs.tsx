@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileText, MessageSquare, Check } from 'lucide-react';
 import PricingDisplay from './PricingDisplay';
 import MeetingPointsDisplay from './MeetingPointsDisplay';
+import AvailabilityDisplay from './AvailabilityDisplay';
+import { AvailabilitySchedule } from '@/types/auth.types';
 
 interface ProfileTabsProps {
   escort?: {
@@ -19,6 +21,7 @@ interface ProfileTabsProps {
     priceWeekend?: number;
     description?: string;
     meetingPoints?: string[];
+    availability?: AvailabilitySchedule;
   };
   initialTab?: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen';
   onTabChange?: (tab: 'service' | 'preise' | 'zeiten' | 'treffpunkte' | 'ueber-mich' | 'bewertungen') => void;
@@ -179,60 +182,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Zeiten
             </h3>
 
-            {/* Weekly Schedule Grid */}
-            <div className="space-y-3 mb-6">
-              {[
-                { day: 'Mo', fullDay: 'Montag', hours: '10:00 - 22:00', available: true },
-                { day: 'Di', fullDay: 'Dienstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Mi', fullDay: 'Mittwoch', hours: '10:00 - 22:00', available: true },
-                { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
-                { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'So', fullDay: 'Sonntag', hours: 'Keine Termine', available: false },
-              ].map((day) => (
-                <div
-                  key={day.day}
-                  className="relative p-4 rounded-lg border"
-                  style={{
-                    background: day.available
-                      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
-                      : 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
-                    borderWidth: '1px',
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
-                        style={{
-                          background: day.available ? 'var(--color-primary)' : 'var(--background-tertiary)',
-                          color: day.available ? 'white' : 'var(--text-secondary)',
-                        }}
-                      >
-                        {day.day}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm" style={{ color: 'var(--text-heading)' }}>
-                          {day.fullDay}
-                        </p>
-                        <p className="text-xs" style={{ color: day.available ? 'var(--color-primary)' : 'var(--text-secondary)' }}>
-                          {day.available ? 'Verfügbar' : 'Nicht verfügbar'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className="text-sm font-medium"
-                        style={{ color: day.available ? 'var(--text-heading)' : 'var(--text-secondary)' }}
-                      >
-                        {day.hours}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AvailabilityDisplay availability={escort?.availability} />
           </>
         );
       case 'treffpunkte':
@@ -394,60 +344,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Zeiten
             </h3>
 
-            {/* Weekly Schedule Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {[
-                { day: 'Mo', fullDay: 'Montag', hours: '10:00 - 22:00', available: true },
-                { day: 'Di', fullDay: 'Dienstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Mi', fullDay: 'Mittwoch', hours: '10:00 - 22:00', available: true },
-                { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
-                { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'So', fullDay: 'Sonntag', hours: 'Keine Termine', available: false },
-              ].map((day) => (
-                <div
-                  key={day.day}
-                  className="relative p-4 rounded-lg border"
-                  style={{
-                    background: day.available
-                      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
-                      : 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
-                    borderWidth: '1px',
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
-                        style={{
-                          background: day.available ? 'var(--color-primary)' : 'var(--background-tertiary)',
-                          color: day.available ? 'white' : 'var(--text-secondary)',
-                        }}
-                      >
-                        {day.day}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm" style={{ color: 'var(--text-heading)' }}>
-                          {day.fullDay}
-                        </p>
-                        <p className="text-xs" style={{ color: day.available ? 'var(--color-primary)' : 'var(--text-secondary)' }}>
-                          {day.available ? 'Verfügbar' : 'Nicht verfügbar'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className="text-sm font-medium"
-                        style={{ color: day.available ? 'var(--text-heading)' : 'var(--text-secondary)' }}
-                      >
-                        {day.hours}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AvailabilityDisplay availability={escort?.availability} />
           </div>
 
         {/* Treffpunkte Section */}
@@ -682,60 +579,7 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Zeiten
             </h3>
 
-            {/* Weekly Schedule Grid */}
-            <div className="space-y-3 mb-6">
-              {[
-                { day: 'Mo', fullDay: 'Montag', hours: '10:00 - 22:00', available: true },
-                { day: 'Di', fullDay: 'Dienstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Mi', fullDay: 'Mittwoch', hours: '10:00 - 22:00', available: true },
-                { day: 'Do', fullDay: 'Donnerstag', hours: '10:00 - 22:00', available: true },
-                { day: 'Fr', fullDay: 'Freitag', hours: '12:00 - 02:00', available: true },
-                { day: 'Sa', fullDay: 'Samstag', hours: '12:00 - 02:00', available: true },
-                { day: 'So', fullDay: 'Sonntag', hours: 'Keine Termine', available: false },
-              ].map((day) => (
-                <div
-                  key={day.day}
-                  className="relative p-4 rounded-lg border"
-                  style={{
-                    background: day.available
-                      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%)'
-                      : 'var(--background-secondary)',
-                    borderColor: 'var(--border)',
-                    borderWidth: '1px',
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
-                        style={{
-                          background: day.available ? 'var(--color-primary)' : 'var(--background-tertiary)',
-                          color: day.available ? 'white' : 'var(--text-secondary)',
-                        }}
-                      >
-                        {day.day}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm" style={{ color: 'var(--text-heading)' }}>
-                          {day.fullDay}
-                        </p>
-                        <p className="text-xs" style={{ color: day.available ? 'var(--color-primary)' : 'var(--text-secondary)' }}>
-                          {day.available ? 'Verfügbar' : 'Nicht verfügbar'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className="text-sm font-medium"
-                        style={{ color: day.available ? 'var(--text-heading)' : 'var(--text-secondary)' }}
-                      >
-                        {day.hours}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AvailabilityDisplay availability={escort?.availability} />
           </div>
 
           {/* Treffpunkte Section */}

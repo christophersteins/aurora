@@ -85,6 +85,11 @@ export default function EscortProfileForm() {
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [loadingGallery, setLoadingGallery] = useState(false);
 
+  // State for time changes (manual save required)
+  const [tempAvailability, setTempAvailability] = useState(user?.availability || {});
+  const [hasUnsavedTimeChanges, setHasUnsavedTimeChanges] = useState(false);
+  const [isSavingTime, setIsSavingTime] = useState(false);
+
   // Mobile navigation state - null means menu is shown, string means section is shown
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -104,6 +109,11 @@ export default function EscortProfileForm() {
     { id: 'beschreibung', label: 'Beschreibung', icon: FileText },
     { id: 'verifizierung', label: 'Verifizierung', icon: ShieldCheck },
   ];
+
+  // Sync tempAvailability with formData when it changes (e.g., after save)
+  useEffect(() => {
+    setTempAvailability(formData.availability || {});
+  }, [formData.availability]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -203,6 +213,29 @@ export default function EscortProfileForm() {
       autoSave(newData);
     }, 1000);
   }, [autoSave]);
+
+  // Manual save for time changes
+  const handleSaveTimeChanges = async () => {
+    setIsSavingTime(true);
+    setError(null);
+
+    const newData = { ...formData, availability: tempAvailability };
+
+    try {
+      await autoSave(newData);
+      setHasUnsavedTimeChanges(false);
+    } catch (err) {
+      console.error('Error saving time changes:', err);
+    } finally {
+      setIsSavingTime(false);
+    }
+  };
+
+  // Discard time changes
+  const handleDiscardTimeChanges = () => {
+    setTempAvailability(formData.availability || {});
+    setHasUnsavedTimeChanges(false);
+  };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1004,14 +1037,73 @@ export default function EscortProfileForm() {
               }`}
             >
               <h2 className="text-xl font-bold text-heading mb-6 pt-6 lg:pt-0">Zeiten</h2>
+
+              {/* Unsaved Changes Banner */}
+              {hasUnsavedTimeChanges && (
+                <div className="mb-6 p-4 rounded-lg border-2 animate-in fade-in duration-300" style={{
+                  backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                  borderColor: 'var(--color-primary)',
+                }}>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5" style={{
+                      backgroundColor: 'var(--color-primary)',
+                    }}>
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-heading mb-1">
+                        Ungespeicherte Änderungen
+                      </p>
+                      <p className="text-xs text-muted">
+                        Du hast Änderungen an deinen Verfügbarkeitszeiten vorgenommen, die noch nicht gespeichert wurden.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <AvailabilityScheduler
-                value={formData.availability || {}}
+                value={tempAvailability}
                 onChange={(value) => {
-                  const newData = { ...formData, availability: value };
-                  setFormData(newData);
-                  debouncedSave(newData);
+                  setTempAvailability(value);
+                  setHasUnsavedTimeChanges(true);
                 }}
               />
+
+              {/* Save and Discard Buttons */}
+              {hasUnsavedTimeChanges && (
+                <div className="mt-6 flex gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <button
+                    onClick={handleDiscardTimeChanges}
+                    disabled={isSavingTime}
+                    className="flex-1 sm:flex-none px-6 py-3 rounded-lg border border-default text-body font-medium transition-all hover:bg-page-secondary disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Verwerfen
+                  </button>
+                  <button
+                    onClick={handleSaveTimeChanges}
+                    disabled={isSavingTime}
+                    className="flex-1 sm:flex-none px-6 py-3 rounded-lg text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                    style={{
+                      backgroundColor: 'var(--color-primary)',
+                    }}
+                    onMouseEnter={(e) => !isSavingTime && (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
+                  >
+                    {isSavingTime ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span>Speichert...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Änderungen speichern</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Treffpunkte Section */}
