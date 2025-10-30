@@ -13,7 +13,7 @@ export default function MobileBottomNav() {
   const t = useTranslations('nav');
 
   // Check if we're on the chat page
-  const isChatPage = pathname?.includes('/chat');
+  const isChatPage = pathname?.includes('/nachrichten');
 
   // Helper function to check if a link is active
   const isActive = (path: string) => {
@@ -101,13 +101,13 @@ export default function MobileBottomNav() {
 
         {/* Messages */}
         <Link
-          href="/chat"
+          href="/nachrichten"
           className="flex flex-col items-center justify-center flex-1 py-2 relative"
         >
           <div className="relative">
             <MessageCircle
               size={24}
-              strokeWidth={isActive('/chat') ? 2.5 : 2}
+              strokeWidth={isActive('/nachrichten') ? 2.5 : 2}
               className="mb-1"
               style={{ color: 'var(--text-heading)' }}
             />
@@ -121,7 +121,7 @@ export default function MobileBottomNav() {
             className="text-xs mobile-nav-text"
             style={{
               color: 'var(--text-secondary)',
-              fontWeight: isActive('/chat') ? 600 : 400,
+              fontWeight: isActive('/nachrichten') ? 600 : 400,
             }}
           >
             {t('messages')}

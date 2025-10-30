@@ -242,15 +242,15 @@ export default function Header() {
                   <span className={`text-xl ${isActive('/notifications') ? 'font-bold' : 'font-medium'}`}>{t('notifications')}</span>
                 </button>
                 <Link
-                  href="/chat"
+                  href="/nachrichten"
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                    isActive('/chat')
+                    isActive('/nachrichten')
                       ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                       : 'link-primary'
                   }`}
                 >
                   <div className="relative flex-shrink-0">
-                    <MessageCircle size={26} strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                    <MessageCircle size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
                     {totalUnreadCount > 0 && (
                       <span
                         className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"
@@ -260,7 +260,7 @@ export default function Header() {
                       </span>
                     )}
                   </div>
-                  <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
+                  <span className={`text-xl ${isActive('/nachrichten') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
                 </Link>
                 <Link
                   href="/bookmarks"
@@ -444,16 +444,16 @@ export default function Header() {
                   </button>
 
                   <Link
-                    href="/chat"
+                    href="/nachrichten"
                     onClick={closeMobileMenu}
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
-                      isActive('/chat')
+                      isActive('/nachrichten')
                         ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
                         : 'link-primary'
                     }`}
                   >
                     <div className="relative flex-shrink-0">
-                      <MessageCircle size={26} strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                      <MessageCircle size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
                       {totalUnreadCount > 0 && (
                         <span
                           className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"
@@ -463,7 +463,7 @@ export default function Header() {
                         </span>
                       )}
                     </div>
-                    <span className={`text-xl ${isActive('/chat') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
+                    <span className={`text-xl ${isActive('/nachrichten') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
                   </Link>
 
                   <Link

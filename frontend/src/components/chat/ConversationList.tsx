@@ -209,10 +209,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           <h1 className="text-xl font-bold text-heading">Nachrichten</h1>
           <button
             onClick={onNewConversation}
-            className="link-primary cursor-pointer"
+            className="cursor-pointer"
             title="Neue Nachricht"
           >
-            <SquarePen className="w-5 h-5" />
+            <SquarePen className="w-5 h-5 link-primary" />
           </button>
         </div>
 

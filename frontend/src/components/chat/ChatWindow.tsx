@@ -563,7 +563,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, currentU
       console.log('Chat gelöscht:', conversationId);
       setShowOptionsMenu(false);
       // Redirect to chat overview or clear selection
-      window.location.href = '/chat';
+      window.location.href = '/nachrichten';
     } catch (error) {
       console.error('Fehler beim Löschen des Chats:', error);
       alert('Fehler beim Löschen des Chats');

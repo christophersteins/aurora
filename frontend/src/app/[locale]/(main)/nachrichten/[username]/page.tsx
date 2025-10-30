@@ -10,7 +10,7 @@ export default function ChatPage() {
   const { user } = useAuthStore();
   const params = useParams();
   const router = useRouter();
-  const recipientId = params.userId as string;
+  const recipientUsername = params.username as string;
 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +21,7 @@ export default function ChatPage() {
   useEffect(() => {
     const isMobile = window.innerWidth < 768; // md breakpoint
     if (isMobile) {
-      router.replace('/chat');
+      router.replace('/nachrichten');
       return;
     }
   }, [router]);
@@ -44,6 +44,23 @@ export default function ChatPage() {
           }
         }
 
+        // First, get the user by username to get their ID
+        const userResponse = await fetch(`http://localhost:4000/users/username/${recipientUsername}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include',
+        });
+
+        if (!userResponse.ok) {
+          throw new Error('Benutzer nicht gefunden');
+        }
+
+        const otherUser = await userResponse.json();
+        const recipientId = otherUser.id;
+        setOtherUserName(otherUser.username);
+
+        // Then create or find the conversation
         const response = await fetch('http://localhost:4000/chat/conversations', {
           method: 'POST',
           headers: {
@@ -57,24 +74,24 @@ export default function ChatPage() {
         if (response.ok) {
           const conversation = await response.json();
           setConversationId(conversation.id);
-          setOtherUserName(conversation.otherUserName || 'User');
+          setOtherUserName(conversation.otherUserName || otherUser.username);
         } else {
           const errorText = await response.text();
           console.error('Server error:', response.status, errorText);
-          setError('Could not load conversation');
+          setError('Konversation konnte nicht geladen werden');
         }
       } catch (err) {
-        setError('Netzwerkfehler beim Laden der Konversation');
+        setError(err instanceof Error ? err.message : 'Netzwerkfehler beim Laden der Konversation');
         console.error('Fehler beim Laden der Konversation:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (recipientId) {
+    if (recipientUsername) {
       findOrCreateConversation();
     }
-  }, [recipientId]);
+  }, [recipientUsername]);
 
   if (isLoading) {
     return (

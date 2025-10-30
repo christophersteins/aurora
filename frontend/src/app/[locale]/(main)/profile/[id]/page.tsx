@@ -354,7 +354,7 @@ export default function ProfilePage() {
     }
 
     // Navigate to chat with this escort
-    router.push(`/chat/${escort.id}`);
+    router.push(`/nachrichten/${escort.username}`);
   };
 
   const handleDateClick = () => {

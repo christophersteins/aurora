@@ -11,7 +11,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isChatPage = pathname?.includes('/chat');
+  const isChatPage = pathname?.includes('/nachrichten');
 
   return (
     <>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ConversationList } from '@/components/chat/ConversationList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { NewConversationModal } from '@/components/chat/NewConversationModal';
@@ -8,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 
 export default function ChatPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const { conversations, setConversations, setLoading } = useChatStore();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -56,6 +58,14 @@ export default function ChatPage() {
     fetchConversations();
   }, []);
 
+  const handleSelectConversation = (conversationId: string) => {
+    const conversation = conversations.find(c => c.id === conversationId);
+    if (conversation) {
+      // Navigate to the conversation URL with username
+      router.push(`/nachrichten/${conversation.otherUserName}`);
+    }
+  };
+
   const handleCreateConversation = async (otherUserId: string) => {
     try {
       // Get JWT token from localStorage
@@ -84,11 +94,8 @@ export default function ChatPage() {
         const newConversation = await response.json();
         console.log('✅ Neue Konversation erstellt:', newConversation);
 
-        // Liste aktualisieren
-        await fetchConversations();
-
-        // Open new conversation directly
-        setSelectedConversationId(newConversation.id);
+        // Navigate to the new conversation
+        router.push(`/nachrichten/${newConversation.otherUserName}`);
       } else {
         console.error('❌ Fehler beim Erstellen der Konversation', response.status);
         alert('Fehler beim Erstellen der Konversation');
@@ -119,7 +126,7 @@ export default function ChatPage() {
             <ConversationList
               conversations={conversations}
               selectedId={selectedConversationId}
-              onSelectConversation={setSelectedConversationId}
+              onSelectConversation={handleSelectConversation}
               onNewConversation={() => setIsModalOpen(true)}
             />
           </div>
