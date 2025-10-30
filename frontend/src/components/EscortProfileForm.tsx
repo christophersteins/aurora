@@ -356,9 +356,47 @@ export default function EscortProfileForm() {
 
   return (
     <div>
-      {/* Überschrift mit Button - Desktop Layout */}
-      <div className="hidden lg:flex lg:items-center lg:justify-between mb-6">
+      {/* Überschrift - Desktop Layout */}
+      <div className="hidden lg:block mb-6">
         <h1 className="text-3xl font-bold text-heading">Profil bearbeiten</h1>
+      </div>
+
+      {/* Überschrift - Mobile/Tablet */}
+      <h1 className="text-3xl font-bold text-heading mb-6 lg:hidden">Profil bearbeiten</h1>
+
+      {/* Profile Picture Section - Desktop only, shown between title and containers */}
+      <div className="mb-6 hidden lg:flex lg:items-center lg:justify-between">
+        <div className="flex items-center gap-4">
+          <div
+            className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
+            onClick={() => setShowProfilePictureModal(true)}
+          >
+            {profilePicturePreview ? (
+              <img
+                src={profilePicturePreview}
+                alt="Profilbild"
+                className="w-16 h-16 object-cover rounded-full"
+              />
+            ) : (
+              <div className="w-16 h-16 border border-default rounded-full flex items-center justify-center">
+                <span className="text-heading font-bold text-lg">
+                  {user?.firstName?.[0] || user?.username?.[0] || '?'}
+                </span>
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="text-heading text-lg font-semibold">
+              {user?.username || user?.email}
+            </p>
+            <button
+              onClick={() => setShowProfilePictureModal(true)}
+              className="text-sm text-action-primary hover:text-action-primary-hover transition-colors mt-1 cursor-pointer"
+            >
+              Profilbild ändern
+            </button>
+          </div>
+        </div>
         <button
           onClick={() => window.location.href = `/profile/${user?.username}`}
           className="btn-base btn-secondary"
@@ -366,9 +404,6 @@ export default function EscortProfileForm() {
           Profil ansehen
         </button>
       </div>
-
-      {/* Überschrift - Mobile/Tablet */}
-      <h1 className="text-3xl font-bold text-heading mb-6 lg:hidden">Profil bearbeiten</h1>
 
       {/* Profile Picture Section - Mobile/Tablet only, shown above menu */}
       <div className="mb-6 lg:hidden">
@@ -454,9 +489,9 @@ export default function EscortProfileForm() {
         </div>
       )}
 
-      <div className="lg:flex lg:gap-6">
+      <div className="lg:flex gap-0">
         {/* Sidebar Navigation - Desktop only - Sticky Position */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:rounded-r-none">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;
@@ -465,13 +500,14 @@ export default function EscortProfileForm() {
                 <button
                   key={section.id}
                   onClick={() => handleTabClick(section.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
+                  className={`w-full flex items-center gap-3 !pl-6 pr-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
                     isActive
                       ? 'bg-page-secondary'
                       : 'hover:bg-page-secondary/50'
                   }`}
                   style={{
-                    borderRadius: 0
+                    borderRadius: 0,
+                    ...(isActive && { borderRight: '2px solid var(--color-primary)' })
                   }}
                 >
                   <Icon className={`w-5 h-5 flex-shrink-0 transition-all ${isActive ? 'scale-105' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
@@ -484,7 +520,7 @@ export default function EscortProfileForm() {
 
       {/* Main Content */}
       <div className={`flex-1 ${activeSection === null ? 'hidden lg:block' : 'block lg:block'} ${activeSection !== null ? 'animate-slide-in-right lg:animate-none' : ''}`}>
-        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:shadow-md lg:rounded-lg' : 'p-6'}`}>
+        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:border-l-0 lg:shadow-md lg:rounded-lg lg:rounded-l-none' : 'p-6 lg:border-l-0 lg:rounded-l-none'}`}>
           {/* Saving indicator - only shown while saving */}
           {isSaving && (
             <div className="flex items-center justify-end mb-6">
@@ -494,45 +530,6 @@ export default function EscortProfileForm() {
               </span>
             </div>
           )}
-
-          {/* Profile Picture Section - Desktop only */}
-          <div
-            id="profilbild"
-            className="mb-8 scroll-mt-8 hidden lg:block"
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="cursor-pointer transition-opacity hover:opacity-80 flex-shrink-0"
-                onClick={() => setShowProfilePictureModal(true)}
-              >
-                {profilePicturePreview ? (
-                  <img
-                    src={profilePicturePreview}
-                    alt="Profilbild"
-                    className="w-16 h-16 object-cover rounded-full"
-                  />
-                ) : (
-                  <div className="w-16 h-16 border border-default rounded-full flex items-center justify-center">
-                    <span className="text-heading font-bold text-lg">
-                      {user?.firstName?.[0] || user?.username?.[0] || '?'}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="text-heading text-base font-medium mb-1">
-                  {user?.username || user?.email}
-                </p>
-                <button
-                  onClick={() => setShowProfilePictureModal(true)}
-                  className="text-sm text-action-primary hover:text-action-primary-hover transition-colors cursor-pointer"
-                >
-                  Profilbild ändern
-                </button>
-              </div>
-            </div>
-          </div>
-
 
           {/* Form */}
           <div className="space-y-8">

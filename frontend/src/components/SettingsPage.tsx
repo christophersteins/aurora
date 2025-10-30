@@ -292,9 +292,9 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <div className="flex gap-0 lg:gap-6">
+      <div className="flex gap-0">
         {/* Sidebar Navigation - Desktop only */}
-        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-24 lg:self-start border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+        <aside className="hidden lg:block lg:w-64 lg:flex-shrink-0 border border-[#2f3336] shadow-md bg-page-primary rounded-lg lg:rounded-r-none">
           <nav>
             {sections.map((section) => {
               const Icon = section.icon;
@@ -303,12 +303,15 @@ export default function SettingsPage() {
                 <button
                   key={section.id}
                   onClick={() => handleTabClick(section.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
+                  className={`w-full flex items-center gap-3 !pl-6 pr-4 py-4 text-sm font-medium transition-colors cursor-pointer group text-body ${
                     isActive
                       ? 'bg-page-secondary'
                       : 'hover:bg-page-secondary/50'
                   }`}
-                  style={{ borderRadius: 0 }}
+                  style={{
+                    borderRadius: 0,
+                    ...(isActive && { borderRight: '2px solid var(--color-primary)' })
+                  }}
                 >
                   <Icon className={`w-5 h-5 flex-shrink-0 transition-all ${isActive ? 'scale-105' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
                   <span className={`text-left transition-all ${isActive ? 'font-bold' : ''}`}>{section.label}</span>
@@ -320,7 +323,7 @@ export default function SettingsPage() {
 
       {/* Main Content */}
       <div className={`flex-1 ${activeSection === null ? 'hidden lg:block' : 'block lg:block'} ${activeSection !== null && !isMounting ? 'animate-slide-in-right lg:animate-none' : ''}`}>
-        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:shadow-md lg:rounded-lg' : 'p-6'}`}>
+        <div className={`bg-page-primary border border-[#2f3336] shadow-md rounded-lg ${activeSection !== null ? 'p-0 border-0 shadow-none rounded-none lg:p-6 lg:border lg:border-l-0 lg:shadow-md lg:rounded-lg lg:rounded-l-none' : 'p-6 lg:border-l-0 lg:rounded-l-none'}`}>
           {/* Content */}
           <div className="space-y-8">
             {/* Konto Section */}
@@ -338,40 +341,41 @@ export default function SettingsPage() {
 
               <div className="space-y-6">
                 {/* Username Field */}
-                <div className="lg:flex lg:items-start lg:gap-6">
-                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                    {t('account.username.label')}
-                  </label>
-                  <div className="lg:flex-1">
-                    {!isEditingUsername ? (
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
+                <div>
+                  {!isEditingUsername ? (
+                    <>
+                      <div className="lg:flex lg:items-center lg:justify-between">
+                        <div className="flex items-center gap-0.5 mb-2 lg:mb-0">
+                          <label className="text-sm text-muted w-32 flex-shrink-0">
+                            {t('account.username.label')}
+                          </label>
                           <p className="text-body">{user?.username}</p>
-                          <button
-                            onClick={() => {
-                              if (canChangeUsername) {
-                                setIsEditingUsername(true);
-                                setNewUsername(user?.username || '');
-                              }
-                            }}
-                            disabled={!canChangeUsername}
-                            className={`text-sm font-medium ${
-                              canChangeUsername
-                                ? 'text-action-primary hover:underline cursor-pointer'
-                                : 'text-muted cursor-not-allowed'
-                            }`}
-                          >
-                            {t('account.username.change')}
-                          </button>
                         </div>
-                        {!canChangeUsername && daysUntilUsernameChange !== null && (
-                          <div className="flex items-start gap-2 text-sm text-muted">
-                            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                            <p>{t('account.username.availableIn', { days: daysUntilUsernameChange })}</p>
-                          </div>
-                        )}
+                        <button
+                          onClick={() => {
+                            if (canChangeUsername) {
+                              setIsEditingUsername(true);
+                              setNewUsername(user?.username || '');
+                            }
+                          }}
+                          disabled={!canChangeUsername}
+                          className={`text-sm font-medium ${
+                            canChangeUsername
+                              ? 'text-action-primary hover:underline cursor-pointer'
+                              : 'text-muted cursor-not-allowed'
+                          }`}
+                        >
+                          {t('account.username.change')}
+                        </button>
                       </div>
-                    ) : (
+                      {!canChangeUsername && daysUntilUsernameChange !== null && (
+                        <div className="flex items-start gap-2 text-sm text-muted mt-2">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <p>{t('account.username.availableIn', { days: daysUntilUsernameChange })}</p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
                       <div className="space-y-3">
                         <input
                           type="text"
@@ -408,22 +412,23 @@ export default function SettingsPage() {
                           </button>
                         </div>
                       </div>
-                    )}
-                    {usernameSuccess && (
-                      <p className="mt-2 text-sm text-green-500">{t('account.username.success')}</p>
-                    )}
-                  </div>
+                  )}
+                  {usernameSuccess && (
+                    <p className="mt-2 text-sm text-green-500">{t('account.username.success')}</p>
+                  )}
                 </div>
 
                 {/* Email Field */}
-                <div className="lg:flex lg:items-start lg:gap-6">
-                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                    {t('account.email.label')}
-                  </label>
-                  <div className="lg:flex-1">
-                    {!isEditingEmail ? (
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-body">{user?.email}</p>
+                <div>
+                  {!isEditingEmail ? (
+                    <>
+                      <div className="lg:flex lg:items-center lg:justify-between">
+                        <div className="flex items-center gap-0.5 mb-2 lg:mb-0">
+                          <label className="text-sm text-muted w-32 flex-shrink-0">
+                            {t('account.email.label')}
+                          </label>
+                          <p className="text-body">{user?.email}</p>
+                        </div>
                         <button
                           onClick={() => {
                             setIsEditingEmail(true);
@@ -434,6 +439,7 @@ export default function SettingsPage() {
                           {t('account.email.change')}
                         </button>
                       </div>
+                    </>
                     ) : (
                       <div className="space-y-3">
                         <input
@@ -467,22 +473,23 @@ export default function SettingsPage() {
                           </button>
                         </div>
                       </div>
-                    )}
-                    {emailSuccess && (
-                      <p className="mt-2 text-sm text-green-500">{t('account.email.success')}</p>
-                    )}
-                  </div>
+                  )}
+                  {emailSuccess && (
+                    <p className="mt-2 text-sm text-green-500">{t('account.email.success')}</p>
+                  )}
                 </div>
 
                 {/* Password Field */}
-                <div className="lg:flex lg:items-start lg:gap-6">
-                  <label className="block text-sm mb-2 lg:mb-0 lg:w-48 lg:flex-shrink-0 lg:text-right text-muted">
-                    {t('account.password.label')}
-                  </label>
-                  <div className="lg:flex-1">
-                    {!isEditingPassword ? (
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-body">••••••••</p>
+                <div>
+                  {!isEditingPassword ? (
+                    <>
+                      <div className="lg:flex lg:items-center lg:justify-between">
+                        <div className="flex items-center gap-0.5 mb-2 lg:mb-0">
+                          <label className="text-sm text-muted w-32 flex-shrink-0">
+                            {t('account.password.label')}
+                          </label>
+                          <p className="text-body">••••••••</p>
+                        </div>
                         <button
                           onClick={() => setIsEditingPassword(true)}
                           className="text-sm font-medium text-action-primary hover:underline cursor-pointer"
@@ -490,6 +497,7 @@ export default function SettingsPage() {
                           {t('account.password.change')}
                         </button>
                       </div>
+                    </>
                     ) : (
                       <div className="space-y-3">
                         <input
@@ -531,11 +539,10 @@ export default function SettingsPage() {
                           </button>
                         </div>
                       </div>
-                    )}
-                    {passwordSuccess && (
-                      <p className="mt-2 text-sm text-green-500">{t('account.password.success')}</p>
-                    )}
-                  </div>
+                  )}
+                  {passwordSuccess && (
+                    <p className="mt-2 text-sm text-green-500">{t('account.password.success')}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -609,9 +616,10 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => handleReadReceiptsChange(!readReceipts)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      readReceipts ? 'bg-success' : 'bg-gray-600'
-                    }`}
+                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                    style={{
+                      backgroundColor: readReceipts ? 'var(--color-primary)' : '#4b5563'
+                    }}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

@@ -335,6 +335,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 }`}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
+                {selectedId === conv.id && (
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-[2px]"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
+                  />
+                )}
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
