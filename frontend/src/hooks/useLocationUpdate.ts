@@ -19,7 +19,14 @@ export const useLocationUpdate = ({
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
-  const { latitude, longitude, error, loading, requestLocation } = useGeolocation(autoRequest);
+  const { 
+    latitude, 
+    longitude, 
+    accuracy, // NEU: Genauigkeit auch hier verfügbar machen
+    error, 
+    loading, 
+    requestLocation 
+  } = useGeolocation(autoRequest);
 
   const updateLocationInBackend = async () => {
     if (!userId || !token) {
@@ -39,6 +46,13 @@ export const useLocationUpdate = ({
     try {
       await geolocationService.updateLocation(userId, latitude, longitude, token);
       setUpdateSuccess(true);
+      
+      // Log für Debugging
+      console.log('✅ Standort im Backend aktualisiert:', {
+        lat: latitude.toFixed(6),
+        lng: longitude.toFixed(6),
+        accuracy: accuracy ? `${accuracy.toFixed(0)}m` : 'unbekannt'
+      });
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
@@ -70,10 +84,23 @@ export const useLocationUpdate = ({
           async (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
+            const acc = position.coords.accuracy;
+
+            console.log('📍 GPS-Position für Update erhalten:', {
+              lat: lat.toFixed(6),
+              lng: lng.toFixed(6),
+              accuracy: `${acc.toFixed(0)}m`,
+              timestamp: new Date(position.timestamp).toLocaleString('de-DE'),
+            });
 
             try {
               await geolocationService.updateLocation(userId, lat, lng, token);
               setUpdateSuccess(true);
+              
+              // Warnung bei ungenauer Position
+              if (acc > 1000) {
+                console.warn('⚠️ Ungenauer Standort gespeichert:', `${(acc / 1000).toFixed(1)} km Genauigkeit`);
+              }
             } catch (err) {
               const errorMessage = err instanceof Error 
                 ? err.message 
@@ -86,13 +113,19 @@ export const useLocationUpdate = ({
             let errorMessage = 'Standort konnte nicht abgerufen werden';
             if (error.code === error.PERMISSION_DENIED) {
               errorMessage = 'Standortzugriff wurde verweigert';
+            } else if (error.code === error.POSITION_UNAVAILABLE) {
+              errorMessage = 'Standort nicht verfügbar - GPS aktivieren';
+            } else if (error.code === error.TIMEOUT) {
+              errorMessage = 'Zeitüberschreitung - schwaches GPS-Signal';
             }
+            
+            console.error('❌ GPS-Fehler:', error);
             reject(new Error(errorMessage));
           },
           {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
+            enableHighAccuracy: true, // WICHTIG: Konsistent mit anderen Stellen
+            timeout: 30000, // 30 Sekunden statt 10
+            maximumAge: 0, // Keine gecachten Werte
           }
         );
       });
@@ -109,6 +142,7 @@ export const useLocationUpdate = ({
   return {
     latitude,
     longitude,
+    accuracy, // NEU: Genauigkeit zurückgeben
     error: error || updateError,
     loading: loading || isUpdating,
     updateSuccess,
