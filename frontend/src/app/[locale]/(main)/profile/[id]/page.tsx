@@ -14,6 +14,9 @@ import { scrollPositionUtil } from '@/utils/scrollPosition';
 import { useAuthStore } from '@/store/authStore';
 import { useOnlineStatusStore } from '@/store/onlineStatusStore';
 import axios from 'axios';
+import LoginModal from '@/components/LoginModal';
+import RegisterModal from '@/components/RegisterModal';
+import ForgotPasswordModal from '@/components/ForgotPasswordModal';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -39,6 +42,9 @@ export default function ProfilePage() {
   const [mediaTab, setMediaTab] = useState<'fotos' | 'videos'>('fotos');
   const [similarEscorts, setSimilarEscorts] = useState<User[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
 
   // Reset selected image index when switching tabs
   useEffect(() => {
@@ -339,11 +345,23 @@ export default function ProfilePage() {
   const handleMessageClick = () => {
     if (!escort?.id) return;
 
+    // Check if user is logged in
+    if (!user) {
+      setLoginModalOpen(true);
+      return;
+    }
+
     // Navigate to chat with this escort
     router.push(`/chat/${escort.id}`);
   };
 
   const handleDateClick = () => {
+    // Check if user is logged in
+    if (!user) {
+      setLoginModalOpen(true);
+      return;
+    }
+
     // TODO: Open date booking modal
     console.log('Open date booking');
   };
@@ -432,7 +450,7 @@ export default function ProfilePage() {
 
   const handleBookmarkClick = async () => {
     if (!user || !escort || !token) {
-      router.push('/login');
+      setLoginModalOpen(true);
       return;
     }
 
@@ -462,6 +480,33 @@ export default function ProfilePage() {
     } finally {
       setBookmarkLoading(false);
     }
+  };
+
+  const openLoginModal = () => {
+    setLoginModalOpen(true);
+    setRegisterModalOpen(false);
+  };
+
+  const openRegisterModal = () => {
+    setRegisterModalOpen(true);
+    setLoginModalOpen(false);
+  };
+
+  const closeModals = () => {
+    setLoginModalOpen(false);
+    setRegisterModalOpen(false);
+    setForgotPasswordModalOpen(false);
+  };
+
+  const openForgotPasswordModal = () => {
+    setForgotPasswordModalOpen(true);
+    setLoginModalOpen(false);
+    setRegisterModalOpen(false);
+  };
+
+  const handleBackToLoginFromForgotPassword = () => {
+    setForgotPasswordModalOpen(false);
+    setLoginModalOpen(true);
   };
 
   if (loading) {
@@ -779,7 +824,7 @@ export default function ProfilePage() {
                                       Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
                                     </p>
                                     <button
-                                      onClick={() => router.push('/login')}
+                                      onClick={() => setLoginModalOpen(true)}
                                       className="btn-base btn-primary w-full cursor-pointer"
                                     >
                                       Jetzt anmelden
@@ -817,7 +862,7 @@ export default function ProfilePage() {
                                       Dieser Inhalt ist nur für eingeloggte Benutzer sichtbar.
                                     </p>
                                     <button
-                                      onClick={() => router.push('/login')}
+                                      onClick={() => setLoginModalOpen(true)}
                                       className="btn-base btn-primary w-full cursor-pointer"
                                     >
                                       Jetzt anmelden
@@ -1270,12 +1315,6 @@ export default function ProfilePage() {
                 >
                   Nachricht schreiben
                 </button>
-                <button
-                  onClick={handleDateClick}
-                  className="w-full btn-base btn-secondary cursor-pointer flex items-center justify-center"
-                >
-                  Date vereinbaren
-                </button>
               </div>
 
               {/* Tags */}
@@ -1490,7 +1529,7 @@ export default function ProfilePage() {
                               <button
                                 onClick={() => {
                                   setIsFullscreen(false);
-                                  router.push('/login');
+                                  setLoginModalOpen(true);
                                 }}
                                 className="btn-base btn-primary w-full cursor-pointer"
                               >
@@ -1530,7 +1569,7 @@ export default function ProfilePage() {
                               <button
                                 onClick={() => {
                                   setIsFullscreen(false);
-                                  router.push('/login');
+                                  setLoginModalOpen(true);
                                 }}
                                 className="btn-base btn-primary w-full cursor-pointer"
                               >
@@ -1738,6 +1777,28 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Login Modal */}
+        <LoginModal
+          isOpen={loginModalOpen}
+          onClose={closeModals}
+          onSwitchToRegister={openRegisterModal}
+          onSwitchToForgotPassword={openForgotPasswordModal}
+        />
+
+        {/* Register Modal */}
+        <RegisterModal
+          isOpen={registerModalOpen}
+          onClose={closeModals}
+          onSwitchToLogin={openLoginModal}
+        />
+
+        {/* Forgot Password Modal */}
+        <ForgotPasswordModal
+          isOpen={forgotPasswordModalOpen}
+          onClose={closeModals}
+          onBackToLogin={handleBackToLoginFromForgotPassword}
+        />
     </div>
   );
 }

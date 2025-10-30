@@ -489,32 +489,6 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 }}
               >
                 <h4 className="font-semibold mb-3" style={{ color: 'var(--text-heading)' }}>
-                  Meine Interessen
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {['Reisen', 'Kulinarik', 'Kunst & Kultur', 'Sport', 'Musik', 'Mode', 'Literatur'].map((interest) => (
-                    <span
-                      key={interest}
-                      className="px-3 py-1.5 rounded-full text-sm font-medium"
-                      style={{
-                        background: 'var(--color-primary)',
-                        color: 'white',
-                      }}
-                    >
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div
-                className="p-5 rounded-lg"
-                style={{
-                  background: 'var(--background-secondary)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <h4 className="font-semibold mb-3" style={{ color: 'var(--text-heading)' }}>
                   Das schätzen meine Kunden
                 </h4>
                 <ul className="space-y-2">
@@ -793,32 +767,6 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
                 <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
                   Ich freue mich darauf, Sie kennenzulernen und gemeinsam unvergessliche Stunden zu verbringen!
                 </p>
-              </div>
-
-              <div
-                className="p-5 rounded-lg"
-                style={{
-                  background: 'var(--background-secondary)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <h4 className="font-semibold mb-3" style={{ color: 'var(--text-heading)' }}>
-                  Meine Interessen
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {['Reisen', 'Kulinarik', 'Kunst & Kultur', 'Sport', 'Musik', 'Mode', 'Literatur'].map((interest) => (
-                    <span
-                      key={interest}
-                      className="px-3 py-1.5 rounded-full text-sm font-medium"
-                      style={{
-                        background: 'var(--color-primary)',
-                        color: 'white',
-                      }}
-                    >
-                      {interest}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               <div
