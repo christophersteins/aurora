@@ -8,7 +8,7 @@ export default function Footer() {
   const t = useTranslations('footer');
 
   return (
-    <footer className="bg-page-primary border-t border-[#2f3336] mt-auto" style={{ marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))', border: '3px solid blue' }}>
+    <footer className="bg-page-primary border-t border-[#2f3336] mt-auto" style={{ marginLeft: 'calc(var(--sidebar-offset, 0px) + var(--sidebar-width, 0px))' }}>
       <div className="py-12" style={{ maxWidth: 'var(--max-content-width)', paddingLeft: 'var(--header-footer-padding-x)', paddingRight: 'var(--header-footer-padding-x)' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1">

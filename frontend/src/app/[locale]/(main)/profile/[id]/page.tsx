@@ -17,11 +17,12 @@ import axios from 'axios';
 import LoginModal from '@/components/LoginModal';
 import RegisterModal from '@/components/RegisterModal';
 import ForgotPasswordModal from '@/components/ForgotPasswordModal';
+import ReportModal from '@/components/ReportModal';
 
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
-  const { user, token } = useAuthStore();
+  const { user, token, isAuthenticated, _hasHydrated } = useAuthStore();
   const { getUserStatus, userStatuses } = useOnlineStatusStore();
   const [escort, setEscort] = useState<User | null>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
@@ -45,6 +46,7 @@ export default function ProfilePage() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [forgotPasswordModalOpen, setForgotPasswordModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
 
   // Reset selected image index when switching tabs
   useEffect(() => {
@@ -1086,6 +1088,13 @@ export default function ProfilePage() {
 
                 {/* Report */}
                 <button
+                  onClick={() => {
+                    if (_hasHydrated && isAuthenticated) {
+                      setReportModalOpen(true);
+                    } else {
+                      setLoginModalOpen(true);
+                    }
+                  }}
                   className="flex flex-col items-center gap-2 text-sm font-medium transition-colors cursor-pointer"
                   style={{ color: 'var(--text-secondary)' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}
@@ -1797,6 +1806,16 @@ export default function ProfilePage() {
           onClose={closeModals}
           onBackToLogin={handleBackToLoginFromForgotPassword}
         />
+
+        {/* Report Modal */}
+        {escort && (
+          <ReportModal
+            isOpen={reportModalOpen}
+            onClose={() => setReportModalOpen(false)}
+            reportedUserId={escort.id}
+            reportedUsername={escort.username}
+          />
+        )}
     </div>
   );
 }

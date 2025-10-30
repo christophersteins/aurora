@@ -9,6 +9,7 @@ import { WaitlistModule } from './waitlist/waitlist.module';
 import { ChatModule } from './chat/chat.module';
 import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mail/mail.module';
+import { ReportsModule } from './reports/reports.module';
 import { getTypeOrmConfig } from './config/typeorm.config';
 
 @Module({
@@ -28,6 +29,7 @@ import { getTypeOrmConfig } from './config/typeorm.config';
     ChatModule,
     AdminModule,
     MailModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
