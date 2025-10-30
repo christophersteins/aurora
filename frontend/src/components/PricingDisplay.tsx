@@ -33,53 +33,79 @@ export default function PricingDisplay({ prices }: PricingDisplayProps) {
     }).format(price);
   };
 
-  const priceOptions: PriceOption[] = [
-    {
+  const priceOptions: PriceOption[] = [];
+
+  if (prices?.price30Min) {
+    priceOptions.push({
       duration: '30 Minuten',
-      price: formatPrice(prices?.price30Min) || '150 €',
+      price: formatPrice(prices.price30Min)!,
       category: 'short',
-    },
-    {
+    });
+  }
+
+  if (prices?.price1Hour) {
+    priceOptions.push({
       duration: '1 Stunde',
-      price: formatPrice(prices?.price1Hour) || '250 €',
+      price: formatPrice(prices.price1Hour)!,
       category: 'standard',
-    },
-    {
+    });
+  }
+
+  if (prices?.price2Hours) {
+    priceOptions.push({
       duration: '2 Stunden',
-      price: formatPrice(prices?.price2Hours) || '450 €',
+      price: formatPrice(prices.price2Hours)!,
       category: 'standard',
-    },
-    {
+    });
+  }
+
+  if (prices?.price3Hours) {
+    priceOptions.push({
       duration: '3 Stunden',
-      price: formatPrice(prices?.price3Hours) || '600 €',
+      price: formatPrice(prices.price3Hours)!,
       category: 'premium',
-    },
-    {
+    });
+  }
+
+  if (prices?.price6Hours) {
+    priceOptions.push({
       duration: '6 Stunden',
-      price: formatPrice(prices?.price6Hours) || '1.000 €',
+      price: formatPrice(prices.price6Hours)!,
       category: 'premium',
-    },
-    {
+    });
+  }
+
+  if (prices?.price12Hours) {
+    priceOptions.push({
       duration: '12 Stunden',
-      price: formatPrice(prices?.price12Hours) || '1.800 €',
+      price: formatPrice(prices.price12Hours)!,
       category: 'premium',
-    },
-    {
+    });
+  }
+
+  if (prices?.price24Hours) {
+    priceOptions.push({
       duration: '24 Stunden',
-      price: formatPrice(prices?.price24Hours) || '3.000 €',
+      price: formatPrice(prices.price24Hours)!,
       category: 'special',
-    },
-    {
+    });
+  }
+
+  if (prices?.priceOvernight) {
+    priceOptions.push({
       duration: 'Übernachtung',
-      price: formatPrice(prices?.priceOvernight) || '2.500 €',
+      price: formatPrice(prices.priceOvernight)!,
       category: 'special',
-    },
-    {
+    });
+  }
+
+  if (prices?.priceWeekend) {
+    priceOptions.push({
       duration: 'Wochenende',
-      price: formatPrice(prices?.priceWeekend) || '5.000 €',
+      price: formatPrice(prices.priceWeekend)!,
       category: 'special',
-    },
-  ].filter(option => option.price !== null);
+    });
+  }
 
   const getCardStyle = () => {
     return {
@@ -88,6 +114,34 @@ export default function PricingDisplay({ prices }: PricingDisplayProps) {
       borderWidth: '1px',
     };
   };
+
+  // Show empty state if no prices are available
+  if (priceOptions.length === 0) {
+    return (
+      <div
+        className="text-center py-12 px-6 rounded-lg border"
+        style={{
+          background: 'var(--background-secondary)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+          style={{
+            background: 'rgba(139, 92, 246, 0.1)',
+          }}
+        >
+          <Hourglass className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
+        </div>
+        <p className="text-base font-medium mb-2" style={{ color: 'var(--text-heading)' }}>
+          Keine Preise hinterlegt
+        </p>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          Dieses Profil hat noch keine Preisinformationen eingetragen.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

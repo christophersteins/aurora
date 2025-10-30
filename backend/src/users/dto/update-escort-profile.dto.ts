@@ -1,4 +1,5 @@
-import { IsOptional, IsDateString, IsArray, IsInt, IsString, IsBoolean, IsNumber, Min, Max } from 'class-validator';
+import { IsOptional, IsDateString, IsArray, IsInt, IsString, IsBoolean, IsNumber, Min, Max, IsObject } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateEscortProfileDto {
   @IsOptional()
@@ -93,7 +94,8 @@ export class UpdateEscortProfileDto {
   description?: string;
 
   @IsOptional()
-  availability?: any; // Verfügbarkeitszeiten pro Wochentag
+  @IsObject()
+  availability?: Record<string, any>; // Verfügbarkeitszeiten pro Wochentag
 
   @IsOptional()
   @IsArray()
