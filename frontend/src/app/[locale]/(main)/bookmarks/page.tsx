@@ -1,14 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { User } from '@/types/auth.types';
-import { Heart, LayoutGrid, Grid3x3, MapPin } from 'lucide-react';
+import { Heart, LayoutGrid, Grid3x3, MapPin, MessageCircle, Calendar, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/store/authStore';
 import axios from 'axios';
 
 type GridView = 'compact' | 'comfortable';
+
+interface ContextMenuState {
+  escort: User;
+  x: number;
+  y: number;
+}
 
 export default function MerklistePage() {
   const router = useRouter();
@@ -20,6 +26,8 @@ export default function MerklistePage() {
   const [gridView, setGridView] = useState<GridView>('comfortable');
   const [userLatitude, setUserLatitude] = useState<number | null>(null);
   const [userLongitude, setUserLongitude] = useState<number | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (
@@ -103,6 +111,55 @@ export default function MerklistePage() {
 
     fetchBookmarks();
   }, [_hasHydrated, user, token, router]);
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+
+    const handleScroll = () => {
+      setContextMenu(null);
+    };
+
+    if (contextMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('scroll', handleScroll, true);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [contextMenu]);
+
+  const handleContextMenu = (e: React.MouseEvent, escort: User) => {
+    e.preventDefault();
+
+    // Only show context menu on desktop (lg breakpoint is 1024px)
+    if (window.innerWidth < 1024) {
+      return;
+    }
+
+    setContextMenu({
+      escort,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleSendMessage = (escort: User) => {
+    setContextMenu(null);
+    router.push(`/nachrichten/${escort.username}`);
+  };
+
+  const handleScheduleDate = (escort: User) => {
+    setContextMenu(null);
+    // TODO: Implement date scheduling
+    console.log('Schedule date with:', escort.username);
+  };
 
   const removeBookmark = async (escortId: string) => {
     if (!token) return;
@@ -216,6 +273,7 @@ export default function MerklistePage() {
             <div
               key={escort.id}
               onClick={() => router.push(`/profile/${escort.username}`)}
+              onContextMenu={(e) => handleContextMenu(e, escort)}
               className="bg-page-primary border-depth rounded-lg overflow-hidden cursor-pointer transition-all"
             >
               {/* Profile Picture */}
@@ -306,6 +364,44 @@ export default function MerklistePage() {
         </div>
       )}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          ref={contextMenuRef}
+          className="fixed bg-page-secondary border border-default rounded-lg shadow-lg overflow-hidden z-50"
+          style={{
+            top: `${contextMenu.y}px`,
+            left: `${contextMenu.x}px`,
+          }}
+        >
+          <button
+            onClick={() => handleSendMessage(contextMenu.escort)}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>{t('sendMessage')}</span>
+          </button>
+          <button
+            onClick={() => handleScheduleDate(contextMenu.escort)}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-body cursor-pointer"
+          >
+            <Calendar className="w-5 h-5" />
+            <span>{t('scheduleDate')}</span>
+          </button>
+          <div className="border-t border-default my-1"></div>
+          <button
+            onClick={() => {
+              removeBookmark(contextMenu.escort.id);
+              setContextMenu(null);
+            }}
+            className="w-full px-4 py-3 text-left hover:bg-page-primary transition-all flex items-center gap-3 text-error cursor-pointer"
+          >
+            <Trash2 className="w-5 h-5" />
+            <span>{t('removeFromList')}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

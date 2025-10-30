@@ -7,5 +7,8 @@
   "loading": "Loading...",
   "retry": "Retry",
   "compactView": "Compact view",
-  "comfortableView": "Comfortable view"
+  "comfortableView": "Comfortable view",
+  "sendMessage": "Send message",
+  "scheduleDate": "Schedule date",
+  "removeFromList": "Remove from list"
 }
