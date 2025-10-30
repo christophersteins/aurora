@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { escortService } from '@/services/escortService';
 import { User } from '@/types/auth.types';
 import MemberFilterSidebar from '@/components/MemberFilterSidebar';
+import CustomSelect, { CustomSelectOption } from '@/components/CustomSelect';
 import {
   ListFilter,
   MapPin,
@@ -192,6 +193,8 @@ export default function MembersPage() {
   // Track if toolbar is stuck/fixed
   const [isToolbarStuck, setIsToolbarStuck] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const mobileSortButtonRef = useRef<HTMLButtonElement>(null);
+  const [mobileSortDropdownPosition, setMobileSortDropdownPosition] = useState({ top: 0, right: 0 });
 
   // Track initial mount to prevent saving on first render
   const isInitialMount = useRef(true);
@@ -442,6 +445,43 @@ export default function MembersPage() {
       sentinelEl.remove();
     };
   }, []);
+
+  // Update mobile sort dropdown position when opened
+  useEffect(() => {
+    if (showMobileSortDropdown && mobileSortButtonRef.current) {
+      const rect = mobileSortButtonRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      setMobileSortDropdownPosition({
+        top: rect.bottom + 8,
+        right: viewportWidth - rect.right,
+      });
+    }
+  }, [showMobileSortDropdown]);
+
+  // Lock body scroll when mobile sort dropdown is open
+  useEffect(() => {
+    if (showMobileSortDropdown) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      return () => {
+        // Restore body scroll
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showMobileSortDropdown]);
 
   // Fetch location suggestions from Nominatim
   const fetchLocationSuggestions = async (query: string) => {
@@ -934,7 +974,7 @@ export default function MembersPage() {
         {/* Toolbar - Sticky on scroll */}
         <div
           ref={toolbarRef}
-          className={`${!locationSearch && !isLoadingLocation ? 'mb-10' : 'mb-6'} z-10 bg-[#000000]/80 backdrop-blur-md transition-all duration-300`}
+          className={`${!locationSearch && !isLoadingLocation ? 'mb-10' : 'mb-6'} relative z-[100] bg-[#000000]/80 backdrop-blur-md transition-all duration-300`}
         >
           <div>
             {/* Mobile Layout (Smartphone) */}
@@ -972,7 +1012,7 @@ export default function MembersPage() {
                   {showSuggestions && locationSuggestions.length > 0 && (
                     <div
                       ref={suggestionsRef}
-                      className="absolute z-50 w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                      className="absolute z-[9999] w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg max-h-60 overflow-y-auto"
                     >
                       {locationSuggestions.map((suggestion, index) => {
                         const cityName =
@@ -1097,142 +1137,99 @@ export default function MembersPage() {
                   {/* Sort Dropdown (Mobile) */}
                   <div className="relative">
                     <button
+                      ref={mobileSortButtonRef}
                       onClick={() => setShowMobileSortDropdown(!showMobileSortDropdown)}
-                      className="p-2 rounded-lg border border-default bg-page-secondary text-body hover:border-primary transition cursor-pointer"
+                      className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
+                        showMobileSortDropdown
+                          ? 'bg-action-primary border-primary text-primary'
+                          : 'border-default bg-page-secondary text-body hover:border-primary'
+                      }`}
                       title={t('sorting')}
                     >
-                      <ArrowUpDown className="w-5 h-5 text-muted" />
+                      <ArrowUpDown className={`w-5 h-5 transition-transform duration-300 ${showMobileSortDropdown ? 'rotate-180' : ''}`} />
                     </button>
 
                     {showMobileSortDropdown && (
-                      <div className="absolute right-0 mt-2 w-56 bg-page-secondary border border-default rounded-lg shadow-lg z-50">
-                        <button
-                          onClick={() => {
-                            setSortBy('distance');
-                            setShowMobileSortDropdown(false);
+                      <>
+                        {/* Backdrop overlay for mobile */}
+                        <div
+                          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
+                          onClick={() => setShowMobileSortDropdown(false)}
+                          style={{ animation: 'fadeIn 0.2s ease-out' }}
+                        />
+
+                        {/* Dropdown menu */}
+                        <div
+                          className="fixed w-64 bg-page-secondary border border-default rounded-lg shadow-2xl z-[9999] overflow-hidden"
+                          style={{
+                            animation: 'slideDown 0.2s ease-out',
+                            top: `${mobileSortDropdownPosition.top}px`,
+                            right: `${mobileSortDropdownPosition.right}px`,
                           }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortDistanceAsc')}</span>
-                            {sortBy === 'distance' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('age-desc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortAgeDesc')}</span>
-                            {sortBy === 'age-desc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('age-asc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortAgeAsc')}</span>
-                            {sortBy === 'age-asc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('cupSize-desc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortCupSizeDesc')}</span>
-                            {sortBy === 'cupSize-desc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('cupSize-asc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortCupSizeAsc')}</span>
-                            {sortBy === 'cupSize-asc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('height-desc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortHeightDesc')}</span>
-                            {sortBy === 'height-desc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('height-asc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortHeightAsc')}</span>
-                            {sortBy === 'height-asc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('weight-desc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition border-b border-default cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortWeightDesc')}</span>
-                            {sortBy === 'weight-desc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortBy('weight-asc');
-                            setShowMobileSortDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-3 hover:bg-page-primary transition cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-body">{t('sortWeightAsc')}</span>
-                            {sortBy === 'weight-asc' && (
-                              <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            )}
-                          </div>
-                        </button>
-                      </div>
+                          {[
+                            { value: 'distance', label: t('sortDistanceAsc') },
+                            { value: 'age-desc', label: t('sortAgeDesc') },
+                            { value: 'age-asc', label: t('sortAgeAsc') },
+                            { value: 'cupSize-desc', label: t('sortCupSizeDesc') },
+                            { value: 'cupSize-asc', label: t('sortCupSizeAsc') },
+                            { value: 'height-desc', label: t('sortHeightDesc') },
+                            { value: 'height-asc', label: t('sortHeightAsc') },
+                            { value: 'weight-desc', label: t('sortWeightDesc') },
+                            { value: 'weight-asc', label: t('sortWeightAsc') },
+                          ].map((option, index, array) => {
+                            const isSelected = sortBy === option.value;
+                            return (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  setSortBy(option.value as SortOption);
+                                  setShowMobileSortDropdown(false);
+                                }}
+                                className={`w-full text-left px-4 py-3.5 transition-all duration-150 cursor-pointer ${
+                                  index !== array.length - 1 ? 'border-b border-default' : ''
+                                } ${
+                                  isSelected
+                                    ? 'bg-action-primary/10 text-primary'
+                                    : 'hover:bg-page-primary text-body'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className={isSelected ? 'font-medium' : ''}>{option.label}</span>
+                                  {isSelected && (
+                                    <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20">
+                                      <Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Keyframes for animations */}
+                        <style jsx>{`
+                          @keyframes slideDown {
+                            from {
+                              opacity: 0;
+                              transform: translateY(-8px);
+                            }
+                            to {
+                              opacity: 1;
+                              transform: translateY(0);
+                            }
+                          }
+
+                          @keyframes fadeIn {
+                            from {
+                              opacity: 0;
+                            }
+                            to {
+                              opacity: 1;
+                            }
+                          }
+                        `}</style>
+                      </>
                     )}
                   </div>
 
@@ -1327,7 +1324,7 @@ export default function MembersPage() {
                   {showSuggestions && locationSuggestions.length > 0 && (
                     <div
                       ref={suggestionsRef}
-                      className="absolute z-50 w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                      className="absolute z-[9999] w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg max-h-60 overflow-y-auto"
                     >
                       {locationSuggestions.map((suggestion, index) => {
                         const cityName =
@@ -1417,24 +1414,23 @@ export default function MembersPage() {
                 <div className="flex-grow"></div>
 
                 {/* Sort Select */}
-                <div className="relative">
-                  <ArrowUpDown className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" />
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="pl-10 pr-4 py-2 border border-default rounded-lg focus:outline-none bg-page-primary text-muted appearance-none cursor-pointer"
-                  >
-                    <option value="distance">{t('sortDistanceAsc')}</option>
-                    <option value="age-desc">{t('sortAgeDesc')}</option>
-                    <option value="age-asc">{t('sortAgeAsc')}</option>
-                    <option value="cupSize-desc">{t('sortCupSizeDesc')}</option>
-                    <option value="cupSize-asc">{t('sortCupSizeAsc')}</option>
-                    <option value="height-desc">{t('sortHeightDesc')}</option>
-                    <option value="height-asc">{t('sortHeightAsc')}</option>
-                    <option value="weight-desc">{t('sortWeightDesc')}</option>
-                    <option value="weight-asc">{t('sortWeightAsc')}</option>
-                  </select>
-                </div>
+                <CustomSelect
+                  value={sortBy}
+                  onChange={(value) => setSortBy(value as SortOption)}
+                  icon={<ArrowUpDown className="w-5 h-5" />}
+                  options={[
+                    { value: 'distance', label: t('sortDistanceAsc') },
+                    { value: 'age-desc', label: t('sortAgeDesc') },
+                    { value: 'age-asc', label: t('sortAgeAsc') },
+                    { value: 'cupSize-desc', label: t('sortCupSizeDesc') },
+                    { value: 'cupSize-asc', label: t('sortCupSizeAsc') },
+                    { value: 'height-desc', label: t('sortHeightDesc') },
+                    { value: 'height-asc', label: t('sortHeightAsc') },
+                    { value: 'weight-desc', label: t('sortWeightDesc') },
+                    { value: 'weight-asc', label: t('sortWeightAsc') },
+                  ]}
+                  className="min-w-[220px]"
+                />
 
                 {/* View Switcher (ganz rechts) */}
                 <div className="flex gap-2">
