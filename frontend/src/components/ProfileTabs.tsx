@@ -5,10 +5,12 @@ import { Clock, Star, ChevronDown, Briefcase, Euro, Calendar, MapPinned, FileTex
 import PricingDisplay from './PricingDisplay';
 import MeetingPointsDisplay from './MeetingPointsDisplay';
 import AvailabilityDisplay from './AvailabilityDisplay';
+import ReviewSection from './ReviewSection';
 import { AvailabilitySchedule } from '@/types/auth.types';
 
 interface ProfileTabsProps {
   escort?: {
+    id?: string;
     services?: string[];
     price30Min?: number;
     price1Hour?: number;
@@ -418,94 +420,13 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
 
         {/* Bewertungen Section */}
           <div id="bewertungen" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-heading)' }}>
-                Bewertungen
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5"
-                      style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>
-                  5.0
-                </span>
-                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  (24 Bewertungen)
-                </span>
+            {escort?.id ? (
+              <ReviewSection userId={escort.id} />
+            ) : (
+              <div className="text-center py-8">
+                <p style={{ color: 'var(--text-secondary)' }}>Bewertungen können nicht geladen werden</p>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              {[
-                {
-                  name: 'Michael S.',
-                  rating: 5,
-                  date: 'Vor 2 Tagen',
-                  text: 'Absolut fantastisches Erlebnis! Sehr professionell, charmant und wunderschön. Die Zeit verging viel zu schnell. Definitiv eine Empfehlung!',
-                },
-                {
-                  name: 'Thomas K.',
-                  rating: 5,
-                  date: 'Vor 1 Woche',
-                  text: 'Ein unvergesslicher Abend! Tolle Gespräche, viel gelacht und eine sehr angenehme Atmosphäre. Genau so hatte ich es mir vorgestellt.',
-                },
-                {
-                  name: 'Alexander B.',
-                  rating: 5,
-                  date: 'Vor 2 Wochen',
-                  text: 'Sehr diskret, pünktlich und einfach zauberhaft. Man fühlt sich sofort wohl. Kann ich nur weiterempfehlen!',
-                },
-              ].map((review, index) => (
-                <div
-                  key={index}
-                  className="p-5 rounded-lg border"
-                  style={{
-                    background: 'var(--background-primary)',
-                    borderColor: 'var(--border)',
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-semibold" style={{ color: 'var(--text-heading)' }}>
-                        {review.name}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                        {review.date}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-4 h-4"
-                          style={{
-                            color: i < review.rating ? 'var(--color-primary)' : 'var(--border)',
-                            fill: i < review.rating ? 'var(--color-primary)' : 'none'
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-regular)' }}>
-                    {review.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 text-center">
-              <button
-                className="btn-base btn-secondary cursor-pointer"
-              >
-                Alle Bewertungen anzeigen
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -653,94 +574,13 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
 
           {/* Bewertungen Section */}
           <div id="bewertungen" className="scroll-mt-24 pt-12 border-t" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold" style={{ color: 'var(--text-heading)' }}>
-                Bewertungen
-              </h3>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5"
-                      style={{ color: 'var(--color-primary)', fill: 'var(--color-primary)' }}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>
-                  5.0
-                </span>
-                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  (24)
-                </span>
+            {escort?.id ? (
+              <ReviewSection userId={escort.id} />
+            ) : (
+              <div className="text-center py-8">
+                <p style={{ color: 'var(--text-secondary)' }}>Bewertungen können nicht geladen werden</p>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              {[
-                {
-                  name: 'Michael S.',
-                  rating: 5,
-                  date: 'Vor 2 Tagen',
-                  text: 'Absolut fantastisches Erlebnis! Sehr professionell, charmant und wunderschön. Die Zeit verging viel zu schnell. Definitiv eine Empfehlung!',
-                },
-                {
-                  name: 'Thomas K.',
-                  rating: 5,
-                  date: 'Vor 1 Woche',
-                  text: 'Ein unvergesslicher Abend! Tolle Gespräche, viel gelacht und eine sehr angenehme Atmosphäre. Genau so hatte ich es mir vorgestellt.',
-                },
-                {
-                  name: 'Alexander B.',
-                  rating: 5,
-                  date: 'Vor 2 Wochen',
-                  text: 'Sehr diskret, pünktlich und einfach zauberhaft. Man fühlt sich sofort wohl. Kann ich nur weiterempfehlen!',
-                },
-              ].map((review, index) => (
-                <div
-                  key={index}
-                  className="p-5 rounded-lg border"
-                  style={{
-                    background: 'var(--background-primary)',
-                    borderColor: 'var(--border)',
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-semibold" style={{ color: 'var(--text-heading)' }}>
-                        {review.name}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                        {review.date}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-4 h-4"
-                          style={{
-                            color: i < review.rating ? 'var(--color-primary)' : 'var(--border)',
-                            fill: i < review.rating ? 'var(--color-primary)' : 'none'
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-regular)' }}>
-                    {review.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 text-center">
-              <button
-                className="btn-base btn-secondary cursor-pointer"
-              >
-                Alle Bewertungen anzeigen
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>

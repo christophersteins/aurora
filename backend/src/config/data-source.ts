@@ -5,6 +5,8 @@ import { GalleryPhoto } from '../users/entities/gallery-photo.entity';
 import { Message } from '../chat/entities/message.entity';
 import { Conversation } from '../chat/entities/conversation.entity';
 import { Waitlist } from '../waitlist/entities/waitlist.entity';
+import { Report } from '../reports/entities/report.entity';
+import { Review } from '../reviews/entities/review.entity';
 
 config();
 
@@ -15,7 +17,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'aurora_user',
   password: process.env.DB_PASSWORD || 'aurora_password',
   database: process.env.DB_DATABASE || 'aurora_db',
-  entities: [User, GalleryPhoto, Message, Conversation, Waitlist],
+  entities: [User, GalleryPhoto, Message, Conversation, Waitlist, Report, Review],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
   logging: true, // Hilfreich für Debugging
