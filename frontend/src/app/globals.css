@@ -1064,3 +1064,13 @@ nav.fixed[style*='zIndex'] {
   }
 }
 
+/* ========================================
+   CHAT PAGE: HIDE HEADER ON MOBILE
+   ======================================== */
+/* Hide header on mobile when chat is open */
+@media (max-width: 767px) {
+  header.chat-open-mobile-hidden {
+    display: none !important;
+  }
+}
+

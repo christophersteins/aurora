@@ -152,7 +152,7 @@ export default function MerklistePage() {
 
   const handleSendMessage = (escort: User) => {
     setContextMenu(null);
-    router.push(`/nachrichten/${escort.username}`);
+    router.push(`/nachrichten?username=${escort.username}`);
   };
 
   const handleScheduleDate = (escort: User) => {
