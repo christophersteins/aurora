@@ -31,6 +31,7 @@ export default function CustomSelect({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -44,8 +45,8 @@ export default function CustomSelect({
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8, // 8px gap
-        left: rect.left + window.scrollX,
+        top: rect.bottom + 8, // 8px gap - no scrollY needed for fixed position
+        left: rect.left,
         width: rect.width,
       });
     }
@@ -73,32 +74,36 @@ export default function CustomSelect({
     };
   }, [isOpen]);
 
-  // Lock body scroll when dropdown is open
+  // Close dropdown on scroll outside (but update position when hovering)
   useEffect(() => {
-    if (isOpen) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
+    if (!isOpen) return;
 
-      // Lock body scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
+    const handleScroll = (event: Event) => {
+      // If hovering over dropdown, update position instead of closing
+      if (isHovering) {
+        if (buttonRef.current) {
+          const rect = buttonRef.current.getBoundingClientRect();
+          setDropdownPosition({
+            top: rect.bottom + 8, // no scrollY needed for fixed position
+            left: rect.left,
+            width: rect.width,
+          });
+        }
+        return;
+      }
+      // Scrolling outside dropdown - close it
+      setIsOpen(false);
+    };
 
-      return () => {
-        // Restore body scroll
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
+    // Listen to scroll events on window and all scrollable containers
+    window.addEventListener('scroll', handleScroll, true);
 
-        // Restore scroll position
-        window.scrollTo(0, scrollY);
-      };
-    }
-  }, [isOpen]);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen, isHovering]);
 
-  // Update position on resize (scroll is disabled)
+  // Update position on resize
   useEffect(() => {
     if (!isOpen) return;
 
@@ -106,8 +111,8 @@ export default function CustomSelect({
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
         setDropdownPosition({
-          top: rect.bottom + window.scrollY + 8,
-          left: rect.left + window.scrollX,
+          top: rect.bottom + 8, // no scrollY needed for fixed position
+          left: rect.left,
           width: rect.width,
         });
       }
@@ -142,6 +147,8 @@ export default function CustomSelect({
   const dropdownContent = isOpen && mounted && (
     <div
       ref={dropdownRef}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
       className="fixed bg-page-secondary border border-default rounded-lg shadow-xl overflow-hidden animate-slideDown"
       style={{
         top: `${dropdownPosition.top}px`,
