@@ -602,6 +602,7 @@ export default function MembersPage() {
     setFilters({
       ...filters,
       useRadius: false,
+      radiusKm: 100,
       userLatitude: null,
       userLongitude: null,
     });
@@ -990,8 +991,20 @@ export default function MembersPage() {
                     type="text"
                     value={locationSearch}
                     onChange={(e) => {
-                      setLocationSearch(e.target.value);
+                      const value = e.target.value;
+                      setLocationSearch(value);
                       setShowSuggestions(true);
+
+                      // Reset radius to default when search field is cleared
+                      if (value === '') {
+                        setFilters(prev => ({
+                          ...prev,
+                          radiusKm: 100,
+                          useRadius: false,
+                          userLatitude: null,
+                          userLongitude: null,
+                        }));
+                      }
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     placeholder={t('searchPlaceholder')}
@@ -1292,8 +1305,20 @@ export default function MembersPage() {
                     type="text"
                     value={locationSearch}
                     onChange={(e) => {
-                      setLocationSearch(e.target.value);
+                      const value = e.target.value;
+                      setLocationSearch(value);
                       setShowSuggestions(true);
+
+                      // Reset radius to default when search field is cleared
+                      if (value === '') {
+                        setFilters(prev => ({
+                          ...prev,
+                          radiusKm: 100,
+                          useRadius: false,
+                          userLatitude: null,
+                          userLongitude: null,
+                        }));
+                      }
                     }}
                     onFocus={() => setShowSuggestions(true)}
                     placeholder={t('desktopSearchPlaceholder')}

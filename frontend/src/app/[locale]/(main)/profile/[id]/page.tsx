@@ -1006,7 +1006,7 @@ export default function ProfilePage() {
 
               {/* Thumbnail Gallery */}
               {photos.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 px-4 lg:px-0">
+                <div className="flex justify-center gap-2 overflow-x-auto pb-2 px-4 lg:px-0">
                   {photos.map((photo, index) => {
                     const isRestricted = !user && photo.isFsk18;
                     return (
