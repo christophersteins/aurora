@@ -2,15 +2,35 @@ import apiClient from '@/lib/api-client';
 import { Conversation, Message } from '@/types/chat.types';
 
 export const chatService = {
-  // Alle Conversations abrufen
+  // Alle Conversations abrufen (dedupliziert im Backend)
   getConversations: async (): Promise<Conversation[]> => {
     const response = await apiClient.get('/chat/conversations');
-    return response.data;
+    // Zusätzliche Client-seitige Deduplizierung als Sicherheit
+    const conversations = response.data;
+    const dedupMap = new Map<string, Conversation>();
+    
+    for (const conv of conversations) {
+      if (!dedupMap.has(conv.otherUserId) || 
+          new Date(conv.lastMessageTime || conv.updatedAt) > 
+          new Date(dedupMap.get(conv.otherUserId)!.lastMessageTime || dedupMap.get(conv.otherUserId)!.updatedAt)) {
+        dedupMap.set(conv.otherUserId, conv);
+      }
+    }
+    
+    return Array.from(dedupMap.values()).sort((a, b) => {
+      // Sort pinned conversations first, then by last message time
+      if (a.isPinned !== b.isPinned) {
+        return a.isPinned ? -1 : 1;
+      }
+      const timeA = new Date(a.lastMessageTime || a.updatedAt).getTime();
+      const timeB = new Date(b.lastMessageTime || b.updatedAt).getTime();
+      return timeB - timeA;
+    });
   },
 
-  // Conversation erstellen oder finden
-  createOrGetConversation: async (userId: string): Promise<Conversation> => {
-    const response = await apiClient.post('/chat/conversations', { userId });
+  // Conversation erstellen oder finden (Backend stellt sicher, dass nur eine existiert)
+  createOrGetConversation: async (otherUserId: string): Promise<Conversation> => {
+    const response = await apiClient.post('/chat/conversations', { otherUserId });
     return response.data;
   },
 

@@ -81,7 +81,6 @@ export class ChatController {
     for (const file of files) {
       const mediaUrl = `/uploads/chat/${file.filename}`;
       const mediaType = file.mimetype.startsWith('image/') ? 'image' : 'video';
-
       const message = await this.chatService.sendMessage(
         conversationId,
         userId,
@@ -89,7 +88,6 @@ export class ChatController {
         mediaUrl,
         mediaType,
       );
-
       messages.push(message);
 
       // Broadcast message via WebSocket
@@ -102,7 +100,6 @@ export class ChatController {
         mediaType: message.mediaType,
         timestamp: message.createdAt,
       };
-
       this.chatGateway.server.emit(`message:${conversationId}`, messagePayload);
     }
 
@@ -140,7 +137,6 @@ export class ChatController {
     @Body('duration') duration: string,
   ) {
     const userId = req.user.id;
-
     if (!files || files.length === 0) {
       return { success: false, message: 'No file uploaded' };
     }
@@ -218,5 +214,17 @@ export class ChatController {
     const userId = req.user.id;
     await this.chatService.deleteConversation(conversationId, userId);
     return { success: true };
+  }
+
+  // Maintenance endpoint to cleanup duplicate conversations
+  @Post('maintenance/cleanup-duplicates')
+  async cleanupDuplicates(@Req() req) {
+    const userId = req.user.id;
+    const deletedCount = await this.chatService.cleanupDuplicateConversations(userId);
+    return { 
+      success: true, 
+      deletedCount,
+      message: `Cleaned up ${deletedCount} duplicate conversation(s)`
+    };
   }
 }

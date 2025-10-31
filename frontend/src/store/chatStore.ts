@@ -8,7 +8,7 @@ interface ChatState {
   totalUnreadCount: number;
   isLoading: boolean;
   error: string | null;
-
+  
   // Actions
   setConversations: (conversations: Conversation[]) => void;
   setActiveConversation: (conversationId: string | null) => void;
@@ -24,6 +24,30 @@ interface ChatState {
   clearStore: () => void;
 }
 
+// Helper function to deduplicate conversations by otherUserId
+const deduplicateConversations = (conversations: Conversation[]): Conversation[] => {
+  const dedupMap = new Map<string, Conversation>();
+  
+  for (const conv of conversations) {
+    const existing = dedupMap.get(conv.otherUserId);
+    if (!existing || 
+        new Date(conv.lastMessageTime || conv.updatedAt) > 
+        new Date(existing.lastMessageTime || existing.updatedAt)) {
+      dedupMap.set(conv.otherUserId, conv);
+    }
+  }
+  
+  return Array.from(dedupMap.values()).sort((a, b) => {
+    // Sort pinned conversations first, then by last message time
+    if (a.isPinned !== b.isPinned) {
+      return a.isPinned ? -1 : 1;
+    }
+    const timeA = new Date(a.lastMessageTime || a.updatedAt).getTime();
+    const timeB = new Date(b.lastMessageTime || b.updatedAt).getTime();
+    return timeB - timeA;
+  });
+};
+
 export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   activeConversationId: null,
@@ -32,15 +56,32 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  setConversations: (conversations) => set({ conversations }),
+  setConversations: (conversations) => {
+    // Always deduplicate conversations before setting
+    const deduplicated = deduplicateConversations(conversations);
+    set({ conversations: deduplicated });
+  },
 
   setActiveConversation: (conversationId) =>
     set({ activeConversationId: conversationId }),
 
   addConversation: (conversation) =>
-    set((state) => ({
-      conversations: [conversation, ...state.conversations],
-    })),
+    set((state) => {
+      // Check if conversation with same otherUserId already exists
+      const existing = state.conversations.find(c => c.otherUserId === conversation.otherUserId);
+      
+      if (existing) {
+        // Update existing conversation instead of adding duplicate
+        const updated = state.conversations.map(conv =>
+          conv.otherUserId === conversation.otherUserId ? conversation : conv
+        );
+        return { conversations: deduplicateConversations(updated) };
+      } else {
+        // Add new conversation
+        const updated = [conversation, ...state.conversations];
+        return { conversations: deduplicateConversations(updated) };
+      }
+    }),
 
   setMessages: (conversationId, messages) =>
     set((state) => ({
@@ -53,20 +94,26 @@ export const useChatStore = create<ChatState>((set, get) => ({
   addMessage: (conversationId, message) =>
     set((state) => {
       const existingMessages = state.messages[conversationId] || [];
+      
+      // Update conversations to reflect new message
+      const updatedConversations = state.conversations.map((conv) => {
+        if (conv.id === conversationId) {
+          return {
+            ...conv,
+            lastMessage: message.content,
+            lastMessageTime: message.createdAt,
+            updatedAt: message.createdAt,
+          };
+        }
+        return conv;
+      });
+      
       return {
         messages: {
           ...state.messages,
           [conversationId]: [...existingMessages, message],
         },
-        conversations: state.conversations.map((conv) =>
-          conv.id === conversationId
-            ? {
-                ...conv,
-                lastMessage: message,
-                updatedAt: message.createdAt,
-              }
-            : conv
-        ),
+        conversations: deduplicateConversations(updatedConversations),
       };
     }),
 
@@ -98,18 +145,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   setLoading: (isLoading) => set({ isLoading }),
-
+  
   setError: (error) => set({ error }),
-
+  
   setTotalUnreadCount: (count) => set({ totalUnreadCount: count }),
-
+  
   updateTotalUnreadCount: () => {
     const state = get();
-    const total = state.conversations.reduce(
-      (sum, conv) => sum + (conv.unreadCount || 0),
-      0
-    );
-    set({ totalUnreadCount: total });
+    // Count unique users with unread messages
+    const usersWithUnread = new Set<string>();
+    
+    state.conversations.forEach(conv => {
+      if (conv.unreadCount && conv.unreadCount > 0) {
+        usersWithUnread.add(conv.otherUserId);
+      }
+    });
+    
+    set({ totalUnreadCount: usersWithUnread.size });
   },
 
   clearStore: () =>
