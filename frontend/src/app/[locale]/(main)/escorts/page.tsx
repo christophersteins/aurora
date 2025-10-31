@@ -19,6 +19,7 @@ import {
   Star,
   Gem,
   RotateCcw,
+  Navigation,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { scrollPositionUtil } from '@/utils/scrollPosition';
@@ -974,11 +975,11 @@ export default function MembersPage() {
         {/* Toolbar - Sticky on scroll */}
         <div
           ref={toolbarRef}
-          className={`${!locationSearch && !isLoadingLocation ? 'mb-10' : 'mb-6'} relative z-[100] bg-[#000000]/80 backdrop-blur-md transition-all duration-300`}
+          className="mb-6 relative z-[100] bg-[#000000]/80 backdrop-blur-md transition-all duration-300"
         >
           <div>
             {/* Mobile Layout (Smartphone) */}
-            <div className={`block lg:hidden ${!locationSearch && !isLoadingLocation ? 'space-y-10' : 'space-y-4'}`}>
+            <div className="block lg:hidden space-y-4">
               {/* First Row: Location Search + Radius */}
               <div className="flex gap-3 items-center">
                 {/* Location Search Field */}
@@ -997,8 +998,8 @@ export default function MembersPage() {
                     className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                   />
 
-                  {/* Clear Icon */}
-                  {locationSearch && (
+                  {/* Clear Icon or Location Icon */}
+                  {locationSearch ? (
                     <button
                       onClick={handleClearLocationSearch}
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer z-10"
@@ -1006,6 +1007,25 @@ export default function MembersPage() {
                     >
                       <X className="w-5 h-5 text-muted" />
                     </button>
+                  ) : !isLoadingLocation ? (
+                    <button
+                      onClick={handleUseCurrentLocation}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
+                      style={{ color: 'var(--color-primary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '';
+                      }}
+                      title="Meinen Standort verwenden"
+                    >
+                      <Navigation className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
                   )}
 
                   {/* Autocomplete Suggestions */}
@@ -1034,35 +1054,6 @@ export default function MembersPage() {
                           </button>
                         );
                       })}
-                    </div>
-                  )}
-
-                  {/* Use Current Location Link - positioned below input */}
-                  {!locationSearch && !isLoadingLocation && (
-                    <button
-                      type="button"
-                      onClick={handleUseCurrentLocation}
-                      className="absolute top-full mt-2 left-0 text-sm flex items-center gap-1.5 bg-transparent border-none p-0 font-medium transition-colors"
-                      style={{
-                        color: 'var(--color-primary)',
-                        textDecoration: 'none',
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--color-primary-hover)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'var(--color-primary)';
-                      }}
-                    >
-                      <MapPin className="w-4 h-4" />
-                      Meinen Standort verwenden
-                    </button>
-                  )}
-                  {isLoadingLocation && (
-                    <div className="absolute top-full mt-2 left-0 flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                      <span className="text-sm text-muted">Standort wird geladen...</span>
                     </div>
                   )}
                 </div>
@@ -1309,8 +1300,8 @@ export default function MembersPage() {
                     className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                   />
 
-                  {/* Clear Icon */}
-                  {locationSearch && (
+                  {/* Clear Icon or Location Icon */}
+                  {locationSearch ? (
                     <button
                       onClick={handleClearLocationSearch}
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer z-10"
@@ -1318,6 +1309,25 @@ export default function MembersPage() {
                     >
                       <X className="w-5 h-5 text-muted" />
                     </button>
+                  ) : !isLoadingLocation ? (
+                    <button
+                      onClick={handleUseCurrentLocation}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
+                      style={{ color: 'var(--color-primary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '';
+                      }}
+                      title="Meinen Standort verwenden"
+                    >
+                      <Navigation className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
                   )}
 
                   {/* Autocomplete Suggestions */}
@@ -1346,35 +1356,6 @@ export default function MembersPage() {
                           </button>
                         );
                       })}
-                    </div>
-                  )}
-
-                  {/* Use Current Location Link - positioned below input */}
-                  {!locationSearch && !isLoadingLocation && (
-                    <button
-                      type="button"
-                      onClick={handleUseCurrentLocation}
-                      className="absolute top-full mt-2 left-0 text-sm flex items-center gap-1.5 bg-transparent border-none p-0 font-medium transition-colors"
-                      style={{
-                        color: 'var(--color-primary)',
-                        textDecoration: 'none',
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = 'var(--color-primary-hover)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'var(--color-primary)';
-                      }}
-                    >
-                      <MapPin className="w-4 h-4" />
-                      Meinen Standort verwenden
-                    </button>
-                  )}
-                  {isLoadingLocation && (
-                    <div className="absolute top-full mt-2 left-0 flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                      <span className="text-sm text-muted">Standort wird geladen...</span>
                     </div>
                   )}
                 </div>
