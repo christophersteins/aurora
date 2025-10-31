@@ -1190,7 +1190,7 @@ export default function MembersPage() {
                                   setSortBy(option.value as SortOption);
                                   setShowMobileSortDropdown(false);
                                 }}
-                                className={`w-full text-left px-4 py-3.5 transition-all duration-150 cursor-pointer ${
+                                className={`w-full text-left px-4 py-3.5 transition-all duration-150 cursor-pointer text-sm ${
                                   index !== array.length - 1 ? 'border-b border-default' : ''
                                 } ${
                                   isSelected
@@ -1248,7 +1248,7 @@ export default function MembersPage() {
                       }`}
                       title={t('compactView')}
                     >
-                      <LayoutGrid className="w-5 h-5" />
+                      <LayoutGrid className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setGridView('comfortable')}
@@ -1259,7 +1259,7 @@ export default function MembersPage() {
                       }`}
                       title={t('comfortableView')}
                     >
-                      <Grid3x3 className="w-5 h-5" />
+                      <Grid3x3 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -1449,7 +1449,7 @@ export default function MembersPage() {
                     }`}
                     title={t('compactView')}
                   >
-                    <LayoutGrid className="w-5 h-5" />
+                    <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setGridView('comfortable')}
@@ -1460,7 +1460,7 @@ export default function MembersPage() {
                     }`}
                     title={t('comfortableView')}
                   >
-                    <Grid3x3 className="w-5 h-5" />
+                    <Grid3x3 className="w-4 h-4" />
                   </button>
                 </div>
             </div>

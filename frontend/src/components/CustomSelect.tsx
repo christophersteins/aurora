@@ -166,7 +166,7 @@ export default function CustomSelect({
             <button
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              className={`w-full flex items-center justify-between px-4 py-3 transition-all duration-150 cursor-pointer ${
+              className={`w-full flex items-center justify-between px-4 py-3 transition-all duration-150 cursor-pointer text-sm ${
                 index !== options.length - 1 ? 'border-b border-default' : ''
               } ${
                 isSelected
@@ -227,7 +227,9 @@ export default function CustomSelect({
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center gap-3 px-4 py-2.5 border border-default rounded-lg bg-page-primary text-body hover:border-primary transition-all duration-200 cursor-pointer group"
+        className={`w-full flex items-center gap-3 px-4 py-2.5 border border-default rounded-lg bg-page-primary hover:border-primary transition-all duration-200 cursor-pointer group text-sm ${
+          isOpen ? 'text-body' : 'text-muted'
+        }`}
       >
         {/* Icon */}
         {icon && <div className="text-muted transition-colors group-hover:text-primary">{icon}</div>}
