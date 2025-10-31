@@ -3,7 +3,7 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
-import { Users, Calendar, MessageCircle, Bell, User } from 'lucide-react';
+import { Users, Calendar, Mail, Bell, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function MobileBottomNav() {
@@ -105,7 +105,7 @@ export default function MobileBottomNav() {
           className="flex flex-col items-center justify-center flex-1 py-2 relative"
         >
           <div className="relative">
-            <MessageCircle
+            <Mail
               size={24}
               strokeWidth={isActive('/nachrichten') ? 2.5 : 2}
               className="mb-1"

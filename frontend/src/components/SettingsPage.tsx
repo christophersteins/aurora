@@ -638,7 +638,7 @@ export default function SettingsPage() {
                     onClick={() => handleReadReceiptsChange(!readReceipts)}
                     className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
                     style={{
-                      backgroundColor: readReceipts ? 'var(--color-primary)' : '#4b5563'
+                      backgroundColor: readReceipts ? 'var(--color-secondary)' : '#4b5563'
                     }}
                   >
                     <span

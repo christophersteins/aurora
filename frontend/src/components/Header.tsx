@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useUIStore } from '@/store/uiStore';
 import { useState, useEffect, useRef } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, MessageCircle, Home, Users, Building2, Video, Sparkles, LogIn, Bookmark } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, Mail, Home, Users, Building2, Video, Sparkles, LogIn, Bookmark } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -250,7 +250,7 @@ export default function Header() {
                   }`}
                 >
                   <div className="relative flex-shrink-0">
-                    <MessageCircle size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
+                    <Mail size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
                     {totalUnreadCount > 0 && (
                       <span
                         className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"
@@ -453,7 +453,7 @@ export default function Header() {
                     }`}
                   >
                     <div className="relative flex-shrink-0">
-                      <MessageCircle size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
+                      <Mail size={26} strokeWidth={isActive('/nachrichten') ? 2.5 : 2} />
                       {totalUnreadCount > 0 && (
                         <span
                           className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 text-white text-[11px] font-bold rounded-full flex items-center justify-center"

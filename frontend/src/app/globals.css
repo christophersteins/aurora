@@ -814,7 +814,7 @@ input[type="checkbox"]:focus {
 }
 
 .switch.active {
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary);
 }
 
 .switch:not(.active) {
@@ -843,7 +843,7 @@ button[class*="rounded-full"][class*="h-6"][class*="w-11"] {
 button[class*="rounded-full"][class*="h-6"][class*="w-11"][class*="bg-action-secondary"],
 button[class*="rounded-full"][class*="h-6"][class*="w-11"][class*="bg-success"],
 button[class*="rounded-full"][class*="h-6"][class*="w-11"][class*="bg-primary"] {
-  background-color: var(--color-primary) !important;
+  background-color: var(--color-secondary) !important;
 }
 
 button[class*="rounded-full"][class*="h-6"][class*="w-11"]:hover {
