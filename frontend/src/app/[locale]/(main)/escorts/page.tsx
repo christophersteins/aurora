@@ -12,7 +12,6 @@ import {
   LayoutGrid,
   Grid3x3,
   ArrowUpDown,
-  X,
   Check,
   Crown,
   Search,
@@ -20,6 +19,8 @@ import {
   Gem,
   RotateCcw,
   Navigation,
+  Minus,
+  Plus,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { scrollPositionUtil } from '@/utils/scrollPosition';
@@ -107,6 +108,8 @@ const initialFilters: Filters = {
 const FILTER_STORAGE_KEY = 'aurora_member_filters';
 const LOCATION_SEARCH_KEY = 'aurora_location_search';
 const SORT_STORAGE_KEY = 'aurora_member_sort';
+const LAST_LOCATION_KEY = 'aurora_last_location';
+const FIRST_VISIT_KEY = 'aurora_escorts_first_visit';
 
 type GridView = 'compact' | 'comfortable';
 
@@ -185,6 +188,8 @@ export default function MembersPage() {
   const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [lastValidLocationSearch, setLastValidLocationSearch] = useState('');
+  const [showGpsSuggestion, setShowGpsSuggestion] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -195,10 +200,27 @@ export default function MembersPage() {
   const [isToolbarStuck, setIsToolbarStuck] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const mobileSortButtonRef = useRef<HTMLButtonElement>(null);
-  const [mobileSortDropdownPosition, setMobileSortDropdownPosition] = useState({ top: 0, right: 0 });
+  const mobileSortDropdownRef = useRef<HTMLDivElement>(null);
 
   // Track initial mount to prevent saving on first render
   const isInitialMount = useRef(true);
+
+  // Save location to localStorage
+  const saveLocationToStorage = (latitude: number, longitude: number) => {
+    try {
+      localStorage.setItem(LAST_LOCATION_KEY, JSON.stringify({ latitude, longitude }));
+    } catch (error) {
+      console.error('Error saving location to localStorage:', error);
+    }
+  };
+
+  // Automatically detect location on first visit (using IP only, no GPS prompt)
+  const detectLocationOnFirstVisit = async () => {
+    // Use IP-based location without prompting for GPS permission
+    // GPS will only be requested when user clicks the location icon
+    console.info('First visit: detecting location via IP (no GPS prompt)');
+    getLocationFromIP(true); // Show in search field
+  };
 
   // Get location from IP address
   const getLocationFromIP = async (updateSearchField: boolean = false) => {
@@ -211,6 +233,9 @@ export default function MembersPage() {
       const latitude = data.latitude || fallbackCoords.latitude;
       const longitude = data.longitude || fallbackCoords.longitude;
 
+      // Save location for future use
+      saveLocationToStorage(latitude, longitude);
+
       // Update search field if requested (manual GPS button click)
       if (updateSearchField) {
         if (data.latitude && data.longitude) {
@@ -218,8 +243,10 @@ export default function MembersPage() {
           const postcode = data.postal || '';
           const displayName = postcode ? `${postcode} ${cityName}` : cityName;
           setLocationSearch(displayName);
+          setLastValidLocationSearch(displayName);
         } else {
           setLocationSearch('Deutschland');
+          setLastValidLocationSearch('Deutschland');
         }
       }
 
@@ -236,7 +263,10 @@ export default function MembersPage() {
       // Fallback to center of Germany
       if (updateSearchField) {
         setLocationSearch('Deutschland');
+        setLastValidLocationSearch('Deutschland');
       }
+
+      saveLocationToStorage(fallbackCoords.latitude, fallbackCoords.longitude);
 
       setFilters((prev) => ({
         ...prev,
@@ -252,7 +282,7 @@ export default function MembersPage() {
     }
   };
 
-  // Process URL parameters from home page search
+  // Process URL parameters from home page search and handle first visit
   useEffect(() => {
     const lat = searchParams.get('lat');
     const lon = searchParams.get('lon');
@@ -262,6 +292,16 @@ export default function MembersPage() {
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lon);
       const radiusKm = radius ? parseInt(radius) : 100;
+
+      // Save location
+      saveLocationToStorage(latitude, longitude);
+
+      // Mark as visited (not first visit anymore)
+      try {
+        localStorage.setItem(FIRST_VISIT_KEY, 'false');
+      } catch (error) {
+        console.error('Error saving first visit flag:', error);
+      }
 
       // Reverse geocoding to get location name
       fetch(
@@ -294,9 +334,62 @@ export default function MembersPage() {
         radiusKm: radiusKm,
       }));
     } else {
-      // No URL parameters - get approximate location silently if we don't have coordinates yet
-      if (!filters.userLatitude && !filters.userLongitude) {
-        getLocationFromIP(false); // Silent mode: don't update search field
+      // No URL parameters - check if first visit
+      try {
+        const isFirstVisit = localStorage.getItem(FIRST_VISIT_KEY) !== 'false';
+        const savedLocationSearch = localStorage.getItem(LOCATION_SEARCH_KEY);
+
+        if (isFirstVisit && !savedLocationSearch) {
+          // First visit and no saved location search - automatically detect location
+          console.info('First visit detected - automatically detecting location');
+          detectLocationOnFirstVisit();
+
+          // Mark as visited
+          localStorage.setItem(FIRST_VISIT_KEY, 'false');
+        } else if (savedLocationSearch && !locationSearch) {
+          // Not first visit but search field is empty - restore from localStorage
+          // This happens on page reload
+          try {
+            const savedLocation = localStorage.getItem(LAST_LOCATION_KEY);
+            if (savedLocation) {
+              const { latitude, longitude } = JSON.parse(savedLocation);
+              setFilters((prev) => ({
+                ...prev,
+                userLatitude: latitude,
+                userLongitude: longitude,
+              }));
+            } else {
+              // No saved coordinates - get IP-based location silently
+              getLocationFromIP(false);
+            }
+          } catch (error) {
+            console.error('Error loading saved location:', error);
+            getLocationFromIP(false);
+          }
+        } else if (!filters.userLatitude && !filters.userLongitude) {
+          // No coordinates yet - load saved location or get IP-based
+          try {
+            const savedLocation = localStorage.getItem(LAST_LOCATION_KEY);
+            if (savedLocation) {
+              const { latitude, longitude } = JSON.parse(savedLocation);
+              setFilters((prev) => ({
+                ...prev,
+                userLatitude: latitude,
+                userLongitude: longitude,
+              }));
+            } else {
+              // No saved location - get IP-based location silently
+              getLocationFromIP(false);
+            }
+          } catch (error) {
+            console.error('Error loading saved location:', error);
+            getLocationFromIP(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking first visit:', error);
+        // Fallback to IP-based location
+        getLocationFromIP(false);
       }
     }
   }, [searchParams]);
@@ -347,6 +440,14 @@ export default function MembersPage() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [pathname]);
+
+  // Initialize lastValidLocationSearch when locationSearch is first loaded
+  useEffect(() => {
+    if (locationSearch && !lastValidLocationSearch) {
+      setLastValidLocationSearch(locationSearch);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
 
   // Save location search to LocalStorage on changes
   useEffect(() => {
@@ -447,41 +548,39 @@ export default function MembersPage() {
     };
   }, []);
 
-  // Update mobile sort dropdown position when opened
+  // Close mobile sort dropdown on scroll
   useEffect(() => {
-    if (showMobileSortDropdown && mobileSortButtonRef.current) {
-      const rect = mobileSortButtonRef.current.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      setMobileSortDropdownPosition({
-        top: rect.bottom + 8,
-        right: viewportWidth - rect.right,
-      });
-    }
+    if (!showMobileSortDropdown) return;
+
+    const handleScroll = () => {
+      setShowMobileSortDropdown(false);
+    };
+
+    // Close on scroll
+    window.addEventListener('scroll', handleScroll, true);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+    };
   }, [showMobileSortDropdown]);
 
-  // Lock body scroll when mobile sort dropdown is open
+  // Close mobile sort dropdown when clicking outside
   useEffect(() => {
-    if (showMobileSortDropdown) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
+    if (!showMobileSortDropdown) return;
 
-      // Lock body scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileSortDropdownRef.current &&
+        !mobileSortDropdownRef.current.contains(event.target as Node) &&
+        mobileSortButtonRef.current &&
+        !mobileSortButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowMobileSortDropdown(false);
+      }
+    };
 
-      return () => {
-        // Restore body scroll
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-
-        // Restore scroll position
-        window.scrollTo(0, scrollY);
-      };
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMobileSortDropdown]);
 
   // Fetch location suggestions from Nominatim
@@ -521,10 +620,22 @@ export default function MembersPage() {
   // Get user's current location (manual click on location button)
   const handleUseCurrentLocation = () => {
     setIsLoadingLocation(true);
+    setShowGpsSuggestion(false); // Hide GPS suggestion when clicked
+
+    // Mark as not first visit (user manually requested location)
+    try {
+      localStorage.setItem(FIRST_VISIT_KEY, 'false');
+    } catch (error) {
+      console.error('Error saving first visit flag:', error);
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+
+          // Save location for future use
+          saveLocationToStorage(latitude, longitude);
 
           // Reverse geocoding to get location name
           try {
@@ -545,6 +656,7 @@ export default function MembersPage() {
             const displayName = postcode ? `${postcode} ${cityName}` : cityName;
 
             setLocationSearch(displayName);
+            setLastValidLocationSearch(displayName);
             setFilters({
               ...filters,
               useRadius: true,
@@ -561,6 +673,7 @@ export default function MembersPage() {
               userLongitude: longitude,
             });
             setLocationSearch('Aktueller Standort');
+            setLastValidLocationSearch('Aktueller Standort');
           }
 
           setIsLoadingLocation(false);
@@ -586,28 +699,53 @@ export default function MembersPage() {
       suggestion.address?.village ||
       suggestion.display_name;
 
+    const latitude = parseFloat(suggestion.lat);
+    const longitude = parseFloat(suggestion.lon);
+
+    // Save location for future use
+    saveLocationToStorage(latitude, longitude);
+
+    // Mark as not first visit (user manually selected location)
+    try {
+      localStorage.setItem(FIRST_VISIT_KEY, 'false');
+    } catch (error) {
+      console.error('Error saving first visit flag:', error);
+    }
+
     setLocationSearch(cityName);
+    setLastValidLocationSearch(cityName); // Save as last valid value
     setFilters({
       ...filters,
       useRadius: true,
-      userLatitude: parseFloat(suggestion.lat),
-      userLongitude: parseFloat(suggestion.lon),
+      userLatitude: latitude,
+      userLongitude: longitude,
     });
     setShowSuggestions(false);
   };
 
-  // Clear location search
-  const handleClearLocationSearch = () => {
+  // Handle location search focus - clear the field for new input
+  const handleLocationSearchFocus = () => {
+    // Save the current value before clearing
+    if (locationSearch) {
+      setLastValidLocationSearch(locationSearch);
+    }
     setLocationSearch('');
-    setFilters({
-      ...filters,
-      useRadius: false,
-      radiusKm: 100,
-      userLatitude: null,
-      userLongitude: null,
-    });
-    setLocationSuggestions([]);
-    setShowSuggestions(false);
+    setShowSuggestions(true);
+    setShowGpsSuggestion(true); // Show GPS suggestion on focus
+  };
+
+  // Handle location search blur - restore if nothing was entered
+  const handleLocationSearchBlur = () => {
+    // Hide GPS suggestion immediately
+    setShowGpsSuggestion(false);
+
+    // Delay the restore to allow suggestion clicks to complete first
+    setTimeout(() => {
+      // If the field is empty and we have a last valid value, restore it
+      if (!locationSearch && lastValidLocationSearch) {
+        setLocationSearch(lastValidLocationSearch);
+      }
+    }, 200);
   };
 
   // Calculate age from birth date
@@ -898,6 +1036,38 @@ export default function MembersPage() {
     }
   };
 
+  // Handle radius increment
+  const handleRadiusIncrement = () => {
+    const newRadius = Math.min((filters.radiusKm || 0) + 5, 500);
+    setFilters({ ...filters, radiusKm: newRadius });
+  };
+
+  // Handle radius decrement
+  const handleRadiusDecrement = () => {
+    const newRadius = Math.max((filters.radiusKm || 0) - 5, 5);
+    setFilters({ ...filters, radiusKm: newRadius });
+  };
+
+  // Handle mobile sort dropdown toggle
+  const handleMobileSortToggle = () => {
+    setShowMobileSortDropdown(!showMobileSortDropdown);
+  };
+
+  // Calculate mobile sort dropdown position
+  const getMobileSortDropdownPosition = () => {
+    if (!mobileSortButtonRef.current) {
+      return { top: 0, left: 0 };
+    }
+
+    const rect = mobileSortButtonRef.current.getBoundingClientRect();
+    const dropdownWidth = 256; // w-64 = 16rem = 256px
+
+    return {
+      top: rect.bottom + 8,
+      left: rect.right - dropdownWidth,
+    };
+  };
+
   // Check if filters are active (excluding location search and radius)
   const hasActiveFilters = () => {
     return (
@@ -995,49 +1165,61 @@ export default function MembersPage() {
                       setLocationSearch(value);
                       setShowSuggestions(true);
 
-                      // Reset radius to default when search field is cleared
+                      // Hide GPS suggestion when user starts typing
+                      if (value.length > 0) {
+                        setShowGpsSuggestion(false);
+                      }
+
+                      // Disable radius filter when search field is cleared, but keep coordinates
                       if (value === '') {
                         setFilters(prev => ({
                           ...prev,
                           radiusKm: 100,
                           useRadius: false,
-                          userLatitude: null,
-                          userLongitude: null,
+                          // Keep userLatitude and userLongitude for distance display
                         }));
                       }
                     }}
-                    onFocus={() => setShowSuggestions(true)}
+                    onFocus={handleLocationSearchFocus}
+                    onBlur={handleLocationSearchBlur}
                     placeholder={t('searchPlaceholder')}
                     className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                   />
 
-                  {/* Clear Icon or Location Icon */}
-                  {locationSearch ? (
-                    <button
-                      onClick={handleClearLocationSearch}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer z-10"
-                      title={t('clearSearch')}
-                    >
-                      <X className="w-5 h-5 text-muted" />
-                    </button>
-                  ) : !isLoadingLocation ? (
-                    <button
-                      onClick={handleUseCurrentLocation}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
-                      style={{ color: 'var(--color-primary)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '';
-                      }}
-                      title="Meinen Standort verwenden"
-                    >
-                      <Navigation className="w-5 h-5" />
-                    </button>
-                  ) : (
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
-                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  {/* GPS Location Icon (hidden when GPS suggestion is shown) */}
+                  {!showGpsSuggestion && (
+                    !isLoadingLocation ? (
+                      <button
+                        onClick={handleUseCurrentLocation}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
+                        style={{ color: 'var(--color-primary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '';
+                        }}
+                        title="Meinen Standort verwenden"
+                      >
+                        <Navigation className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
+                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )
+                  )}
+
+                  {/* GPS Location Suggestion */}
+                  {showGpsSuggestion && (
+                    <div className="absolute z-[9999] w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg">
+                      <button
+                        onClick={handleUseCurrentLocation}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition cursor-pointer flex items-center gap-3"
+                      >
+                        <Navigation className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
+                        <span className="text-body">Aktuellen Standort verwenden</span>
+                      </button>
                     </div>
                   )}
 
@@ -1073,27 +1255,50 @@ export default function MembersPage() {
 
                 {/* Radius Field */}
                 <div className="flex items-center gap-2 relative group">
-                  <input
-                    type="number"
-                    value={filters.radiusKm || ''}
-                    onChange={(e) =>
-                      setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })
-                    }
-                    onBlur={() => {
-                      if (filters.radiusKm < 5) {
-                        setFilters({ ...filters, radiusKm: 5 });
-                      } else if (filters.radiusKm > 500) {
-                        setFilters({ ...filters, radiusKm: 500 });
+                  <div className="relative w-24">
+                    {/* Minus Button */}
+                    <button
+                      onClick={handleRadiusDecrement}
+                      disabled={!locationSearch || filters.radiusKm <= 5}
+                      className="absolute left-1.5 top-1/2 transform -translate-y-1/2 p-0.5 text-primary disabled:opacity-30 disabled:cursor-not-allowed transition z-10"
+                      type="button"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Input Field */}
+                    <input
+                      type="number"
+                      value={filters.radiusKm || ''}
+                      onChange={(e) =>
+                        setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })
                       }
-                    }}
-                    min="5"
-                    max="500"
-                    step="5"
-                    disabled={!locationSearch}
-                    className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ colorScheme: 'dark', accentColor: '#71767b' }}
-                    placeholder="km"
-                  />
+                      onBlur={() => {
+                        if (filters.radiusKm < 5) {
+                          setFilters({ ...filters, radiusKm: 5 });
+                        } else if (filters.radiusKm > 500) {
+                          setFilters({ ...filters, radiusKm: 500 });
+                        }
+                      }}
+                      min="5"
+                      max="500"
+                      step="5"
+                      disabled={!locationSearch}
+                      className="w-full pl-7 pr-8 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="km"
+                    />
+
+                    {/* Plus Button */}
+                    <button
+                      onClick={handleRadiusIncrement}
+                      disabled={!locationSearch || filters.radiusKm >= 500}
+                      className="absolute right-1.5 top-1/2 transform -translate-y-1/2 p-0.5 text-primary disabled:opacity-30 disabled:cursor-not-allowed transition z-10"
+                      type="button"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
                   {!locationSearch && (
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                       <span className="text-sm text-body">{t('radiusTooltip')}</span>
@@ -1142,7 +1347,7 @@ export default function MembersPage() {
                   <div className="relative">
                     <button
                       ref={mobileSortButtonRef}
-                      onClick={() => setShowMobileSortDropdown(!showMobileSortDropdown)}
+                      onClick={handleMobileSortToggle}
                       className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
                         showMobileSortDropdown
                           ? 'bg-action-primary border-primary text-primary'
@@ -1153,88 +1358,75 @@ export default function MembersPage() {
                       <ArrowUpDown className={`w-5 h-5 transition-transform duration-300 ${showMobileSortDropdown ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {showMobileSortDropdown && (
-                      <>
-                        {/* Backdrop overlay for mobile */}
-                        <div
-                          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[9998]"
-                          onClick={() => setShowMobileSortDropdown(false)}
-                          style={{ animation: 'fadeIn 0.2s ease-out' }}
-                        />
+                    {showMobileSortDropdown && (() => {
+                      const position = getMobileSortDropdownPosition();
+                      return (
+                        <>
+                          <div
+                            ref={mobileSortDropdownRef}
+                            className="fixed w-64 bg-page-secondary border border-default rounded-lg shadow-xl z-[9999] overflow-hidden"
+                            style={{
+                              animation: 'slideDown 0.2s ease-out',
+                              top: `${position.top}px`,
+                              left: `${position.left}px`,
+                            }}
+                          >
+                            {[
+                              { value: 'distance', label: t('sortDistanceAsc') },
+                              { value: 'age-desc', label: t('sortAgeDesc') },
+                              { value: 'age-asc', label: t('sortAgeAsc') },
+                              { value: 'cupSize-desc', label: t('sortCupSizeDesc') },
+                              { value: 'cupSize-asc', label: t('sortCupSizeAsc') },
+                              { value: 'height-desc', label: t('sortHeightDesc') },
+                              { value: 'height-asc', label: t('sortHeightAsc') },
+                              { value: 'weight-desc', label: t('sortWeightDesc') },
+                              { value: 'weight-asc', label: t('sortWeightAsc') },
+                            ].map((option, index, array) => {
+                              const isSelected = sortBy === option.value;
+                              return (
+                                <button
+                                  key={option.value}
+                                  onClick={() => {
+                                    setSortBy(option.value as SortOption);
+                                    setShowMobileSortDropdown(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-3.5 transition-all duration-150 cursor-pointer text-sm ${
+                                    index !== array.length - 1 ? 'border-b border-default' : ''
+                                  } ${
+                                    isSelected
+                                      ? 'bg-action-primary/10 text-primary'
+                                      : 'hover:bg-page-primary text-body'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className={isSelected ? 'font-medium' : ''}>{option.label}</span>
+                                    {isSelected && (
+                                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20">
+                                        <Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
 
-                        {/* Dropdown menu */}
-                        <div
-                          className="fixed w-64 bg-page-secondary border border-default rounded-lg shadow-2xl z-[9999] overflow-hidden"
-                          style={{
-                            animation: 'slideDown 0.2s ease-out',
-                            top: `${mobileSortDropdownPosition.top}px`,
-                            right: `${mobileSortDropdownPosition.right}px`,
-                          }}
-                        >
-                          {[
-                            { value: 'distance', label: t('sortDistanceAsc') },
-                            { value: 'age-desc', label: t('sortAgeDesc') },
-                            { value: 'age-asc', label: t('sortAgeAsc') },
-                            { value: 'cupSize-desc', label: t('sortCupSizeDesc') },
-                            { value: 'cupSize-asc', label: t('sortCupSizeAsc') },
-                            { value: 'height-desc', label: t('sortHeightDesc') },
-                            { value: 'height-asc', label: t('sortHeightAsc') },
-                            { value: 'weight-desc', label: t('sortWeightDesc') },
-                            { value: 'weight-asc', label: t('sortWeightAsc') },
-                          ].map((option, index, array) => {
-                            const isSelected = sortBy === option.value;
-                            return (
-                              <button
-                                key={option.value}
-                                onClick={() => {
-                                  setSortBy(option.value as SortOption);
-                                  setShowMobileSortDropdown(false);
-                                }}
-                                className={`w-full text-left px-4 py-3.5 transition-all duration-150 cursor-pointer text-sm ${
-                                  index !== array.length - 1 ? 'border-b border-default' : ''
-                                } ${
-                                  isSelected
-                                    ? 'bg-action-primary/10 text-primary'
-                                    : 'hover:bg-page-primary text-body'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className={isSelected ? 'font-medium' : ''}>{option.label}</span>
-                                  {isSelected && (
-                                    <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20">
-                                      <Check className="w-3.5 h-3.5 text-primary" strokeWidth={3} />
-                                    </div>
-                                  )}
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Keyframes for animations */}
-                        <style jsx>{`
-                          @keyframes slideDown {
-                            from {
-                              opacity: 0;
-                              transform: translateY(-8px);
+                          {/* Keyframes for animations */}
+                          <style jsx>{`
+                            @keyframes slideDown {
+                              from {
+                                opacity: 0;
+                                transform: translateY(-8px);
+                              }
+                              to {
+                                opacity: 1;
+                                transform: translateY(0);
+                              }
                             }
-                            to {
-                              opacity: 1;
-                              transform: translateY(0);
-                            }
-                          }
-
-                          @keyframes fadeIn {
-                            from {
-                              opacity: 0;
-                            }
-                            to {
-                              opacity: 1;
-                            }
-                          }
-                        `}</style>
-                      </>
-                    )}
+                          `}</style>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   {/* View Switcher */}
@@ -1267,7 +1459,7 @@ export default function MembersPage() {
             </div>
 
             {/* Desktop/Tablet Layout */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-end gap-4">
                 {/* Filter Button (ganz links) */}
                 <button
                   onClick={() => setFilterSidebarOpen(true)}
@@ -1298,7 +1490,9 @@ export default function MembersPage() {
                 )}
 
                 {/* Location Search Field */}
-                <div className="w-72 relative">
+                <div className="w-72 flex flex-col gap-1">
+                  <label className="text-xs text-muted px-1">Stadt oder PLZ</label>
+                  <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none z-10" />
                   <input
                     ref={searchInputRef}
@@ -1309,49 +1503,61 @@ export default function MembersPage() {
                       setLocationSearch(value);
                       setShowSuggestions(true);
 
-                      // Reset radius to default when search field is cleared
+                      // Hide GPS suggestion when user starts typing
+                      if (value.length > 0) {
+                        setShowGpsSuggestion(false);
+                      }
+
+                      // Disable radius filter when search field is cleared, but keep coordinates
                       if (value === '') {
                         setFilters(prev => ({
                           ...prev,
                           radiusKm: 100,
                           useRadius: false,
-                          userLatitude: null,
-                          userLongitude: null,
+                          // Keep userLatitude and userLongitude for distance display
                         }));
                       }
                     }}
-                    onFocus={() => setShowSuggestions(true)}
+                    onFocus={handleLocationSearchFocus}
+                    onBlur={handleLocationSearchBlur}
                     placeholder={t('desktopSearchPlaceholder')}
                     className="w-full pl-10 pr-10 py-2 border border-default rounded-lg bg-page-primary text-body focus:outline-none focus:border-primary"
                   />
 
-                  {/* Clear Icon or Location Icon */}
-                  {locationSearch ? (
-                    <button
-                      onClick={handleClearLocationSearch}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-page-secondary rounded transition cursor-pointer z-10"
-                      title={t('clearSearch')}
-                    >
-                      <X className="w-5 h-5 text-muted" />
-                    </button>
-                  ) : !isLoadingLocation ? (
-                    <button
-                      onClick={handleUseCurrentLocation}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
-                      style={{ color: 'var(--color-primary)' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '';
-                      }}
-                      title="Meinen Standort verwenden"
-                    >
-                      <Navigation className="w-5 h-5" />
-                    </button>
-                  ) : (
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
-                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  {/* GPS Location Icon (hidden when GPS suggestion is shown) */}
+                  {!showGpsSuggestion && (
+                    !isLoadingLocation ? (
+                      <button
+                        onClick={handleUseCurrentLocation}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded transition cursor-pointer z-10"
+                        style={{ color: 'var(--color-primary)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '';
+                        }}
+                        title="Meinen Standort verwenden"
+                      >
+                        <Navigation className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5">
+                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )
+                  )}
+
+                  {/* GPS Location Suggestion */}
+                  {showGpsSuggestion && (
+                    <div className="absolute z-[9999] w-full mt-1 bg-page-secondary border border-default rounded-lg shadow-lg">
+                      <button
+                        onClick={handleUseCurrentLocation}
+                        className="w-full text-left px-4 py-3 hover:bg-page-primary transition cursor-pointer flex items-center gap-3"
+                      >
+                        <Navigation className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
+                        <span className="text-body">Aktuellen Standort verwenden</span>
+                      </button>
                     </div>
                   )}
 
@@ -1383,44 +1589,73 @@ export default function MembersPage() {
                       })}
                     </div>
                   )}
+                  </div>
                 </div>
 
                 {/* Radius Field */}
-                <div className="flex items-center gap-2 relative group">
-                  <input
-                    type="number"
-                    value={filters.radiusKm || ''}
-                    onChange={(e) =>
-                      setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })
-                    }
-                    onBlur={() => {
-                      if (filters.radiusKm < 5) {
-                        setFilters({ ...filters, radiusKm: 5 });
-                      } else if (filters.radiusKm > 500) {
-                        setFilters({ ...filters, radiusKm: 500 });
-                      }
-                    }}
-                    min="5"
-                    max="500"
-                    step="5"
-                    disabled={!locationSearch}
-                    className="w-20 px-3 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ colorScheme: 'dark', accentColor: '#71767b' }}
-                    placeholder="km"
-                  />
-                  {!locationSearch && (
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                      <span className="text-sm text-body">{t('radiusTooltip')}</span>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-muted px-1">Radius</label>
+                  <div className="flex items-center gap-2 relative group">
+                    <div className="relative w-24">
+                      {/* Minus Button */}
+                      <button
+                        onClick={handleRadiusDecrement}
+                        disabled={!locationSearch || filters.radiusKm <= 5}
+                        className="absolute left-1.5 top-1/2 transform -translate-y-1/2 p-0.5 text-primary disabled:opacity-30 disabled:cursor-not-allowed transition z-10"
+                        type="button"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Input Field */}
+                      <input
+                        type="number"
+                        value={filters.radiusKm || ''}
+                        onChange={(e) =>
+                          setFilters({ ...filters, radiusKm: parseInt(e.target.value) || 0 })
+                        }
+                        onBlur={() => {
+                          if (filters.radiusKm < 5) {
+                            setFilters({ ...filters, radiusKm: 5 });
+                          } else if (filters.radiusKm > 500) {
+                            setFilters({ ...filters, radiusKm: 500 });
+                          }
+                        }}
+                        min="5"
+                        max="500"
+                        step="5"
+                        disabled={!locationSearch}
+                        className="w-full pl-7 pr-8 py-2 border border-default rounded-lg bg-page-primary text-body text-center focus:outline-none focus:border-primary [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        placeholder="km"
+                      />
+
+                      {/* Plus Button */}
+                      <button
+                        onClick={handleRadiusIncrement}
+                        disabled={!locationSearch || filters.radiusKm >= 500}
+                        className="absolute right-1.5 top-1/2 transform -translate-y-1/2 p-0.5 text-primary disabled:opacity-30 disabled:cursor-not-allowed transition z-10"
+                        type="button"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                  )}
-                  <span className="text-muted text-sm whitespace-nowrap">km</span>
+
+                    {!locationSearch && (
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-page-secondary border border-default rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                        <span className="text-sm text-body">{t('radiusTooltip')}</span>
+                      </div>
+                    )}
+                    <span className="text-muted text-sm whitespace-nowrap">km</span>
+                  </div>
                 </div>
 
                 {/* Spacer to push Sort + View Switcher to the right */}
                 <div className="flex-grow"></div>
 
                 {/* Sort Select */}
-                <CustomSelect
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-muted px-1">Sortierung</label>
+                  <CustomSelect
                   value={sortBy}
                   onChange={(value) => setSortBy(value as SortOption)}
                   icon={<ArrowUpDown className="w-5 h-5" />}
@@ -1437,9 +1672,12 @@ export default function MembersPage() {
                   ]}
                   className="min-w-[220px]"
                 />
+                </div>
 
                 {/* View Switcher (ganz rechts) */}
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-muted px-1">Darstellung</label>
+                  <div className="flex gap-2">
                   <button
                     onClick={() => setGridView('compact')}
                     className={`p-2 rounded-lg border transition cursor-pointer ${
@@ -1462,6 +1700,7 @@ export default function MembersPage() {
                   >
                     <Grid3x3 className="w-4 h-4" />
                   </button>
+                  </div>
                 </div>
             </div>
           </div>

@@ -32,6 +32,7 @@ export default function CustomSelect({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [mounted, setMounted] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const lastScrollYRef = useRef(0);
 
   const selectedOption = options.find((option) => option.value === value);
 
@@ -78,21 +79,35 @@ export default function CustomSelect({
   useEffect(() => {
     if (!isOpen) return;
 
+    // Initialize last scroll position when dropdown opens
+    lastScrollYRef.current = window.scrollY;
+
     const handleScroll = (event: Event) => {
-      // If hovering over dropdown, update position instead of closing
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollYRef.current;
+
+      // Always update position to keep dropdown below the button
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + 8, // no scrollY needed for fixed position
+          left: rect.left,
+          width: rect.width,
+        });
+      }
+
+      // If hovering over dropdown, don't close
       if (isHovering) {
-        if (buttonRef.current) {
-          const rect = buttonRef.current.getBoundingClientRect();
-          setDropdownPosition({
-            top: rect.bottom + 8, // no scrollY needed for fixed position
-            left: rect.left,
-            width: rect.width,
-          });
-        }
+        lastScrollYRef.current = currentScrollY;
         return;
       }
-      // Scrolling outside dropdown - close it
-      setIsOpen(false);
+
+      // Only close if scrolling down, not when scrolling up
+      if (scrollingDown) {
+        setIsOpen(false);
+      }
+
+      lastScrollYRef.current = currentScrollY;
     };
 
     // Listen to scroll events on window and all scrollable containers
