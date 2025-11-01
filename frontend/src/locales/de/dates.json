@@ -1,0 +1,39 @@
+{
+  "title": "Dates",
+  "tabs": {
+    "all": "Alle",
+    "requests": "Anfragen",
+    "upcoming": "Bevorstehend",
+    "past": "Vergangen"
+  },
+  "noDates": "Keine Dates gefunden",
+  "noDatesDescription": "Du hast noch keine Dates. Vereinbare ein Date mit einem Profil.",
+  "noRequests": "Keine Anfragen",
+  "noRequestsDescription": "Du hast keine offenen Date-Anfragen.",
+  "noUpcoming": "Keine bevorstehenden Dates",
+  "noUpcomingDescription": "Du hast keine bestätigten Dates geplant.",
+  "noPast": "Keine vergangenen Dates",
+  "noPastDescription": "Du hast noch keine Dates abgeschlossen.",
+  "browseEscorts": "Escorts durchsuchen",
+  "loading": "Lädt...",
+  "retry": "Erneut versuchen",
+  "status": {
+    "pending": "Ausstehend",
+    "confirmed": "Bestätigt",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgesagt"
+  },
+  "actions": {
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen",
+    "cancel": "Absagen",
+    "viewProfile": "Profil ansehen",
+    "sendMessage": "Nachricht schreiben"
+  },
+  "dateWith": "Date mit",
+  "date": "Datum",
+  "time": "Uhrzeit",
+  "location": "Ort",
+  "duration": "Dauer",
+  "price": "Preis"
+}

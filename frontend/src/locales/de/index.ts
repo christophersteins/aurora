@@ -15,6 +15,7 @@ import videos from './videos.json';
 import premium from './premium.json';
 import settings from './settings.json';
 import bookmarks from './bookmarks.json';
+import dates from './dates.json';
 
 const messages = {
   common,
@@ -33,7 +34,8 @@ const messages = {
   videos,
   premium,
   settings,
-  bookmarks
+  bookmarks,
+  dates
 };
 
 export default messages;

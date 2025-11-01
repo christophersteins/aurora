@@ -1,0 +1,39 @@
+{
+  "title": "Dates",
+  "tabs": {
+    "all": "All",
+    "requests": "Requests",
+    "upcoming": "Upcoming",
+    "past": "Past"
+  },
+  "noDates": "No dates found",
+  "noDatesDescription": "You don't have any dates yet. Schedule a date with a profile.",
+  "noRequests": "No requests",
+  "noRequestsDescription": "You have no pending date requests.",
+  "noUpcoming": "No upcoming dates",
+  "noUpcomingDescription": "You have no confirmed dates scheduled.",
+  "noPast": "No past dates",
+  "noPastDescription": "You haven't completed any dates yet.",
+  "browseEscorts": "Browse Escorts",
+  "loading": "Loading...",
+  "retry": "Retry",
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Cancel",
+    "viewProfile": "View Profile",
+    "sendMessage": "Send Message"
+  },
+  "dateWith": "Date with",
+  "date": "Date",
+  "time": "Time",
+  "location": "Location",
+  "duration": "Duration",
+  "price": "Price"
+}
