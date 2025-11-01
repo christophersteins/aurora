@@ -12,7 +12,7 @@ export const getTypeOrmConfig = (
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_DATABASE'),
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: false, // Disabled due to TypeORM/PostGIS compatibility issue
+    synchronize: true, // Temporarily enabled to create schema
     logging: true,
   };
   
