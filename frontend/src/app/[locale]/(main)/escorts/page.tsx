@@ -1676,7 +1676,6 @@ export default function MembersPage() {
 
                 {/* View Switcher (ganz rechts) */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs text-muted px-1">Darstellung</label>
                   <div className="flex gap-2">
                   <button
                     onClick={() => setGridView('compact')}
