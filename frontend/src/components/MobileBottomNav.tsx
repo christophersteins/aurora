@@ -3,6 +3,7 @@
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
+import { useUIStore } from '@/store/uiStore';
 import { Users, Calendar, Mail, Bell, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -10,6 +11,7 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
   const { isAuthenticated, user, _hasHydrated } = useAuthStore();
   const { totalUnreadCount } = useChatStore();
+  const { mobileMenuOpen } = useUIStore();
   const t = useTranslations('nav');
 
   // Check if we're on the chat page
@@ -28,8 +30,8 @@ export default function MobileBottomNav() {
     }
   };
 
-  // Don't show if not authenticated, not hydrated, or on chat page
-  if (!_hasHydrated || !isAuthenticated || isChatPage) {
+  // Don't show if not authenticated, not hydrated, on chat page, or mobile menu is open
+  if (!_hasHydrated || !isAuthenticated || isChatPage || mobileMenuOpen) {
     return null;
   }
 

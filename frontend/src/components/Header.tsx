@@ -384,14 +384,14 @@ export default function Header() {
       {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden mobile-menu-backdrop"
+          className="fixed inset-0 bg-black/60 z-[10000] md:hidden mobile-menu-backdrop"
           onClick={closeMobileMenu}
         />
       )}
 
       {/* Mobile Menu Slide-in - Same design as Desktop Sidebar */}
       {mobileMenuOpen && (
-        <div className="fixed top-0 right-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-l border-[#2f3336] z-50 md:hidden mobile-menu-enter overflow-y-auto">
+        <div className="fixed top-0 right-0 bottom-0 w-[280px] bg-[#000000]/80 backdrop-blur-md border-l border-[#2f3336] z-[10001] md:hidden mobile-menu-enter overflow-y-auto">
           <div className="flex flex-col h-full py-4 px-3">
             {/* Logo and Close Button */}
             <div className="flex items-center justify-between px-4 mb-8">
