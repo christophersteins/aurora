@@ -1416,8 +1416,11 @@ export default function EscortProfileForm() {
                 </label>
                 <textarea
                   value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  onBlur={debouncedSave}
+                  onChange={(e) => {
+                    const newData = { ...formData, description: e.target.value };
+                    setFormData(newData);
+                    debouncedSave(newData);
+                  }}
                   rows={6}
                   className="w-full lg:flex-1 px-4 py-3 rounded-lg border bg-page-primary text-body border-default focus:outline-none"
                   placeholder="Beschreibe dich selbst..."

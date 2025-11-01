@@ -364,57 +364,27 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Über mich
             </h3>
 
-            <div className="space-y-6">
-              <div>
-                <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
-                  Hallo! Ich bin eine leidenschaftliche und aufgeschlossene Begleiterin, die es liebt,
-                  besondere Momente mit interessanten Menschen zu teilen. Mit meinem charmanten Wesen
-                  und meiner natürlichen Art sorge ich dafür, dass Sie sich von Anfang an wohl fühlen.
+            <div>
+              {escort?.description ? (
+                <p className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-regular)' }}>
+                  {escort.description}
                 </p>
-                <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
-                  Ob ein romantisches Dinner, ein kultureller Abend oder ein entspanntes Treffen -
-                  ich passe mich gerne Ihren Wünschen an. Diskretion und Respekt sind für mich selbstverständlich.
-                </p>
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
-                  Ich freue mich darauf, Sie kennenzulernen und gemeinsam unvergessliche Stunden zu verbringen!
-                </p>
-              </div>
-
-              <div
-                className="p-5 rounded-lg"
-                style={{
-                  background: 'var(--background-secondary)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <h4 className="font-semibold mb-3" style={{ color: 'var(--text-heading)' }}>
-                  Das schätzen meine Kunden
-                </h4>
-                <ul className="space-y-2">
-                  {[
-                    'Professionelles und diskretes Auftreten',
-                    'Gepflegtes und stilvolles Erscheinungsbild',
-                    'Gute Gesprächsführung und Humor',
-                    'Zuverlässigkeit und Pünktlichkeit',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <svg
-                        className="w-5 h-5 flex-shrink-0 mt-0.5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        style={{ color: 'var(--color-primary)' }}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              ) : (
+                <>
+                  <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
+                    Hallo! Ich bin eine leidenschaftliche und aufgeschlossene Begleiterin, die es liebt,
+                    besondere Momente mit interessanten Menschen zu teilen. Mit meinem charmanten Wesen
+                    und meiner natürlichen Art sorge ich dafür, dass Sie sich von Anfang an wohl fühlen.
+                  </p>
+                  <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
+                    Ob ein romantisches Dinner, ein kultureller Abend oder ein entspanntes Treffen -
+                    ich passe mich gerne Ihren Wünschen an. Diskretion und Respekt sind für mich selbstverständlich.
+                  </p>
+                  <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                    Ich freue mich darauf, Sie kennenzulernen und gemeinsam unvergessliche Stunden zu verbringen!
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -518,57 +488,27 @@ export default function ProfileTabs({ escort, initialTab = 'service', onTabChang
               Über mich
             </h3>
 
-            <div className="space-y-6">
-              <div>
-                <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
-                  Hallo! Ich bin eine leidenschaftliche und aufgeschlossene Begleiterin, die es liebt,
-                  besondere Momente mit interessanten Menschen zu teilen. Mit meinem charmanten Wesen
-                  und meiner natürlichen Art sorge ich dafür, dass Sie sich von Anfang an wohl fühlen.
+            <div>
+              {escort?.description ? (
+                <p className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-regular)' }}>
+                  {escort.description}
                 </p>
-                <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
-                  Ob ein romantisches Dinner, ein kultureller Abend oder ein entspanntes Treffen -
-                  ich passe mich gerne Ihren Wünschen an. Diskretion und Respekt sind für mich selbstverständlich.
-                </p>
-                <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
-                  Ich freue mich darauf, Sie kennenzulernen und gemeinsam unvergessliche Stunden zu verbringen!
-                </p>
-              </div>
-
-              <div
-                className="p-5 rounded-lg"
-                style={{
-                  background: 'var(--background-secondary)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <h4 className="font-semibold mb-3" style={{ color: 'var(--text-heading)' }}>
-                  Das schätzen meine Kunden
-                </h4>
-                <ul className="space-y-2">
-                  {[
-                    'Professionelles und diskretes Auftreten',
-                    'Gepflegtes und stilvolles Erscheinungsbild',
-                    'Gute Gesprächsführung und Humor',
-                    'Zuverlässigkeit und Pünktlichkeit',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <svg
-                        className="w-5 h-5 flex-shrink-0 mt-0.5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        style={{ color: 'var(--color-primary)' }}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm" style={{ color: 'var(--text-regular)' }}>
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              ) : (
+                <>
+                  <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
+                    Hallo! Ich bin eine leidenschaftliche und aufgeschlossene Begleiterin, die es liebt,
+                    besondere Momente mit interessanten Menschen zu teilen. Mit meinem charmanten Wesen
+                    und meiner natürlichen Art sorge ich dafür, dass Sie sich von Anfang an wohl fühlen.
+                  </p>
+                  <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--text-regular)' }}>
+                    Ob ein romantisches Dinner, ein kultureller Abend oder ein entspanntes Treffen -
+                    ich passe mich gerne Ihren Wünschen an. Diskretion und Respekt sind für mich selbstverständlich.
+                  </p>
+                  <p className="text-base leading-relaxed" style={{ color: 'var(--text-regular)' }}>
+                    Ich freue mich darauf, Sie kennenzulernen und gemeinsam unvergessliche Stunden zu verbringen!
+                  </p>
+                </>
+              )}
             </div>
           </div>
 

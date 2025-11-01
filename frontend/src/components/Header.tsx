@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
 import { useUIStore } from '@/store/uiStore';
 import { useState, useEffect, useRef } from 'react';
-import { AlignJustify, X, User, Settings, LogOut, Bell, Mail, Home, Users, Building2, Video, Sparkles, LogIn, Bookmark } from 'lucide-react';
+import { AlignJustify, X, User, Settings, LogOut, Bell, Mail, Home, Users, Building2, Video, Sparkles, LogIn, Bookmark, Calendar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import UserMenu from './UserMenu';
@@ -263,6 +263,17 @@ export default function Header() {
                   <span className={`text-xl ${isActive('/nachrichten') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
                 </Link>
                 <Link
+                  href="/dates"
+                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                    isActive('/dates')
+                      ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                      : 'link-primary'
+                  }`}
+                >
+                  <Calendar size={26} className="flex-shrink-0" strokeWidth={isActive('/dates') ? 2.5 : 2} />
+                  <span className={`text-xl ${isActive('/dates') ? 'font-bold' : 'font-medium'}`}>{t('dates')}</span>
+                </Link>
+                <Link
                   href="/bookmarks"
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                     isActive('/bookmarks')
@@ -464,6 +475,19 @@ export default function Header() {
                       )}
                     </div>
                     <span className={`text-xl ${isActive('/nachrichten') ? 'font-bold' : 'font-medium'}`}>{t('messages')}</span>
+                  </Link>
+
+                  <Link
+                    href="/dates"
+                    onClick={closeMobileMenu}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                      isActive('/dates')
+                        ? 'bg-[#e7e9ea]/10 text-[#e7e9ea]'
+                        : 'link-primary'
+                    }`}
+                  >
+                    <Calendar size={26} className="flex-shrink-0" strokeWidth={isActive('/dates') ? 2.5 : 2} />
+                    <span className={`text-xl ${isActive('/dates') ? 'font-bold' : 'font-medium'}`}>{t('dates')}</span>
                   </Link>
 
                   <Link
