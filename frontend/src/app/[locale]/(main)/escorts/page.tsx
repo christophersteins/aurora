@@ -1336,7 +1336,7 @@ export default function MembersPage() {
                       className="p-2 rounded-lg border bg-page-secondary transition-all duration-200 cursor-pointer"
                       style={{
                         borderColor: showMobileSortDropdown ? 'var(--color-primary)' : 'var(--border)',
-                        color: showMobileSortDropdown ? 'var(--color-primary)' : 'var(--text-secondary)',
+                        color: showMobileSortDropdown ? 'var(--text-primary)' : 'var(--text-secondary)',
                       }}
                       onMouseEnter={(e) => {
                         if (!showMobileSortDropdown) {
