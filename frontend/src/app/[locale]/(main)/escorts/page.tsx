@@ -1053,21 +1053,6 @@ export default function MembersPage() {
     setShowMobileSortDropdown(!showMobileSortDropdown);
   };
 
-  // Calculate mobile sort dropdown position
-  const getMobileSortDropdownPosition = () => {
-    if (!mobileSortButtonRef.current) {
-      return { top: 0, left: 0 };
-    }
-
-    const rect = mobileSortButtonRef.current.getBoundingClientRect();
-    const dropdownWidth = 256; // w-64 = 16rem = 256px
-
-    return {
-      top: rect.bottom + 8,
-      left: rect.right - dropdownWidth,
-    };
-  };
-
   // Check if filters are active (excluding location search and radius)
   const hasActiveFilters = () => {
     return (
@@ -1348,29 +1333,37 @@ export default function MembersPage() {
                     <button
                       ref={mobileSortButtonRef}
                       onClick={handleMobileSortToggle}
-                      className={`p-2 rounded-lg border transition-all duration-200 cursor-pointer ${
-                        showMobileSortDropdown
-                          ? 'bg-action-primary border-primary text-primary'
-                          : 'border-default bg-page-secondary text-body hover:border-primary'
-                      }`}
+                      className="p-2 rounded-lg border bg-page-secondary transition-all duration-200 cursor-pointer"
+                      style={{
+                        borderColor: showMobileSortDropdown ? 'var(--color-primary)' : 'var(--border)',
+                        color: showMobileSortDropdown ? 'var(--color-primary)' : 'var(--text-secondary)',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!showMobileSortDropdown) {
+                          e.currentTarget.style.color = 'var(--color-primary)';
+                          e.currentTarget.style.borderColor = 'var(--color-primary)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!showMobileSortDropdown) {
+                          e.currentTarget.style.color = 'var(--text-secondary)';
+                          e.currentTarget.style.borderColor = 'var(--border)';
+                        }
+                      }}
                       title={t('sorting')}
                     >
-                      <ArrowUpDown className={`w-5 h-5 transition-transform duration-300 ${showMobileSortDropdown ? 'rotate-180' : ''}`} />
+                      <ArrowUpDown className="w-5 h-5" />
                     </button>
 
-                    {showMobileSortDropdown && (() => {
-                      const position = getMobileSortDropdownPosition();
-                      return (
-                        <>
-                          <div
-                            ref={mobileSortDropdownRef}
-                            className="fixed w-64 bg-page-secondary border border-default rounded-lg shadow-xl z-[9999] overflow-hidden"
-                            style={{
-                              animation: 'slideDown 0.2s ease-out',
-                              top: `${position.top}px`,
-                              left: `${position.left}px`,
-                            }}
-                          >
+                    {showMobileSortDropdown && (
+                      <>
+                        <div
+                          ref={mobileSortDropdownRef}
+                          className="absolute right-0 top-full mt-2 w-64 bg-page-secondary border border-default rounded-lg shadow-xl z-[9999] overflow-hidden"
+                          style={{
+                            animation: 'slideDown 0.2s ease-out',
+                          }}
+                        >
                             {[
                               { value: 'distance', label: t('sortDistanceAsc') },
                               { value: 'age-desc', label: t('sortAgeDesc') },
@@ -1409,24 +1402,23 @@ export default function MembersPage() {
                                 </button>
                               );
                             })}
-                          </div>
+                        </div>
 
-                          {/* Keyframes for animations */}
-                          <style jsx>{`
-                            @keyframes slideDown {
-                              from {
-                                opacity: 0;
-                                transform: translateY(-8px);
-                              }
-                              to {
-                                opacity: 1;
-                                transform: translateY(0);
-                              }
+                        {/* Keyframes for animations */}
+                        <style jsx>{`
+                          @keyframes slideDown {
+                            from {
+                              opacity: 0;
+                              transform: translateY(-8px);
                             }
-                          `}</style>
-                        </>
-                      );
-                    })()}
+                            to {
+                              opacity: 1;
+                              transform: translateY(0);
+                            }
+                          }
+                        `}</style>
+                      </>
+                    )}
                   </div>
 
                   {/* View Switcher */}
